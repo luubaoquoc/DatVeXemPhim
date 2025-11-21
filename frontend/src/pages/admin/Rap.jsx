@@ -1,0 +1,245 @@
+import React, { useEffect, useState } from "react"
+import { PlusIcon, PencilIcon, Trash2Icon, SearchIcon } from "lucide-react"
+import toast from "react-hot-toast"
+import useApi from "../../hooks/useApi"
+import Pagination from "../../components/admin/Paginnation"
+import DeleteForm from "../../components/admin/DeleteForm"
+
+const Rap = () => {
+  const api = useApi(true)
+
+  const [raps, setRaps] = useState([]);
+  const [showModal, setShowModal] = useState(false)
+  const [editRap, setEditRap] = useState(null)
+  const [formData, setFormData] = useState({
+    tenRap: "",
+    diaChi: "",
+    soDienThoai: "",
+  })
+  const [search, setSearch] = useState("")
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const limit = 10
+
+  // Fetch API
+  const fetchData = async () => {
+    try {
+      const res = await api.get("/rap", {
+        params: { page: currentPage, limit, search }
+      })
+      setRaps(res.data.data)
+      setTotalPages(res.data.totalPages)
+    } catch {
+      toast.error("Không thể tải danh sách phòng!")
+    }
+  }
+
+
+  useEffect(() => {
+    fetchData()
+  }, [currentPage, search])
+
+  // Xử lý thay đổi input
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    setFormData(prev => ({ ...prev, [name]: value }))
+  }
+
+  // Submit Form
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    try {
+      if (editRap) {
+        await api.put(`/rap/${editRap.maRap}`, formData)
+        toast.success("Cập nhật rạp thành công!")
+      } else {
+        await api.post("/rap", formData)
+        toast.success("Thêm rạp thành công!")
+      }
+
+      setShowModal(false)
+      setEditRap(null)
+      setFormData({
+        tenRap: "",
+        diaChi: "",
+        soDienThoai: "",
+      })
+      fetchData()
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Lỗi thao tác!")
+    }
+  }
+
+  // Xóa phòng
+  const handleDelete = async (maRap) => {
+    try {
+      await api.delete(`/rap/${maRap}`)
+      toast.success("Xoá rạp thành công!")
+      fetchData()
+    } catch (err) {
+      console.log(err);
+      toast.error("Xoá thất bại!")
+    }
+  }
+
+
+  // Mở modal thêm/sửa
+  const openModal = (data = null) => {
+    if (data) {
+      setEditRap(data)
+      setFormData({
+        tenRap: data.tenRap || "",
+        diaChi: data.diaChi || "",
+        soDienThoai: data.soDienThoai || ""
+      })
+    } else {
+      setEditRap(null)
+      setFormData({ tenRap: "", diaChi: "", soDienThoai: "" })
+    }
+    setShowModal(true)
+  }
+
+  console.log(raps);
+
+
+  return (
+    <div className="p-6 text-white">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-semibold">Quản lý rạp</h1>
+
+        <button
+          onClick={() => { openModal() }}
+          className="bg-primary text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-primary/80 transition cursor-pointer"
+        >
+          <PlusIcon size={18} /> Thêm rạp
+        </button>
+      </div>
+
+      {/* Search */}
+      <div className="mb-4 border border-primary/30 p-1 w-80 rounded flex items-center">
+        <input
+          type="text"
+          placeholder="Tìm rạp..."
+          className="p-2 rounded bg-black/20 border-none text-white w-full outline-none"
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value)
+            setCurrentPage(1)
+          }}
+        />
+        <SearchIcon className="ml-2 text-gray-400" size={18} />
+      </div>
+
+      {/* Table */}
+      {status === "loading" ? (
+        <p>Đang tải danh sách rạp...</p>
+      ) : (
+        <table className="w-full border-b border-primary/30 rounded-lg text-sm">
+          <thead className="bg-primary/70 text-white">
+            <tr>
+              <th className="p-2">#</th>
+              <th className="p-2 text-left">Tên rạp</th>
+              <th className="p-2 text-left">Địa chỉ</th>
+              <th className="p-2 text-left">Số điện thoại</th>
+              <th className="p-2">Hành động</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {raps?.map((rap, index) => (
+              <tr key={rap.maRap} className="text-center border-b border-primary/30">
+                <td className="p-2">{index + 1}</td>
+                <td className="p-2 font-medium text-left">{rap.tenRap}</td>
+                <td className="p-2 text-left">{rap.diaChi}</td>
+                <td className="p-2 text-left">{rap.soDienThoai}</td>
+
+                <td className="p-2 flex justify-center gap-3">
+                  <button
+                    onClick={() => {
+                      openModal(rap)
+                    }}
+                    className="p-2 text-blue-400 hover:bg-primary/20 rounded cursor-pointer"
+                  >
+                    <PencilIcon size={18} />
+                  </button>
+
+                  <DeleteForm
+                    itemName={rap.tenRap}
+                    onDelete={() => handleDelete(rap.maRap)}
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+      />
+
+      {showModal && (
+        <div className="fixed inset-0 bg-black/70 flex justify-center items-center z-50">
+          <div className="bg-black/80 border border-primary p-6 rounded-lg w-96">
+            <h2 className="text-lg font-semibold mb-4">
+              {editRap ? 'Sửa rạp' : 'Thêm rạp'}
+            </h2>
+            <form onSubmit={handleSubmit}>
+              <div>
+                <label className='block mb-1'>Tên rạp</label>
+                <input
+                  type="text"
+                  name="tenRap"
+                  className="w-full p-2 mb-4 rounded bg-gray-700 border border-gray-600 text-white"
+                  placeholder="Tên rạp..."
+                  value={formData.tenRap}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div>
+                <label className='block mb-1'>Địa chỉ</label>
+                <input
+                  type="text"
+                  name="diaChi"
+                  className="w-full p-2 mb-4 rounded bg-gray-700 border border-gray-600 text-white"
+                  value={formData.diaChi || ""}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div>
+                <label className="block mb-1">Số điện thoại</label>
+                <input
+                  type="text"
+                  name="soDienThoai"
+                  className="w-full p-2 mb-4 rounded bg-gray-700 border border-gray-600 text-white"
+                  value={formData.soDienThoai || ""}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div className="flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  className="px-4 py-2 bg-gray-600 rounded cursor-pointer"
+                >
+                  Hủy
+                </button>
+                <button type="submit" className="px-4 py-2 bg-primary rounded cursor-pointer">
+                  {editRap ? 'Cập nhật' : 'Thêm'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+export default Rap

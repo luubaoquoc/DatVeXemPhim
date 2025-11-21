@@ -1,0 +1,153 @@
+import cloudinary from '../configs/cloudinary.js';
+import TaiKhoan from '../models/TaiKhoan.js';
+import bcrypt from 'bcryptjs';
+import streamifier from 'streamifier'
+
+// GET /api/nguoidung?page=1&limit=20
+export const listUsers = async (req, res) => {
+  try {
+    const page = Math.max(1, Number(req.query.page) || 1);
+    const limit = Math.max(1, Number(req.query.limit) || 20);
+    const offset = (page - 1) * limit;
+
+    const { count, rows } = await TaiKhoan.findAndCountAll({ limit, offset, attributes: { exclude: ['matKhau'] }, order: [['maTaiKhoan', 'ASC']] });
+
+    return res.json({ total: count, page, limit, data: rows });
+  } catch (error) {
+    console.error('listUsers error:', error);
+    return res.status(500).json({ message: 'Lỗi server' });
+  }
+};
+
+// GET /api/nguoidung/:maTaiKhoan
+export const getUser = async (req, res) => {
+  try {
+    const ma = Number(req.params.maTaiKhoan);
+    if (!ma) return res.status(400).json({ message: 'maTaiKhoan không hợp lệ' });
+
+    const user = await TaiKhoan.findByPk(ma, { attributes: { exclude: ['matKhau'] } });
+    if (!user) return res.status(404).json({ message: 'Người dùng không tồn tại' });
+    return res.json(user);
+  } catch (error) {
+    console.error('getUser error:', error);
+    return res.status(500).json({ message: 'Lỗi server' });
+  }
+};
+
+// PUT /api/nguoidung/:maTaiKhoan
+export const updateUser = async (req, res) => {
+  try {
+    const ma = Number(req.params.maTaiKhoan);
+    if (!ma) return res.status(400).json({ message: 'maTaiKhoan không hợp lệ' });
+
+    const user = await TaiKhoan.findByPk(ma);
+    if (!user) return res.status(404).json({ message: 'Người dùng không tồn tại' });
+
+    // chỉ cho sửa các trường sau
+    const { hoTen, email, soDienThoai } = req.body;
+
+    if (soDienThoai && (soDienThoai.length < 10 || soDienThoai.length > 10)) {
+      return res.status(400).json({ message: 'Số điện thoại không hợp lệ' });
+    }
+    const updateData = {};
+    if (hoTen) updateData.hoTen = hoTen;
+    if (email) updateData.email = email;
+    if (soDienThoai) updateData.soDienThoai = soDienThoai;
+
+    await user.update(updateData);
+    const updated = await TaiKhoan.findByPk(ma);
+    return res.json({ message: 'Cập nhật thành công', user: updated });
+  } catch (error) {
+    console.error('updateUser error:', error);
+    return res.status(500).json({ message: 'Lỗi server' });
+  }
+};
+
+// DELETE /api/nguoidung/:maTaiKhoan
+export const deleteUser = async (req, res) => {
+  try {
+    const ma = Number(req.params.maTaiKhoan);
+    if (!ma) return res.status(400).json({ message: 'maTaiKhoan không hợp lệ' });
+
+    const user = await TaiKhoan.findByPk(ma);
+    if (!user) return res.status(404).json({ message: 'Người dùng không tồn tại' });
+
+    await user.destroy();
+    return res.json({ message: 'Xóa người dùng thành công' });
+  } catch (error) {
+    console.error('deleteUser error:', error);
+    return res.status(500).json({ message: 'Lỗi server' });
+  }
+};
+
+export const uploadAvatar = async (req, res) => {
+  try {
+    const ma = Number(req.params.maTaiKhoan);
+    if (!ma) return res.status(400).json({ message: "maTaiKhoan không hợp lệ" });
+
+    const user = await TaiKhoan.findByPk(ma);
+    if (!user) return res.status(404).json({ message: "Người dùng không tồn tại" });
+
+    if (!req.file) {
+      return res.status(400).json({ message: "Vui lòng chọn ảnh" });
+    }
+
+    // Upload Cloudinary
+    const uploadResult = await new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        {
+          folder: "avatars",
+          resource_type: "image",
+        },
+        (error, result) => {
+          if (error) {
+            console.error(' Lỗi upload Cloudinary:', error)
+            return reject(error)
+          }
+          resolve(result)
+        }
+      );
+      streamifier.createReadStream(req.file.buffer).pipe(stream);
+    });
+
+    // update db
+    await user.update({ anhDaiDien: uploadResult.secure_url });
+
+    return res.json({
+      message: "Cập nhật ảnh đại diện thành công",
+      anhDaiDien: uploadResult.secure_url,
+    });
+
+  } catch (error) {
+    console.error("uploadAvatar error:", error);
+    return res.status(500).json({ message: "Lỗi server" });
+  }
+};
+
+// PUT /api/nguoidung/:maTaiKhoan/change-password
+export const changePassword = async (req, res) => {
+  try {
+    const ma = Number(req.params.maTaiKhoan);
+    if (!ma) return res.status(400).json({ message: 'maTaiKhoan không hợp lệ' });
+
+    const { oldPassword, newPassword } = req.body;
+    if (!oldPassword || !newPassword) {
+      return res.status(400).json({ message: 'Vui lòng cung cấp mật khẩu cũ và mật khẩu mới' });
+    }
+    const user = await TaiKhoan.findByPk(ma);
+    if (!user) return res.status(404).json({ message: "Người dùng không tồn tại" });
+
+    const isMatch = await bcrypt.compare(oldPassword, user.matKhau);
+    if (!isMatch) return res.status(400).json({ message: "Mật khẩu hiện tại không đúng" });
+
+    const hashed = await bcrypt.hash(newPassword, 10);
+    await user.update({ matKhau: hashed });
+
+    return res.json({ message: "Đổi mật khẩu thành công" });
+  } catch (error) {
+    console.error("changePassword error:", error);
+    return res.status(500).json({ message: "Lỗi server" });
+  }
+};
+
+
