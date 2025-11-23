@@ -20,7 +20,8 @@ import {
   FileTextIcon,
   BookUserIcon,
   ScanLineIcon,
-  ReceiptTextIcon
+  ReceiptTextIcon,
+  ImagePlus
 } from 'lucide-react'
 import { NavLink } from 'react-router-dom'
 
@@ -64,7 +65,8 @@ const AdminSidebar = () => {
         { name: 'Đạo diễn', path: '/admin/dao-dien', icon: BookUserIcon },
         { name: 'Diễn viên', path: '/admin/dien-vien', icon: AwardIcon },
         { name: 'Thể loại', path: '/admin/the-loai', icon: TagsIcon },
-        { name: 'Đánh giá', path: '/admin/phim/danh-gia', icon: StarIcon }
+        { name: 'Đánh giá', path: '/admin/danh-gia', icon: StarIcon },
+        { name: 'Banner', path: '/admin/banner', icon: ImagePlus }
       ]
     },
     { name: 'Quản lý suất chiếu', path: '/admin/suat-chieu', icon: ClockIcon },

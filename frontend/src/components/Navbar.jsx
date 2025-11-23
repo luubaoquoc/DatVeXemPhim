@@ -9,6 +9,7 @@ const Navbar = () => {
 
   const [isOpen, setIsOpen] = useState(false)
   const [showLogin, setShowLogin] = useState(false)
+  const [openDienAnhDropdown, setOpenDienAnhDropdown] = useState(false)
   const [openDropdown, setOpenDropdown] = useState(false)
   const dispatch = useDispatch()
   const user = useSelector((state) => state.auth.user)
@@ -24,18 +25,51 @@ const Navbar = () => {
         </h1>
       </Link>
 
-      <div className={`max-md:absolute max-md:top-0 max-md:left-0 max-md:font-medium 
+      <div className={`
+      max-md:absolute max-md:top-0 max-md:left-0 max-md:font-medium 
       max-md:text-lg z-50 flex flex-col md:flex-row items-center max-md:justify-center
-      gap-8 min-md:px-8 py-3 max-md:h-screen min-md:rounded-full backdrop-blur bg-black/70
-      md:bg-white/10 md:border border-indigo-500/50 overflow-hidden transition-[width] duration-300
-      ${isOpen ? "max-md:w-full" : "max-md:w-0"}`}>
+      gap-7 min-md:px-8 py-3 max-md:h-screen min-md:rounded-full backdrop-blur bg-black/70
+      md:bg-white/10 md:border-b border-primary overflow-ellipsis transition-[width] duration-300
+      ${isOpen ? "max-md:w-full" : "max-md:hidden"}`}>
+
         <XIcon className='md:hidden absolute top-6 right-6 w-6 h-6 cursor-pointer'
           onClick={() => setIsOpen(!isOpen)} />
 
-        <Link onClick={() => { scrollTo(0, 0); setIsOpen(false) }} to='/'> Trang Chủ</Link>
-        <Link onClick={() => { scrollTo(0, 0); setIsOpen(false) }} to='/phims'> Phim</Link>
-        <Link onClick={() => { scrollTo(0, 0); setIsOpen(false) }} to='/lich-chieu'> Lịch Chiếu</Link>
-        <Link onClick={() => { scrollTo(0, 0); setIsOpen(false) }} to='/rap'> Rạp</Link>
+        <Link onClick={() => { scrollTo(0, 0); setIsOpen(false) }} to='/' className='hover:text-primary'> Trang Chủ</Link>
+        <Link onClick={() => { scrollTo(0, 0); setIsOpen(false) }} to='/phims' className='hover:text-primary'> Phim</Link>
+        <Link onClick={() => { scrollTo(0, 0); setIsOpen(false) }} to='/lich-chieu' className='hover:text-primary'> Lịch Chiếu</Link>
+        <div
+          className="relative group"
+          onClick={() => setOpenDienAnhDropdown(prev => !prev)}
+          onMouseLeave={() => setOpenDienAnhDropdown(false)}
+        >
+          <div className="flex items-center gap-1 cursor-pointer hover:text-primary">
+            <span>Góc Điện Ảnh</span>
+            <ChevronDown className=" w-4 h-4 text-gray-400" />
+          </div>
+
+          <div
+            className={`absolute right-[-70px] mt-2 w-48 bg-black/90 shadow-lg rounded-lg border-b py-2 z-50
+            transition-all duration-200
+            ${openDienAnhDropdown || "group-hover:opacity-100 group-hover:visible"}
+            ${openDienAnhDropdown ? "opacity-100 visible" : "opacity-0 invisible"}
+          `}
+          >
+            <Link to="/dao-dien" className="flex px-4 py-2 text-sm text-gray-300 hover:bg-primary/20 hover:border-l border-primary">
+              Đạo Diễn
+            </Link>
+
+            <Link to="/dien-vien" className="flex px-4 py-2 text-sm text-gray-300 hover:bg-primary/20 hover:border-l border-primary">
+              Diễn Viên
+            </Link>
+
+            <Link to="/the-loai" className="flex px-4 py-2 text-sm text-gray-300 hover:bg-primary/20 hover:border-l border-primary">
+              Thể Loại
+            </Link>
+          </div>
+        </div>
+
+        <Link onClick={() => { scrollTo(0, 0); setIsOpen(false) }} to='/rap' className='hover:text-primary'> Rạp</Link>
       </div>
 
       <div className='flex items-center gap-8'>
@@ -63,7 +97,7 @@ const Navbar = () => {
             </div>
 
             {/* Dropdown */}
-            <div className={` absolute right-[-30px] mt-3 w-48 bg-black/70 shadow-lg rounded-lg border py-2 z-50
+            <div className={` absolute right-[-30px] mt-3 w-48 bg-black/90 shadow-lg rounded-lg border-b py-2 z-50
               transition-all duration-200
             ${openDropdown || "group-hover:opacity-100 group-hover:visible"}
             ${openDropdown ? "opacity-100 visible" : "opacity-0 invisible"}
@@ -71,7 +105,7 @@ const Navbar = () => {
             >
               <Link
                 to="/trang-ca-nhan"
-                className="flex px-4 py-2 text-sm gap-2 text-gray-300 hover:bg-gray-800"
+                className="flex px-4 py-2 text-sm gap-2 text-gray-300 hover:bg-primary/20 hover:border-l border-primary"
               >
                 <UserIcon size={18} />
                 <span>Trang cá nhân</span>
@@ -79,7 +113,7 @@ const Navbar = () => {
 
               <Link
                 to="/lich-su-dat-ve"
-                className="flex items-center px-4 py-2 gap-2 text-sm text-gray-300 hover:bg-gray-800"
+                className="flex items-center px-4 py-2 gap-2 text-sm text-gray-300 hover:bg-primary/20 hover:border-l border-primary"
               >
                 <HistoryIcon size={18} />
                 <span>Lịch sử đặt vé</span>
@@ -87,7 +121,7 @@ const Navbar = () => {
 
               <Link
                 to="/phim-ua-thich"
-                className="flex items-center px-4 py-2 gap-2 text-sm text-gray-300 hover:bg-gray-800"
+                className="flex items-center px-4 py-2 gap-2 text-sm text-gray-300 hover:bg-primary/20 hover:border-l border-primary"
               >
                 <HeartIcon size={18} />
                 <span>Phim yêu thích</span>
@@ -95,7 +129,7 @@ const Navbar = () => {
 
               <button
                 onClick={() => dispatch(logout())}
-                className="flex w-full text-left gap-2 px-4 py-2 text-sm text-red-400 hover:bg-gray-800"
+                className="flex w-full text-left gap-2 px-4 py-2 text-sm text-red-400 hover:bg-primary/20 hover:border-l border-primary cursor-pointer"
               >
                 <LogOutIcon size={18} />
                 <span>Đăng xuất</span>

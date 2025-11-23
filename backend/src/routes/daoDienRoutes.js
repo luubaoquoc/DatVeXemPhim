@@ -9,7 +9,7 @@ import { authenticateToken, isAdmin } from '../middleware/authMiddleware.js'
 
 const router = express.Router()
 
-router.get('/', authenticateToken, isAdmin, getAllDaoDien)
+router.get('/', getAllDaoDien)
 router.post('/', authenticateToken, isAdmin, createDaoDien)
 router.put('/:maDaoDien', authenticateToken, isAdmin, updateDaoDien)
 router.delete('/:maDaoDien', authenticateToken, isAdmin, deleteDaoDien)

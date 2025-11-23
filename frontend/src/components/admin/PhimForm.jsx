@@ -4,6 +4,8 @@ import toast from 'react-hot-toast'
 import useApi from '../../hooks/useApi'
 
 const PhimForm = ({ onSubmit, onClose, editPhim }) => {
+
+  const api = useApi(true);
   const [formData, setFormData] = useState({
     tenPhim: '',
     moTa: '',
@@ -23,8 +25,9 @@ const PhimForm = ({ onSubmit, onClose, editPhim }) => {
   const [daoDiens, setDaoDiens] = useState([]);
   const [dienViens, setDienViens] = useState([]);
   const [theLoais, setTheLoais] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const api = useApi(true);
+
 
   // Load danh mục
   useEffect(() => {
@@ -97,6 +100,7 @@ const PhimForm = ({ onSubmit, onClose, editPhim }) => {
   // Gửi form
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true)
 
     try {
       const data = new FormData();
@@ -122,6 +126,8 @@ const PhimForm = ({ onSubmit, onClose, editPhim }) => {
     } catch (err) {
       console.error(err);
       toast.error('Lỗi khi gửi dữ liệu');
+    } finally {
+      setLoading(false)
     }
   };
 
@@ -328,7 +334,6 @@ const PhimForm = ({ onSubmit, onClose, editPhim }) => {
             </div>
           </div>
 
-
           {/* Trailer */}
           <div>
             <label>Trailer</label>
@@ -342,8 +347,6 @@ const PhimForm = ({ onSubmit, onClose, editPhim }) => {
             />
           </div>
 
-
-
           {/* Buttons */}
           <div className="flex justify-end gap-2 mt-4">
             <button
@@ -355,12 +358,20 @@ const PhimForm = ({ onSubmit, onClose, editPhim }) => {
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-primary rounded hover:bg-primary/80 cursor-pointer"
+              disabled={loading}
+              className={`px-4 py-2 rounded flex items-center gap-2 cursor-pointer
+              ${loading ? 'bg-primary/50 cursor-not-allowed' : 'bg-primary hover:bg-primary/80'}`}
             >
-              {editPhim ? 'Lưu thay đổi' : 'Thêm phim'}
+              {loading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Đang xử lý...
+                </>
+              ) : (
+                editPhim ? 'Cập nhật' : 'Thêm phim'
+              )}
             </button>
           </div>
-
         </form>
 
       </div>

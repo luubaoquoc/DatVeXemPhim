@@ -14,6 +14,7 @@ import SuatChieu from './SuatChieu.js';
 import Rap from './Rap.js';
 import PhongChieu from './PhongChieu.js';
 import Ghe from './Ghe.js';
+import Phim_UaThich from './Phim_UaThich.js';
 
 
 // --- THIẾT LẬP MỐI QUAN HỆ ---
@@ -36,6 +37,10 @@ Phim.belongsTo(DaoDien, { foreignKey: 'maDaoDien', as: 'daoDien' });
 // Phim <-> TheLoai (N - M) via Phim_TheLoai
 Phim.belongsToMany(TheLoai, { through: Phim_TheLoai, foreignKey: 'maPhim', otherKey: 'maTheLoai', as: 'theLoais' });
 TheLoai.belongsToMany(Phim, { through: Phim_TheLoai, foreignKey: 'maTheLoai', otherKey: 'maPhim', as: 'phims' });
+
+// Phim <-> TaiKhoan (N - M) via Phim_UaThich (liked movies)
+Phim.belongsToMany(TaiKhoan, { through: Phim_UaThich, foreignKey: 'maPhim', otherKey: 'maTaiKhoan', as: 'likedBy' });
+TaiKhoan.belongsToMany(Phim, { through: Phim_UaThich, foreignKey: 'maTaiKhoan', otherKey: 'maPhim', as: 'likedPhims' });
 
 // DanhGia relations
 TaiKhoan.hasMany(DanhGia, { foreignKey: 'maTaiKhoan', as: 'danhGias' });
@@ -92,4 +97,5 @@ export {
   Rap,
   PhongChieu,
   Ghe,
+  Phim_UaThich,
 };

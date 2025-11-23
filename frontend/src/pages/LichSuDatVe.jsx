@@ -36,7 +36,7 @@ const LichSuDatVe = () => {
   }, [])
 
   return !isLoading ? (
-    <div className='relative my-40 mb-60 md:px-16 lg:px-40 xl:px-44 overflow-hidden min-h-[80vh]'>
+    <div className='relative my-40 mb-20 md:px-16 lg:px-40 xl:px-44 overflow-hidden min-h-screen'>
       <div className="flex flex-col md:flex-row max-md:px-10">
         <div className="flex-1">
           <ProfileSidebar user={user} dispatch={dispatch} logout={logout} />
@@ -116,7 +116,7 @@ const LichSuDatVe = () => {
       </div>
     </div>
   ) : (
-    <Loading />
+    <Loading height="100vh" />
   )
 }
 

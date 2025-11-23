@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import MoviesCard from '../components/MoviesCard'
 import BlurCircle from '../components/BlurCircle'
 import { fetchPhims, selectAllPhims } from '../redux/features/phimSlice'
+import Loading from '../components/Loading'
 
 const Phims = () => {
   const dispatch = useDispatch()
@@ -17,11 +18,7 @@ const Phims = () => {
       dispatch(fetchPhims({ page: 1, limit: 20, search: '' }))
     }
   }, [dispatch, status, movies.length])
-  if (status === 'loading') return (
-    <div className='flex items-center justify-center h-64'>
-      <p className='text-gray-400'>Đang tải phim...</p>
-    </div>
-  )
+  if (status === 'loading') return <Loading height="100vh" />
 
   if (status === 'failed') return (
     <div className='flex flex-col items-center justify-center h-64'>
@@ -57,6 +54,7 @@ const Phims = () => {
         >
           Phim đang chiếu
         </button>
+        <span className='text-2xl pt-2'>|</span>
         <button
           onClick={() => setActiveTab('sapChieu')}
           className={`py-2 text-2xl font-medium transition cursor-pointer ${activeTab === 'sapChieu'

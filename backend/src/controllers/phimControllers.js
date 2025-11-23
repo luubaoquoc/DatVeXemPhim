@@ -1,5 +1,5 @@
 import { Op } from 'sequelize';
-import { Phim, DanhGia, TheLoai, DienVien, DaoDien } from '../models/index.js';
+import { Phim, DanhGia, TheLoai, DienVien, DaoDien, TaiKhoan, Phim_UaThich } from '../models/index.js';
 import cloudinary from '../configs/cloudinary.js';
 import streamifier from 'streamifier'
 
@@ -115,6 +115,9 @@ export const createPhim = async (req, res) => {
           {
             folder: 'posters',
             resource_type: 'image',
+            width: 500,
+            height: 750,
+            crop: "fill",
             timeout: 120000 // 2 phút
           },
           (error, result) => {
@@ -250,5 +253,75 @@ export const deletePhim = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Lỗi server khi xóa phim' });
+  }
+};
+
+// POST /api/phim/:maPhim/like  - like a movie
+export const likePhim = async (req, res) => {
+  try {
+    const maPhim = parseInt(req.params.maPhim);
+    const maTaiKhoan = req.user?.maTaiKhoan;
+    if (!maTaiKhoan) return res.status(401).json({ message: 'Unauthorized' });
+
+    const phim = await Phim.findByPk(maPhim);
+    if (!phim) return res.status(404).json({ message: 'Phim không tồn tại' });
+
+    const exists = await Phim_UaThich.findOne({ where: { maPhim, maTaiKhoan } });
+    if (exists) return res.status(400).json({ message: 'Đã thích phim này' });
+
+    await Phim_UaThich.create({ maPhim, maTaiKhoan });
+    return res.json({ message: 'Thích phim thành công' });
+  } catch (err) {
+    console.error('likePhim error:', err);
+    return res.status(500).json({ message: 'Lỗi server' });
+  }
+};
+
+// DELETE /api/phim/:maPhim/like  - unlike a movie
+export const unlikePhim = async (req, res) => {
+  try {
+    const maPhim = parseInt(req.params.maPhim);
+    const maTaiKhoan = req.user?.maTaiKhoan;
+    if (!maTaiKhoan) return res.status(401).json({ message: 'Unauthorized' });
+
+    const record = await Phim_UaThich.findOne({ where: { maPhim, maTaiKhoan } });
+    if (!record) return res.status(404).json({ message: 'Chưa thích phim này' });
+
+    await record.destroy();
+    return res.json({ message: 'Bỏ thích phim thành công' });
+  } catch (err) {
+    console.error('unlikePhim error:', err);
+    return res.status(500).json({ message: 'Lỗi server' });
+  }
+};
+
+// GET /api/phim/liked  - get current user's liked movies
+export const getLikedPhims = async (req, res) => {
+  try {
+    const maTaiKhoan = req.user?.maTaiKhoan;
+    if (!maTaiKhoan) return res.status(401).json({ message: 'Unauthorized' });
+
+    const user = await TaiKhoan.findByPk(maTaiKhoan, {
+      include: [
+        {
+          model: Phim,
+          as: 'likedPhims',
+          through: { attributes: ['ngayThich'] },
+          include: [
+            {
+              model: TheLoai,
+              as: 'theLoais',
+              through: { attributes: [] }
+            }
+          ]
+        }]
+    });
+    if (!user) return res.status(404).json({ message: 'Người dùng không tồn tại' });
+
+    // trả về danh sách phim
+    return res.json({ data: user.likedPhims || [] });
+  } catch (err) {
+    console.error('getLikedPhims error:', err);
+    return res.status(500).json({ message: 'Lỗi server' });
   }
 };

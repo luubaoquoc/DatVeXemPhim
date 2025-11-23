@@ -70,6 +70,7 @@ const FeatureSection = () => {
         >
           Phim đang chiếu
         </button>
+        <span className='text-2xl pt-2'>|</span>
         <button
           onClick={() => setActiveTab('sapChieu')}
           className={`py-2 text-2xl font-medium transition cursor-pointer ${activeTab === 'sapChieu'

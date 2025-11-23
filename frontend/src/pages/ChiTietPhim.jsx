@@ -11,10 +11,12 @@ import SuatChieu from '../components/SuatChieu.jsx'
 import { formatDate } from '../lib/dateFormat.js'
 import TrailerModal from '../components/TrailerModal.jsx'
 import useApi from '../hooks/useApi.js'
+import toast from 'react-hot-toast'
 
 const ChiTietPhim = () => {
   const { maPhim } = useParams()
-  const api = useApi()
+  const publicApi = useApi(false)
+  const api = useApi(true)
   const dispatch = useDispatch()
   const movie = useSelector((state) => selectPhimBymaPhim(state, maPhim))
   const allMovies = useSelector(state => state.phim.items || [])
@@ -23,7 +25,8 @@ const ChiTietPhim = () => {
   const [selectedDate, setSelectedDate] = useState(null)
   const [showTrailer, setShowTrailer] = useState(false)
   const [hasFetched, setHasFetched] = useState(false)
-  const navigatt = useNavigate()
+  const [liked, setLiked] = useState(false)
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (!hasFetched) {
@@ -35,6 +38,20 @@ const ChiTietPhim = () => {
     }
   }, [dispatch, maPhim, allMovies.length, hasFetched])
 
+
+  useEffect(() => {
+    const checkLiked = async () => {
+      try {
+        const res = await api.get('/phim/liked')
+        const likedList = res.data?.data || []
+        setLiked(likedList.some(p => p.maPhim === Number(maPhim)))
+      } catch (err) {
+        console.error("Lỗi khi kiểm tra phim đã thích", err)
+      }
+    }
+
+    checkLiked()
+  }, [maPhim])
 
 
   // fetch available dates for this movie from suatchieu API
@@ -52,7 +69,7 @@ const ChiTietPhim = () => {
       if (!resolvedMaPhim) return setDateTimeMap({})
 
       try {
-        const res = await api.get('/suatchieu', { params: { maPhim: resolvedMaPhim, page: 1, limit: 200 } })
+        const res = await publicApi.get('/suatchieu', { params: { maPhim: resolvedMaPhim, page: 1, limit: 200 } })
         const rows = res.data?.data || res.data || []
         const map = {}
         const toLocalDate = (iso) => {
@@ -128,6 +145,23 @@ const ChiTietPhim = () => {
   const runtime = movie.thoiLuong || movie.runtime || 0
   const releaseYear = formatDate(movie.ngayCongChieu)
 
+  const toggleLike = async () => {
+    try {
+      if (liked) {
+        const res = await api.delete(`/phim/${maPhim}/like`)
+        toast.success(res.data?.message || 'Đã bỏ thích phim')
+        setLiked(false)
+      } else {
+        const res = await api.post(`/phim/${maPhim}/like`)
+        toast.success(res.data?.message || 'Đã thích phim')
+        setLiked(true)
+      }
+    } catch (err) {
+      console.error("Lỗi khi like/unlike", err)
+    }
+  }
+
+
   return (
     <div className="px-6 md:px-16 lg:px-40 pt-30 md:pt-50">
       <div className="flex flex-col lg:flex-row gap-10 max-w-7xl mx-auto">
@@ -143,7 +177,7 @@ const ChiTietPhim = () => {
             />
             <div className="relative flex flex-col gap-3 mt-6">
               <BlurCircle top="-100px" left="-100px" />
-              <h1 className="text-4xl font-semibold max-w-96 text-balance">{movie.tenPhim}</h1>
+              <h1 className="text-4xl font-semibold text-balance">{movie.tenPhim}</h1>
               <p className="flex gap-4">
                 <span className="flex items-center gap-1 text-gray-400">
                   <Clock className="size-4 text-primary" /> {runtime} phút
@@ -153,6 +187,8 @@ const ChiTietPhim = () => {
                 </span>
               </p>
 
+              <p className='text-sm text-white font-bold border bg-gray-700 border-primary rounded-md px-2 py-1 w-9 text-center'>{movie.phanLoai}</p>
+
               <div className="flex items-center gap-2 text-gray-400 cursor-pointer hover:text-primary transition">
                 <StarIcon className="size-5 text-primary fill-primary" />
                 {movie.rating}
@@ -160,11 +196,11 @@ const ChiTietPhim = () => {
               </div>
 
               <p className="text-gray-400">
-                Thể loại:{" "}
+                <span className='text-primary/80'>Thể loại:{" "}</span>
                 {genres.map((g, idx) => (
                   <span
                     key={idx}
-                    className="inline-block mx-2 border px-2 py-1 text-xs bg-gray-800 rounded-md text-white/75"
+                    className="inline-block mx-2 border border-primary px-2 py-1 text-xs bg-gray-800 rounded-md text-white/75"
                   >
                     {g.tenTheLoai}
                   </span>
@@ -172,18 +208,18 @@ const ChiTietPhim = () => {
               </p>
 
               <p className="text-gray-400">
-                Đạo diễn:{" "}
-                <span className="mx-2 border px-2 py-1 text-xs bg-gray-800 rounded-md text-white/75">
+                <span className='text-primary/80'>Đạo diễn:{" "}</span>
+                <span className="mx-2 border border-primary px-2 py-1 text-xs bg-gray-800 rounded-md text-white/75">
                   {movie.daoDien?.tenDaoDien}
                 </span>
               </p>
 
-              <p className="text-gray-400">
-                Diễn viên:{" "}
+              <p className="text-gray-400 flex flex-wrap gap-y-2">
+                <span className='text-primary/80'>Diễn viên:{" "}</span>
                 {movie.dienViens?.map((dv, idx) => (
                   <span
                     key={idx}
-                    className="inline-block mx-2 border px-2 py-1 text-xs bg-gray-800 rounded-md text-white/75"
+                    className="inline-block mx-2 border px-2 py-1 text-xs bg-gray-800 rounded-md text-white/75 border-primary"
                   >
                     {dv.tenDienVien}
                   </span>
@@ -202,13 +238,21 @@ const ChiTietPhim = () => {
                   onClick={() => {
                     document.getElementById('dateSelect')?.scrollIntoView({ behavior: 'smooth' })
                   }}
-                  className="px-10 py-3 text-sm bg-primary hover:bg-primary-dull transition rounded-md font-medium active:scale-95 cursor-pointer"
+                  className="px-10 py-3 text-sm bg-primary/80 hover:bg-primary-dull transition rounded-md font-medium active:scale-95 cursor-pointer"
                 >
                   Mua vé
                 </button>
-                <button className="bg-gray-700 p-2.5 rounded-full transition active:scale-95 cursor-pointer">
-                  <Heart className="size-5" />
+                <button
+                  onClick={toggleLike}
+                  className={`p-2.5 rounded-full transition active:scale-95 cursor-pointer
+    ${liked ? "bg-red-600" : "bg-gray-700"}`}
+                >
+                  <Heart
+                    className={`size-5 transition
+      ${liked ? "text-red-400 fill-red-400" : ""}`}
+                  />
                 </button>
+
               </div>
             </div>
           </div>
@@ -248,7 +292,7 @@ const ChiTietPhim = () => {
               )}
           </div>
           <div className='flex justify-center mt-5'>
-            <button onClick={() => { navigatt('/phims'); scrollTo(0, 0) }}
+            <button onClick={() => { navigate('/phims'); scrollTo(0, 0) }}
               className=' flex px-10 py-3 border border-primary hover:bg-primary-dull transition rounded-md
           font-medium cursor-pointer'>
               Xem thêm

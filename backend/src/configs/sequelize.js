@@ -10,7 +10,6 @@ const sequelize = new Sequelize(process.env.MYSQL_DATABASE || 'GoCinema', proces
 
   timezone: '+07:00', // Lưu & đọc theo giờ VN (GMT+7)
   dialectOptions: {
-    useUTC: false, // Không ép dùng UTC
     dateStrings: true, // Trả về chuỗi thay vì Date object
     typeCast: function (field, next) {
       // Giúp MySQL đọc đúng DATETIME / TIMESTAMP

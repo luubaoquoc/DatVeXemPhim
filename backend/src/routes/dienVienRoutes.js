@@ -9,7 +9,7 @@ import { authenticateToken, isAdmin } from '../middleware/authMiddleware.js'
 
 const router = express.Router()
 
-router.get('/', authenticateToken, isAdmin, getAllDienVien)
+router.get('/', getAllDienVien)
 router.post('/', authenticateToken, isAdmin, createDienVien)
 router.put('/:maDienVien', authenticateToken, isAdmin, updateDienVien)
 router.delete('/:maDienVien', authenticateToken, isAdmin, deleteDienVien)

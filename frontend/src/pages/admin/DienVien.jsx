@@ -21,6 +21,8 @@ const DienVien = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const limit = 10;
+  const [loading, setLoading] = useState(false);
+
 
 
 
@@ -51,6 +53,7 @@ const DienVien = () => {
   // Gửi form thêm/sửa
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setLoading(true);
     try {
 
       if (editItem) {
@@ -67,6 +70,8 @@ const DienVien = () => {
       fetchData()
     } catch (error) {
       toast.error(error.response?.data?.message || "Lỗi thao tác!")
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -243,9 +248,23 @@ const DienVien = () => {
                 >
                   Hủy
                 </button>
-                <button type="submit" className="px-4 py-2 bg-primary rounded cursor-pointer">
-                  {editItem ? 'Cập nhật' : 'Thêm'}
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className={`px-4 py-2 rounded cursor-pointer flex items-center gap-2
+    ${loading ? 'bg-primary/50 cursor-not-allowed' : 'bg-primary'}
+  `}
+                >
+                  {loading ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Đang xử lý...
+                    </>
+                  ) : (
+                    editItem ? 'Cập nhật' : 'Thêm'
+                  )}
                 </button>
+
               </div>
             </form>
           </div>

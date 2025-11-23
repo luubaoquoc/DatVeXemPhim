@@ -1,49 +1,60 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-
-const banners = [
-  {
-    id: 1,
-    image: '/cuc-vang-cua-ngoai.jpg',
-
-  },
-  {
-    id: 2,
-    image: '/teeyod.jpg',
-
-  },
-  {
-    id: 3,
-    image: '/nha-ma-xo.jpg',
-
-  },
-]
+import useApi from '../hooks/useApi'
 
 const HeroSection = () => {
+  const api = useApi()
   const [current, setCurrent] = useState(0)
+  const [banners, setBanners] = useState([])
 
-  // Tự động chuyển slide mỗi 5 giây
+  // Fetch banner
+  const fetchBanners = async () => {
+    try {
+      const response = await api.get('/anhbanner')
+      setBanners(response.data || [])
+    } catch (error) {
+      console.error('Lỗi tải ảnh banner:', error)
+    }
+  }
+
   useEffect(() => {
+    fetchBanners()
+  }, [])
+
+  // Auto slide — CHỈ chạy khi có banner
+  useEffect(() => {
+    if (banners.length === 0) return
+
     const timer = setInterval(() => {
       setCurrent((prev) => (prev + 1) % banners.length)
     }, 5000)
+
     return () => clearInterval(timer)
-  }, [])
+  }, [banners.length])
 
-  const nextSlide = useCallback(() => {
-    setCurrent((prev) => (prev + 1) % banners.length)
-  }, [])
+  const nextSlide = () => {
+    if (banners.length > 0) {
+      setCurrent((prev) => (prev + 1) % banners.length)
+    }
+  }
 
-  const prevSlide = useCallback(() => {
-    setCurrent((prev) => (prev - 1 + banners.length) % banners.length)
-  }, [])
+  const prevSlide = () => {
+    if (banners.length > 0) {
+      setCurrent((prev) => (prev - 1 + banners.length) % banners.length)
+    }
+  }
+
+  // Nếu chưa có dữ liệu → show skeleton hoặc empty
+  if (banners.length === 0) {
+    return <div className="h-[70vh] flex items-center justify-center text-gray-400">Đang tải banner...</div>
+  }
 
   const active = banners[current]
 
   return (
     <div className="relative h-[70%] w-full mt-[7rem] overflow-hidden">
       <img
-        src={active.image}
+        src={active?.anh}
         className="w-full h-full object-contain transition-all duration-500"
         alt="banner"
       />
@@ -55,6 +66,7 @@ const HeroSection = () => {
       >
         <ChevronLeft className="w-10 h-10" />
       </button>
+
       <button
         onClick={nextSlide}
         className="absolute right-2 top-1/2 -translate-y-1/2 text-white/50 hover:text-white z-20 cursor-pointer"
@@ -62,17 +74,15 @@ const HeroSection = () => {
         <ChevronRight className="w-10 h-10" />
       </button>
 
-      {/* Dấu chấm điều hướng */}
+      {/* Dots */}
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-20">
         {banners.map((_, index) => (
           <div
             key={index}
             onClick={() => setCurrent(index)}
-            className={`w-3 h-3 rounded-full cursor-pointer transition ${index === current
-              ? 'bg-primary scale-125'
-              : 'bg-white/50 hover:bg-white/80'
+            className={`w-3 h-3 rounded-full cursor-pointer transition ${index === current ? 'bg-primary scale-125' : 'bg-white/50'
               }`}
-          />
+          ></div>
         ))}
       </div>
     </div>
