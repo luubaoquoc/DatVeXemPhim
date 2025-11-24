@@ -21,6 +21,8 @@ export const fetchPhimBymaPhim = createAsyncThunk('phim/fetchPhimBymaPhim', asyn
   }
 })
 
+
+
 const phimSlice = createSlice({
   name: 'phim',
   initialState: {
@@ -29,6 +31,7 @@ const phimSlice = createSlice({
     totalPages: 1,
     totalItems: 0,
     status: 'idle',
+    currentStatus: 'idle',
     error: null,
   },
   reducers: {},
@@ -50,32 +53,23 @@ const phimSlice = createSlice({
       })
 
       .addCase(fetchPhimBymaPhim.pending, (state) => {
-        state.status = 'loading'
-        state.error = null
+        state.currentStatus = 'loading'
       })
       .addCase(fetchPhimBymaPhim.fulfilled, (state, action) => {
-        state.status = 'succeeded'
+        state.currentStatus = 'succeeded'
         state.current = action.payload
-
       })
       .addCase(fetchPhimBymaPhim.rejected, (state, action) => {
-        state.status = 'failed'
-        state.error = action.payload || action.error.message
+        state.currentStatus = 'failed'
+        state.error = action.payload
       })
+
+
   }
 })
 
 export const selectAllPhims = (state) => state.phim.items
 
-// When selecting a phim by id, prefer the item from the list; fall back to
-// `current` (the single movie loaded by the detail page) if not present in
-// the list. This avoids losing list data when user reloads on detail.
-export const selectPhimBymaPhim = (state, maPhim) => {
-  const fromList = state.phim.items.find(m => String(m.maPhim) === String(maPhim) || String(m._maPhim) === String(maPhim))
-  if (fromList) return fromList
-  const cur = state.phim.current
-  if (cur && (String(cur.maPhim) === String(maPhim) || String(cur._maPhim) === String(maPhim))) return cur
-  return undefined
-}
+
 
 export default phimSlice.reducer

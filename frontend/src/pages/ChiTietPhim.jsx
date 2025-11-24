@@ -6,40 +6,48 @@ import DateSelect from '../components/DateSelect'
 import MoviesCard from '../components/MoviesCard'
 import Loading from '../components/Loading'
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchPhimBymaPhim, fetchPhims, selectPhimBymaPhim } from '../redux/features/phimSlice'
+import { fetchPhimBymaPhim, fetchPhims } from '../redux/features/phimSlice'
 import SuatChieu from '../components/SuatChieu.jsx'
 import { formatDate } from '../lib/dateFormat.js'
 import TrailerModal from '../components/TrailerModal.jsx'
 import useApi from '../hooks/useApi.js'
 import toast from 'react-hot-toast'
+import DanhGiaModal from '../components/DanhGiaForm.jsx'
+import Dangnhap from '../components/Dangnhap.jsx'
 
 const ChiTietPhim = () => {
   const { maPhim } = useParams()
   const publicApi = useApi(false)
   const api = useApi(true)
+  const navigate = useNavigate()
   const dispatch = useDispatch()
-  const movie = useSelector((state) => selectPhimBymaPhim(state, maPhim))
+  const user = useSelector(state => state.auth.user)
+  const movie = useSelector((state) => state.phim.current)
   const allMovies = useSelector(state => state.phim.items || [])
-  const status = useSelector((state) => state.phim.status)
+  const currentStatus = useSelector((state) => state.phim.currentStatus)
   const [dateTimeMap, setDateTimeMap] = useState({})
   const [selectedDate, setSelectedDate] = useState(null)
   const [showTrailer, setShowTrailer] = useState(false)
-  const [hasFetched, setHasFetched] = useState(false)
   const [liked, setLiked] = useState(false)
-  const navigate = useNavigate()
+  const [showDanhGia, setShowDanhGia] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false)
+
 
   useEffect(() => {
-    if (!hasFetched) {
-      dispatch(fetchPhimBymaPhim(maPhim))
-      if (!allMovies || allMovies.length === 0) {
-        dispatch(fetchPhims())
-      }
-      setHasFetched(true)
+    dispatch(fetchPhims());
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(fetchPhimBymaPhim(maPhim));
+  }, [dispatch, maPhim]);
+
+
+
+  useEffect(() => {
+    if (!user) {
+      setLiked(false)
+      return
     }
-  }, [dispatch, maPhim, allMovies.length, hasFetched])
-
-
-  useEffect(() => {
     const checkLiked = async () => {
       try {
         const res = await api.get('/phim/liked')
@@ -130,7 +138,7 @@ const ChiTietPhim = () => {
 
 
 
-  if (!movie || status === 'loading') return <Loading />
+  if (!movie || currentStatus === 'loading') return <Loading />
 
   console.log(movie);
 
@@ -146,6 +154,11 @@ const ChiTietPhim = () => {
   const releaseYear = formatDate(movie.ngayCongChieu)
 
   const toggleLike = async () => {
+    if (!user) {
+      setShowLoginModal(true)  // mở modal đăng nhập
+      return
+    }
+
     try {
       if (liked) {
         const res = await api.delete(`/phim/${maPhim}/like`)
@@ -160,6 +173,7 @@ const ChiTietPhim = () => {
       console.error("Lỗi khi like/unlike", err)
     }
   }
+
 
 
   return (
@@ -187,13 +201,14 @@ const ChiTietPhim = () => {
                 </span>
               </p>
 
-              <p className='text-sm text-white font-bold border bg-gray-700 border-primary rounded-md px-2 py-1 w-9 text-center'>{movie.phanLoai}</p>
-
-              <div className="flex items-center gap-2 text-gray-400 cursor-pointer hover:text-primary transition">
+              <div onClick={() => setShowDanhGia(true)}
+                className="flex items-center gap-2 text-gray-400 cursor-pointer hover:text-primary transition">
                 <StarIcon className="size-5 text-primary fill-primary" />
                 {movie.rating}
                 <span className="text-xs">({movie?.danhGias?.length || 0} lượt đánh giá)</span>
               </div>
+              <p className='text-sm text-white font-bold border bg-gray-700 border-primary rounded-md px-2 py-1 w-9 text-center'>{movie.phanLoai}</p>
+
 
               <p className="text-gray-400">
                 <span className='text-primary/80'>Thể loại:{" "}</span>
@@ -307,6 +322,21 @@ const ChiTietPhim = () => {
           onClose={() => setShowTrailer(false)}
         />
       )}
+      {showDanhGia && (
+        <DanhGiaModal
+          maPhim={maPhim}
+          open={showDanhGia}
+          onClose={() => setShowDanhGia(false)}
+        />
+      )}
+      {showLoginModal && (
+        <Dangnhap
+          open={showLoginModal}
+          onClose={() => setShowLoginModal(false)}
+        />
+      )}
+
+
     </div>
   )
 

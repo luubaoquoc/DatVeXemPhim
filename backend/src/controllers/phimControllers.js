@@ -61,12 +61,22 @@ export const getPhim = async (req, res) => {
       include: [
         { model: DaoDien, as: 'daoDien', attributes: ['maDaoDien', 'tenDaoDien'], required: false },
         { model: TheLoai, as: 'theLoais', attributes: ['maTheLoai', 'tenTheLoai'], through: { attributes: [] }, required: false },
-        { model: DienVien, as: 'dienViens', attributes: ['maDienVien', 'tenDienVien'], through: { attributes: [] }, required: false }
+        { model: DienVien, as: 'dienViens', attributes: ['maDienVien', 'tenDienVien'], through: { attributes: [] }, required: false },
+        { model: DanhGia, as: 'danhGias', attributes: ['diem'], separate: true, order: [['ngayDanhGia', 'DESC']], required: false },
       ]
     });
 
     if (!phim) return res.status(404).json({ message: 'Không tìm thấy phim' });
-    res.json(phim);
+
+    const plainPhim = phim.get({ plain: true });
+    const danhGias = plainPhim.danhGias || [];
+    plainPhim.rating = danhGias.length
+      ? (danhGias.reduce((sum, dg) => sum + parseFloat(dg.diem || 0), 0) / danhGias.length).toFixed(1)
+      : null;
+
+    res.json(plainPhim);
+
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Lỗi server' });
@@ -325,3 +335,47 @@ export const getLikedPhims = async (req, res) => {
     return res.status(500).json({ message: 'Lỗi server' });
   }
 };
+
+// Lấy đánh giá của user cho phim (nếu có)
+export const getUserDanhGia = async (req, res) => {
+  try {
+    const maPhim = parseInt(req.params.maPhim);
+    const maTaiKhoan = req.user?.maTaiKhoan;
+    if (!maTaiKhoan) return res.status(401).json({ message: 'Unauthorized' });
+    const danhGia = await DanhGia.findOne({ where: { maPhim, maTaiKhoan } });
+    if (!danhGia) return res.status(404).json({ message: 'Chưa đánh giá phim này' });
+    res.json({ data: danhGia });
+  } catch (err) {
+    console.error('getUserDanhGia error:', err);
+    res.status(500).json({ message: 'Lỗi server khi lấy đánh giá' });
+  }
+};
+
+// Đánh giá phim
+export const danhGiaPhim = async (req, res) => {
+  try {
+    const maPhim = parseInt(req.params.maPhim);
+    const maTaiKhoan = req.user?.maTaiKhoan;
+    const { diem } = req.body;
+    if (!maTaiKhoan) return res.status(401).json({ message: 'Unauthorized' });
+
+    const phim = await Phim.findByPk(maPhim);
+    if (!phim) return res.status(404).json({ message: 'Phim không tồn tại' });
+    if (diem < 1 || diem > 10) {
+      return res.status(400).json({ message: 'Điểm đánh giá phải từ 1 đến 10' });
+    }
+    const [danhGia, created] = await DanhGia.findOrCreate({
+      where: { maPhim, maTaiKhoan },
+      defaults: { diem }
+    });
+    if (!created) {
+      danhGia.diem = diem;
+      await danhGia.save();
+    }
+
+    res.json({ message: created ? 'Đánh giá thành công' : 'Cập nhật đánh giá thành công', data: danhGia });
+  } catch (err) {
+    console.error('danhGiaPhim error:', err);
+    res.status(500).json({ message: 'Lỗi server khi đánh giá phim' });
+  }
+}

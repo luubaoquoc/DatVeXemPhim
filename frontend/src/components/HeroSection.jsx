@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import useApi from '../hooks/useApi'
+import Loading from './Loading'
 
 const HeroSection = () => {
   const api = useApi()
@@ -44,9 +45,9 @@ const HeroSection = () => {
     }
   }
 
-  // Nếu chưa có dữ liệu → show skeleton hoặc empty
+
   if (banners.length === 0) {
-    return <div className="h-[70vh] flex items-center justify-center text-gray-400">Đang tải banner...</div>
+    return <Loading />
   }
 
   const active = banners[current]

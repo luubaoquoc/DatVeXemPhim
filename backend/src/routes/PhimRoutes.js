@@ -1,5 +1,5 @@
 import express from 'express';
-import { listPhims, getPhim, createPhim, updatePhim, deletePhim, likePhim, unlikePhim, getLikedPhims } from '../controllers/phimControllers.js';
+import { listPhims, getPhim, createPhim, updatePhim, deletePhim, likePhim, unlikePhim, getLikedPhims, getUserDanhGia, danhGiaPhim } from '../controllers/phimControllers.js';
 import { authenticateToken, isAdmin } from '../middleware/authMiddleware.js';
 import upload from '../configs/multer.js';
 
@@ -14,6 +14,10 @@ router.get('/:maPhim', getPhim);
 // like / unlike
 router.post('/:maPhim/like', authenticateToken, likePhim);
 router.delete('/:maPhim/like', authenticateToken, unlikePhim);
+
+// đánh giá phim
+router.get('/:maPhim/danhgia', authenticateToken, getUserDanhGia);
+router.post('/:maPhim/danhgia', authenticateToken, danhGiaPhim);
 
 // protected - only admins can create/update/delete
 router.post('/', authenticateToken, isAdmin, upload.single('poster'), createPhim);

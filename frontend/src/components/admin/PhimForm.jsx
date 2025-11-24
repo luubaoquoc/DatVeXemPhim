@@ -149,10 +149,6 @@ const PhimForm = ({ onSubmit, onClose, editPhim }) => {
 
 
 
-
-
-
-
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
       <div className="bg-black/90 border border-primary p-6 rounded-xl w-[950px] text-white overflow-y-auto no-scrollbar max-h-[90vh]">
@@ -307,8 +303,8 @@ const PhimForm = ({ onSubmit, onClose, editPhim }) => {
               >
                 <option value="">-- Chọn độ tuổi --</option>
                 <option value="P">P</option>
-                <option value="C13">T13</option>
-                <option value="C16">T16</option>
+                <option value="T13">T13</option>
+                <option value="T16">T16</option>
                 <option value="C18">C18</option>
               </select>
             </div>
