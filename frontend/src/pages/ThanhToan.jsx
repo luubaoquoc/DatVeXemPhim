@@ -173,9 +173,10 @@ const ThanhToan = () => {
           phong={state.phong}
           rap={state.phong?.rap}
           poster={state.poster}
+          seats={state.seats || []}
           selectedSeats={state.selectedSeats}
           selectedTime={state.gioBatDau}
-          date={state.date}
+          date={state.gioBatDau}
           giaVeCoBan={state.pricePerSeat}
           timeLeft={timeLeft}
           onBack={() => navigate(-1)}

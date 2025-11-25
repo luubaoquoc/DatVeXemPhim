@@ -16,6 +16,7 @@ import datVeRoutes from './routes/DatVeRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
 import phongChieuRoutes from './routes/phongChieuRoutes.js';
 import rapRoutes from './routes/rapRoutes.js';
+import gheRoutes from './routes/gheRoutes.js';
 import anhBannerRoutes from './routes/anhBannerRoutes.js';
 import './crons/index.js';
 // import { runAllCronsNow } from './crons/index.js';
@@ -56,6 +57,7 @@ app.use('/api/datve', datVeRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api/phongchieu', phongChieuRoutes);
 app.use('/api/rap', rapRoutes);
+app.use("/api/ghe", gheRoutes);
 app.use('/api/anhbanner', anhBannerRoutes);
 
 app.listen(PORT, () => {

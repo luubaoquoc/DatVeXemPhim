@@ -45,7 +45,6 @@ const DanhGiaModal = ({ maPhim, open, onClose }) => {
       const res = await api.post(`/phim/${maPhim}/danhgia`, { diem: rating });
       toast.success(res.data?.message || "Đánh giá thành công");
 
-      // ❌ Không update local store, fetch lại dữ liệu từ server
       await dispatch(fetchPhimBymaPhim(maPhim));
 
       onClose();
@@ -107,7 +106,8 @@ const DanhGiaModal = ({ maPhim, open, onClose }) => {
 
         {/* Submit */}
         <div className="flex justify-center mt-3 gap-4">
-          <button className="bg-gray-300 hover:bg-gray-400 text-gray-800 py-3 px-6 rounded-lg font-medium transition cursor-pointer">
+          <button onClick={onClose}
+            className="bg-gray-300 hover:bg-gray-400 text-gray-800 py-3 px-6 rounded-lg font-medium transition cursor-pointer">
             Đóng
           </button>
           <button

@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux'
 import { login, register } from '../redux/features/authSlice'
 import toast from "react-hot-toast";
 import OtpModal from "./OtpModal";
+import { Eye, EyeOff } from "lucide-react";
 
 const Dangnhap = ({ onClose }) => {
   const dispatch = useDispatch()
@@ -14,6 +15,8 @@ const Dangnhap = ({ onClose }) => {
   const [err, setErr] = useState("");
   const [otp, setOtp] = useState("");
   const [showOtpModal, setShowOtpModal] = useState(false);
+  const [showNew, setShowNew] = useState(false)
+
 
 
   const handleSubmit = async (e) => {
@@ -40,7 +43,7 @@ const Dangnhap = ({ onClose }) => {
         !showOtpModal && (
           <div className="bg-black/80 w-[350px] border border-primary rounded-2xl p-6 shadow-xl relative">
             <button
-              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+              className="absolute top-2 right-2 text-gray-500 hover:text-red-700 cursor-pointer"
               onClick={onClose}
             >
               ✕
@@ -67,13 +70,21 @@ const Dangnhap = ({ onClose }) => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
-              <input
-                type="password"
-                placeholder="Mật khẩu"
-                className="w-full px-4 py-2 border-b rounded-xl focus:outline-none "
-                value={matKhau}
-                onChange={(e) => setMatKhau(e.target.value)}
-              />
+              <div className="relative">
+                <input
+                  type={showNew ? "text" : "password"}
+                  placeholder="Mật khẩu"
+                  className="w-full px-4 py-2 border-b rounded-xl focus:outline-none "
+                  value={matKhau}
+                  onChange={(e) => setMatKhau(e.target.value)}
+                />
+                <div
+                  className="absolute right-3 top-2 cursor-pointer text-gray-500"
+                  onClick={() => setShowNew(!showNew)}
+                >
+                  {showNew ? <EyeOff /> : <Eye />}
+                </div>
+              </div>
 
               {isLogin && (
                 <div className="flex items-center justify-between text-sm text-gray-400">

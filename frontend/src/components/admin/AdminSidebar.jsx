@@ -21,7 +21,8 @@ import {
   BookUserIcon,
   ScanLineIcon,
   ReceiptTextIcon,
-  ImagePlus
+  ImagePlus,
+  Armchair
 } from 'lucide-react'
 import { NavLink } from 'react-router-dom'
 
@@ -77,7 +78,8 @@ const AdminSidebar = () => {
       icon: Building2Icon,
       children: [
         { name: 'Danh sách rạp', path: '/admin/rap', icon: ListIcon },
-        { name: 'Danh sách phòng chiếu', path: '/admin/phong-chieu', icon: DoorOpenIcon }
+        { name: 'Danh sách phòng chiếu', path: '/admin/phong-chieu', icon: DoorOpenIcon },
+        { name: 'Quản lý ghế', path: '/admin/quan-ly-ghe', icon: Armchair }
       ]
     },
     {

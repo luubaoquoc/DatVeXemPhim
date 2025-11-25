@@ -3,7 +3,7 @@ import sequelize from '../configs/sequelize.js';
 import Phim from './Phim.js';
 import TheLoai from './TheLoai.js';
 
-// Join table for PHIM <-> THE_LOAI
+
 const Phim_TheLoai = sequelize.define('Phim_TheLoai', {
   maPhim: {
     type: DataTypes.INTEGER,

@@ -5,6 +5,7 @@ import toast from 'react-hot-toast'
 import { formatDate } from '../../lib/dateFormat'
 import Pagination from '../../components/admin/Paginnation'
 import DeleteForm from '../../components/admin/DeleteForm'
+import SearchInput from '../../components/SearchInput'
 
 const DaoDien = () => {
   const api = useApi(true)
@@ -113,19 +114,11 @@ const DaoDien = () => {
         </button>
       </div>
 
-      <div className="mb-4 border border-primary/30 p-1 w-74 rounded flex items-center">
-        <input
-          type="text"
-          placeholder="Tìm đạo diễn..."
-          className="p-2 rounded bg-black/20 border-none text-white w-64 outline-none"
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setCurrentPage(1); // reset về trang đầu
-          }}
-        />
-        <SearchIcon className="inline ml-2 text-gray-400" size={18} />
-      </div>
+      <SearchInput
+        search={search}
+        setSearch={setSearch}
+        setCurrentPage={setCurrentPage}
+      />
 
       <table className="w-full border-b border-primary/30 rounded-lg text-sm">
         <thead className="bg-primary/70 text-white">

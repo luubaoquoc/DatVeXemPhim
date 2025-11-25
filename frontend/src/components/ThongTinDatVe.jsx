@@ -1,13 +1,15 @@
 import React from 'react'
 import isoTimeFormat from "../lib/isoTimeFormat";
 import { Clock } from 'lucide-react';
+import { formatDate } from '../lib/dateFormat';
 
 const ThongoTinDatVe = (
   { phim,
     phong,
     rap,
     poster,
-    selectedSeats,
+    seats = [],
+    selectedSeats = [],
     selectedTime,
     date,
     giaVeCoBan,
@@ -54,7 +56,7 @@ const ThongoTinDatVe = (
         </p>
         <span>-</span>
         <p className="text-sm text-gray-300">
-          Ngày: <span className="text-primary">{date}</span>
+          Ngày: <span className="text-primary">{formatDate(date)}</span>
         </p>
       </div>
 
@@ -62,9 +64,19 @@ const ThongoTinDatVe = (
         <p className="text-sm text-gray-300 mb-1">
           Ghế đã chọn:{" "}
           <span className="text-primary font-bold">
-            {selectedSeats?.join(", ") || "Chưa chọn"}
+            {selectedSeats?.length > 0
+              ? selectedSeats
+                .map(seatId => {
+                  // tìm ghế trong seats (truyền từ SoDoGheNgoi)
+                  const s = seats.find(s => s.maGhe === seatId);
+                  return s ? `${s.hang}${s.soGhe}` : seatId;
+                })
+                .join(", ")
+              : "Chưa chọn"
+            }
           </span>
         </p>
+
       </div>
 
       <div className="mt-4 border-t border-gray-700 pt-3 flex justify-between items-center">

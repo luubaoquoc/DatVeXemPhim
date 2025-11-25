@@ -4,6 +4,7 @@ import toast from "react-hot-toast"
 import useApi from "../../hooks/useApi"
 import Pagination from "../../components/admin/Paginnation"
 import DeleteForm from "../../components/admin/DeleteForm"
+import SearchInput from "../../components/SearchInput"
 
 const PhongChieu = () => {
   const api = useApi(true)
@@ -21,6 +22,8 @@ const PhongChieu = () => {
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const limit = 10
+  const [loading, setLoading] = useState(false);
+
 
   // Fetch API
   const fetchData = async () => {
@@ -57,6 +60,7 @@ const PhongChieu = () => {
   // Submit Form
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setLoading(true);
     try {
       if (editPhong) {
         await api.put(`/phongchieu/${editPhong.maPhong}`, formData)
@@ -76,6 +80,8 @@ const PhongChieu = () => {
       fetchData()
     } catch (err) {
       toast.error(err.response?.data?.message || "Lỗi thao tác!")
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -125,63 +131,52 @@ const PhongChieu = () => {
       </div>
 
       {/* Search */}
-      <div className="mb-4 border border-primary/30 p-1 w-80 rounded flex items-center">
-        <input
-          type="text"
-          placeholder="Tìm phòng chiếu..."
-          className="p-2 rounded bg-black/20 border-none text-white w-full outline-none"
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value)
-            setCurrentPage(1)
-          }}
-        />
-        <SearchIcon className="ml-2 text-gray-400" size={18} />
-      </div>
+      <SearchInput
+        search={search}
+        setSearch={setSearch}
+        setCurrentPage={setCurrentPage}
+      />
 
       {/* Table */}
-      {status === "loading" ? (
-        <p>Đang tải danh sách phòng...</p>
-      ) : (
-        <table className="w-full border-b border-primary/30 rounded-lg text-sm">
-          <thead className="bg-primary/70 text-white">
-            <tr>
-              <th className="p-2">#</th>
-              <th className="p-2 text-left">Tên phòng</th>
-              <th className="p-2 text-left">Tổng ghế</th>
-              <th className="p-2 text-left">Tên rạp</th>
-              <th className="p-2">Hành động</th>
+
+      <table className="w-full border-b border-primary/30 rounded-lg text-sm">
+        <thead className="bg-primary/70 text-white">
+          <tr>
+            <th className="p-2">#</th>
+            <th className="p-2 text-left">Tên phòng</th>
+            <th className="p-2 text-left">Tổng ghế</th>
+            <th className="p-2 text-left">Tên rạp</th>
+            <th className="p-2">Hành động</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {phongchieus?.map((phong, index) => (
+            <tr key={phong.maPhong} className="text-center border-b border-primary/30">
+              <td className="p-2">{index + 1}</td>
+              <td className="p-2 font-medium text-left">{phong.tenPhong}</td>
+              <td className="p-2 text-left">{phong.tongSoGhe}</td>
+              <td className="p-2 text-left">{phong.rap?.tenRap}</td>
+
+              <td className="p-2 flex justify-center gap-3">
+                <button
+                  onClick={() => {
+                    openModal(phong)
+                  }}
+                  className="p-2 text-blue-400 hover:bg-primary/20 rounded cursor-pointer"
+                >
+                  <PencilIcon size={18} />
+                </button>
+
+                <DeleteForm
+                  itemName={phong.tenPhong}
+                  onDelete={() => handleDelete(phong.maPhong)}
+                />
+              </td>
             </tr>
-          </thead>
-
-          <tbody>
-            {phongchieus?.map((phong, index) => (
-              <tr key={phong.maPhong} className="text-center border-b border-primary/30">
-                <td className="p-2">{index + 1}</td>
-                <td className="p-2 font-medium text-left">{phong.tenPhong}</td>
-                <td className="p-2 text-left">{phong.tongSoGhe}</td>
-                <td className="p-2 text-left">{phong.rap?.tenRap}</td>
-
-                <td className="p-2 flex justify-center gap-3">
-                  <button
-                    onClick={() => {
-                      openModal(phong)
-                    }}
-                    className="p-2 text-blue-400 hover:bg-primary/20 rounded cursor-pointer"
-                  >
-                    <PencilIcon size={18} />
-                  </button>
-
-                  <DeleteForm
-                    itemName={phong.tenPhong}
-                    onDelete={() => handleDelete(phong.maPhong)}
-                  />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+          ))}
+        </tbody>
+      </table>
 
       <Pagination
         currentPage={currentPage}
@@ -247,8 +242,21 @@ const PhongChieu = () => {
                 >
                   Hủy
                 </button>
-                <button type="submit" className="px-4 py-2 bg-primary rounded cursor-pointer">
-                  {editPhong ? 'Cập nhật' : 'Thêm'}
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className={`px-4 py-2 rounded cursor-pointer flex items-center gap-2
+                  ${loading ? 'bg-primary/50 cursor-not-allowed' : 'bg-primary'}
+                `}
+                >
+                  {loading ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Đang xử lý...
+                    </>
+                  ) : (
+                    editPhong ? 'Cập nhật' : 'Thêm'
+                  )}
                 </button>
               </div>
             </form>

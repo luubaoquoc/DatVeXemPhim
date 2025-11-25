@@ -5,9 +5,11 @@ import Rap from "../models/Rap.js";
 
 // Tính layout dựa theo tổng số ghế
 const getLayoutFromTotal = (total) => {
-  if (total === 90) return { rows: 10, cols: 9 };
-  if (total === 72) return { rows: 8, cols: 9 };
-  if (total === 60) return { rows: 6, cols: 10 };
+  // if (total === 120) return { rows: 10, cols: 12 };
+  // if (total === 100) return { rows: 10, cols: 10 };
+  // if (total === 90) return { rows: 10, cols: 9 };
+  // if (total === 72) return { rows: 8, cols: 9 };
+  // if (total === 60) return { rows: 6, cols: 10 };
 
   // fallback auto như hình vuông
   const cols = Math.ceil(Math.sqrt(total));
@@ -125,8 +127,8 @@ export const suaPhongChieu = async (req, res) => {
 
     // 2. nếu thay đổi tổng số ghế → update lại ghế
     if (tongSoGhe && tongSoGhe !== oldTotal) {
-      await Ghe.destroy({ where: { maPhong: id } }); // xoá toàn bộ ghế
-      const newSeats = generateSeats(id, tongSoGhe);
+      await Ghe.destroy({ where: { maPhong } }); // xoá toàn bộ ghế
+      const newSeats = generateSeats(maPhong, tongSoGhe);
       await Ghe.bulkCreate(newSeats);
     }
 

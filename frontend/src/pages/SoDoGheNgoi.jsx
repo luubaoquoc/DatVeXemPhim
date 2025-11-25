@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { assets } from '../assets/assets'
 import Loading from '../components/Loading'
@@ -8,9 +8,10 @@ import BlurCircle from '../components/BlurCircle'
 import toast from 'react-hot-toast'
 import useApi from '../hooks/useApi'
 import ThongoTinDatVe from '../components/ThongTinDatVe'
+import GheLayout from '../components/gheLayout'
 
 const SoDoGheNgoi = () => {
-  const { maPhim: _maPhim, date, maSuatChieu } = useParams()
+  const { maPhim: _maPhim, maSuatChieu } = useParams()
   const [selectedSeats, setSelectedSeats] = useState([])
   const [bookedSeats, setBookedSeats] = useState([])
   const [selectedTime, setSelectedTime] = useState(null)
@@ -41,12 +42,13 @@ const SoDoGheNgoi = () => {
   // Lấy danh sách ghế của phòng (tùy thuộc show.phongChieu.maPhong)
   useEffect(() => {
     const fetchSeats = async () => {
+      const maPhong = show?.phongChieu?.maPhong
+      if (!maPhong) return;
       try {
-        const maPhong = show?.phongChieu?.maPhong
 
-        const res = await publicApi.get(`/suatchieu/ghe/phong/${maPhong}`)
+        const res = await publicApi.get(`/ghe`, { params: { maPhong } })
         // expected res.data = array of seats: { maGhe, maPhong, hang, soGhe, trangThai, ...}
-        const data = Array.isArray(res.data) ? res.data : (res.data?.ghe || [])
+        const data = res.data.items || res.data || []
         // normalize seat items to have id = hang + soGhe
         const normalized = data.map(s => ({
           ...s,
@@ -71,7 +73,8 @@ const SoDoGheNgoi = () => {
       try {
         const res = await api.get(`/datve/ghe-da-dat/${maSuatChieu}`)
         // backend nên trả array dạng ['A1','B2', ...]
-        setBookedSeats(res.data.gheDaDat || res.data || [])
+        const booked = (res.data.gheDaDat || res.data || []).map(s => String(s).trim().toUpperCase())
+        setBookedSeats(booked)
       } catch (err) {
         console.error('Lỗi khi tải ghế đã đặt:', err)
         setBookedSeats([])
@@ -81,6 +84,7 @@ const SoDoGheNgoi = () => {
   }, [maSuatChieu, api])
 
   const handleSeatClick = (seatId) => {
+
     if (bookedSeats.includes(seatId)) return //  Không cho chọn ghế đã đặt
     if (!selectedTime) return toast.error('Vui lòng chọn khung giờ chiếu!')
     if (!selectedSeats.includes(seatId) && selectedSeats.length >= 5) {
@@ -93,59 +97,6 @@ const SoDoGheNgoi = () => {
     )
   }
 
-  // Gom nhóm ghế theo hàng: { A: [...], B: [...] }
-  const seatsByRow = useMemo(() => {
-    const groups = {}
-    seats.forEach(s => {
-      const row = s.hang
-      if (!groups[row]) groups[row] = []
-      // ensure proper numeric sort key
-      groups[row].push({ ...s, id: s.id || `${s.hang}${s.soGhe}` })
-    })
-    Object.keys(groups).forEach(r => {
-      groups[r].sort((a, b) => Number(a.soGhe) - Number(b.soGhe))
-    })
-    return groups
-  }, [seats])
-
-  // Tạo mảng hàng theo thứ tự alphabet (A, B, C, ...)
-  const rowsOrdered = useMemo(() => {
-    return Object.keys(seatsByRow).sort((a, b) => a.localeCompare(b))
-  }, [seatsByRow])
-
-
-  const renderRow = (row) => {
-    if (!row) return null
-    const rowSeats = seatsByRow[row] || []
-    return (
-      <div key={row} className='flex gap-2 mt-2'>
-        <div className='flex flex-wrap items-center justify-center gap-2'>
-          {rowSeats.map(s => {
-            const id = s.id || `${s.hang}${s.soGhe}`
-            const isBooked = bookedSeats.includes(id)
-            const isSelected = selectedSeats.includes(id)
-            // optional: detect loaiGhe to style VIP, COUPLE, ...
-            const loai = s.loaiGhe || s.loai || null
-            return (
-              <button
-                key={id}
-                onClick={() => handleSeatClick(id)}
-                disabled={isBooked}
-                className={`h-8 w-8 rounded border border-primary/60 cursor-pointer transition
-                  ${isBooked ? 'bg-gray-500/40 text-gray-300 cursor-not-allowed' : ''}
-                  ${isSelected ? 'bg-primary text-white' : ''}
-                  ${!isBooked && !isSelected && loai === 'VIP' ? 'ring-1 ring-yellow-400' : ''}
-                `}
-                title={id}
-              >
-                {id}
-              </button>
-            )
-          })}
-        </div>
-      </div>
-    )
-  }
 
   const handleThanhToan = async () => {
     if (selectedSeats.length === 0)
@@ -153,7 +104,10 @@ const SoDoGheNgoi = () => {
     try {
       const payload = {
         maSuatChieu,
-        chiTiet: selectedSeats,
+        chiTiet: selectedSeats.map(seatId => {
+          const s = seats.find(s => s.maGhe === seatId || s.id === seatId);
+          return s ? `${s.hang}${s.soGhe}` : seatId;
+        }),
         tongTien: selectedSeats.length * (show.giaVeCoBan || 0),
       };
       const res = await api.post("/datve", payload);
@@ -164,7 +118,6 @@ const SoDoGheNgoi = () => {
             thoiHanThanhToan: res.data.thoiHanThanhToan,
             maSuatChieu,
             maPhim: _maPhim,
-            date,
             selectedSeats,
             pricePerSeat: show.giaVeCoBan,
             phim: show.phim,
@@ -180,6 +133,9 @@ const SoDoGheNgoi = () => {
       toast.error(msg);
     }
   }
+
+  console.log(bookedSeats);
+
 
   // Giao diện chính
   if (!show) return <Loading />
@@ -205,11 +161,13 @@ const SoDoGheNgoi = () => {
           <img src={assets.screenImage} alt="" className='shadow-2xl rounded-lg shadow-red-200' />
           <p className='text-gray-300 text-sm mb-6'>Màn hình</p>
 
-          <div className="flex flex-col items-center mt-10 text-xs text-gray-300">
-            <div className="flex flex-col items-center gap-3">
-              {rowsOrdered.map(row => renderRow(row))}
-            </div>
-          </div>
+          <GheLayout
+            seats={seats}
+            bookedSeats={bookedSeats}
+            selectedSeats={selectedSeats}
+            onSelectSeat={(seat) => handleSeatClick(`${seat.hang}${seat.soGhe}`)}
+            mode="booking"
+          />
 
         </div>
       </div>
@@ -221,9 +179,10 @@ const SoDoGheNgoi = () => {
           phong={show.phongChieu}
           rap={show.phongChieu?.rap}
           poster={show.phim?.poster}
+          date={show.gioBatDau}
+          seats={seats}
           selectedSeats={selectedSeats}
           selectedTime={selectedTime}
-          date={date}
           giaVeCoBan={show.giaVeCoBan}
           onBack={() => { navigate(-1); scrollTo(0, 0) }}
           onAction={handleThanhToan}

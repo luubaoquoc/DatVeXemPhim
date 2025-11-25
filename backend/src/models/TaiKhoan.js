@@ -1,5 +1,7 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../configs/sequelize.js';
+import VaiTro from './VaiTro.js';
+import Rap from './Rap.js';
 
 const TaiKhoan = sequelize.define('TaiKhoan', {
   maTaiKhoan: {
@@ -10,21 +12,21 @@ const TaiKhoan = sequelize.define('TaiKhoan', {
   },
 
   hoTen: { type: DataTypes.STRING(100), allowNull: false },
-  email: { type: DataTypes.STRING(255), allowNull: false, unique: true },
-  matKhau: { type: DataTypes.STRING(255), allowNull: false },
+  email: { type: DataTypes.STRING, allowNull: false, unique: true },
+  matKhau: { type: DataTypes.STRING, allowNull: false },
   soDienThoai: { type: DataTypes.STRING(10), allowNull: true },
   ngayTao: { type: DataTypes.DATE, defaultValue: DataTypes.NOW, allowNull: false },
   emailXacThuc: { type: DataTypes.BOOLEAN, defaultValue: false },
   otpMa: { type: DataTypes.STRING(6), allowNull: true },
   otpHetHan: { type: DataTypes.DATE, allowNull: true },
-  anhDaiDien: { type: DataTypes.STRING(255), defaultValue: null, allowNull: true },
+  anhDaiDien: { type: DataTypes.STRING, defaultValue: null, allowNull: true },
 
   maVaiTro: {
     type: DataTypes.INTEGER,
     allowNull: false,
     defaultValue: 1,
     references: {
-      model: 'VAI_TRO',
+      model: VaiTro,
       key: 'maVaiTro'
     }
 
@@ -34,7 +36,7 @@ const TaiKhoan = sequelize.define('TaiKhoan', {
     type: DataTypes.INTEGER,
     allowNull: true,
     references: {
-      model: 'RAP',
+      model: Rap,
       key: 'maRap'
     }
   }

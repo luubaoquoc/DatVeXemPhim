@@ -4,6 +4,8 @@ import toast from "react-hot-toast"
 import useApi from "../../hooks/useApi"
 import Pagination from "../../components/admin/Paginnation"
 import DeleteForm from "../../components/admin/DeleteForm"
+import SearchInput from "../../components/SearchInput"
+import Loading from "../../components/Loading"
 
 const Rap = () => {
   const api = useApi(true)
@@ -20,6 +22,7 @@ const Rap = () => {
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const limit = 10
+  const [loading, setLoading] = useState(false)
 
   // Fetch API
   const fetchData = async () => {
@@ -48,6 +51,7 @@ const Rap = () => {
   // Submit Form
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setLoading(true)
     try {
       if (editRap) {
         await api.put(`/rap/${editRap.maRap}`, formData)
@@ -67,6 +71,8 @@ const Rap = () => {
       fetchData()
     } catch (err) {
       toast.error(err.response?.data?.message || "Lỗi thao tác!")
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -100,6 +106,7 @@ const Rap = () => {
   }
 
   console.log(raps);
+  if (loading) return <Loading />
 
 
   return (
@@ -116,63 +123,53 @@ const Rap = () => {
       </div>
 
       {/* Search */}
-      <div className="mb-4 border border-primary/30 p-1 w-80 rounded flex items-center">
-        <input
-          type="text"
-          placeholder="Tìm rạp..."
-          className="p-2 rounded bg-black/20 border-none text-white w-full outline-none"
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value)
-            setCurrentPage(1)
-          }}
-        />
-        <SearchIcon className="ml-2 text-gray-400" size={18} />
-      </div>
+      <SearchInput
+        search={search}
+        setSearch={setSearch}
+        setCurrentPage={setCurrentPage}
+      />
 
       {/* Table */}
-      {status === "loading" ? (
-        <p>Đang tải danh sách rạp...</p>
-      ) : (
-        <table className="w-full border-b border-primary/30 rounded-lg text-sm">
-          <thead className="bg-primary/70 text-white">
-            <tr>
-              <th className="p-2">#</th>
-              <th className="p-2 text-left">Tên rạp</th>
-              <th className="p-2 text-left">Địa chỉ</th>
-              <th className="p-2 text-left">Số điện thoại</th>
-              <th className="p-2">Hành động</th>
+
+      <table className="w-full border-b border-primary/30 rounded-lg text-sm">
+        <thead className="bg-primary/70 text-white">
+          <tr>
+            <th className="p-2">#</th>
+            <th className="p-2 text-left">Tên rạp</th>
+            <th className="p-2 text-left">Địa chỉ</th>
+            <th className="p-2 text-left">Số điện thoại</th>
+            <th className="p-2">Hành động</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {raps?.map((rap, index) => (
+            <tr key={rap.maRap} className="text-center border-b border-primary/30">
+              <td className="p-2">{index + 1}</td>
+              <td className="p-2 font-medium text-left">{rap.tenRap}</td>
+              <td className="p-2 text-left">{rap.diaChi}</td>
+              <td className="p-2 text-left">{rap.soDienThoai}</td>
+
+              <td className="p-2 flex justify-center gap-3">
+                <button
+                  onClick={() => {
+                    openModal(rap)
+                  }}
+                  className="p-2 text-blue-400 hover:bg-primary/20 rounded cursor-pointer"
+                >
+                  <PencilIcon size={18} />
+                </button>
+
+                <DeleteForm
+                  itemName={rap.tenRap}
+                  onDelete={() => handleDelete(rap.maRap)}
+                />
+              </td>
             </tr>
-          </thead>
+          ))}
+        </tbody>
+      </table>
 
-          <tbody>
-            {raps?.map((rap, index) => (
-              <tr key={rap.maRap} className="text-center border-b border-primary/30">
-                <td className="p-2">{index + 1}</td>
-                <td className="p-2 font-medium text-left">{rap.tenRap}</td>
-                <td className="p-2 text-left">{rap.diaChi}</td>
-                <td className="p-2 text-left">{rap.soDienThoai}</td>
-
-                <td className="p-2 flex justify-center gap-3">
-                  <button
-                    onClick={() => {
-                      openModal(rap)
-                    }}
-                    className="p-2 text-blue-400 hover:bg-primary/20 rounded cursor-pointer"
-                  >
-                    <PencilIcon size={18} />
-                  </button>
-
-                  <DeleteForm
-                    itemName={rap.tenRap}
-                    onDelete={() => handleDelete(rap.maRap)}
-                  />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
 
       <Pagination
         currentPage={currentPage}
@@ -230,8 +227,21 @@ const Rap = () => {
                 >
                   Hủy
                 </button>
-                <button type="submit" className="px-4 py-2 bg-primary rounded cursor-pointer">
-                  {editRap ? 'Cập nhật' : 'Thêm'}
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className={`px-4 py-2 rounded cursor-pointer flex items-center gap-2
+                  ${loading ? 'bg-primary/50 cursor-not-allowed' : 'bg-primary'}
+                `}
+                >
+                  {loading ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Đang xử lý...
+                    </>
+                  ) : (
+                    editRap ? 'Cập nhật' : 'Thêm'
+                  )}
                 </button>
               </div>
             </form>

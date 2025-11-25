@@ -7,6 +7,7 @@ import { ChevronRight, SearchIcon } from 'lucide-react'
 import { fetchPhims } from '../redux/features/phimSlice'
 import Pagination from '../components/admin/Paginnation'
 import { formatDate } from '../lib/dateFormat'
+import SearchInput from '../components/SearchInput'
 
 const DaoDien = () => {
 
@@ -48,19 +49,12 @@ const DaoDien = () => {
       <div className="flex flex-col lg:flex-row gap-10 max-w-7xl mx-auto">
         <div className="flex-2">
           <h2 className="text-2xl font-medium mb-8 lg:text-left border-l-3 border-primary pl-2">Đạo Diễn</h2>
-          <div className="mb-4 border border-primary/30 p-1 w-74 rounded flex items-center">
-            <input
-              type="text"
-              placeholder="Tìm đạo diễn..."
-              className="p-2 rounded bg-black/20 border-none text-white w-64 outline-none"
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setCurrentPage(1); // reset về trang đầu
-              }}
-            />
-            <SearchIcon className="inline ml-2 text-gray-400" size={18} />
-          </div>
+
+          <SearchInput
+            search={search}
+            setSearch={setSearch}
+            setCurrentPage={setCurrentPage}
+          />
           <div className="flex flex-col gap-3">
             {daoDiens.map((daoDien) => (
               <div key={daoDien.maDaoDien} className="bg-black/30 rounded-lg overflow-hidden shadow-lg flex gap-3">

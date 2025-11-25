@@ -1,5 +1,6 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../configs/sequelize.js';
+import TaiKhoan from './TaiKhoan.js';
 
 const DatVe = sequelize.define('DatVe', {
   maDatVe: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
@@ -8,14 +9,13 @@ const DatVe = sequelize.define('DatVe', {
     type: DataTypes.INTEGER,
     allowNull: true,
     references: {
-      model: 'TAI_KHOAN',
+      model: TaiKhoan,
       key: 'maTaiKhoan'
     }
   },
   maSuatChieu: { type: DataTypes.INTEGER, allowNull: false },
   ngayDat: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
   tongTien: { type: DataTypes.DECIMAL(10, 2), allowNull: false },
-  // store selected seat labels (e.g. "A1,A2") as a comma-separated string
   soGhe: { type: DataTypes.STRING, allowNull: false },
   trangThai: {
     type: DataTypes.ENUM(
@@ -31,7 +31,7 @@ const DatVe = sequelize.define('DatVe', {
     type: DataTypes.INTEGER,
     allowNull: true,
     references: {
-      model: 'TAI_KHOAN',
+      model: TaiKhoan,
       key: 'maTaiKhoan'
     }
   }

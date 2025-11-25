@@ -1,13 +1,20 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../configs/sequelize.js';
+import TaiKhoan from './TaiKhoan.js';
+import Phim from './Phim.js';
 
 const DanhGia = sequelize.define('DanhGia', {
-  maDanhGia: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true, allowNull: false },
+  maDanhGia: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    primaryKey: true,
+    allowNull: false
+  },
   maTaiKhoan: {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-      model: 'TAI_KHOAN',
+      model: TaiKhoan,
       key: 'maTaiKhoan'
     }
   },
@@ -15,7 +22,7 @@ const DanhGia = sequelize.define('DanhGia', {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-      model: 'PHIM',
+      model: Phim,
       key: 'maPhim'
     }
   },

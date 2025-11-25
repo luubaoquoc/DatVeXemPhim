@@ -8,6 +8,7 @@ import useApi from '../../hooks/useApi'
 import Pagination from '../../components/admin/Paginnation'
 import DeleteForm from '../../components/admin/DeleteForm'
 import PhimDetail from '../../components/admin/ChiTietPhim'
+import SearchInput from '../../components/SearchInput'
 
 const QuanLyPhim = () => {
   const api = useApi(true)
@@ -83,20 +84,11 @@ const QuanLyPhim = () => {
         </button>
       </div>
 
-      <div className="mb-4 border border-primary/30 p-1 w-74 rounded flex items-center">
-        <input
-          type="text"
-          placeholder="Tìm phim..."
-          className="p-2 rounded bg-black/20 border-none text-white w-64 outline-none"
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setCurrentPage(1); // reset về trang đầu
-          }}
-        />
-        <SearchIcon className="inline ml-2 text-gray-400" size={18} />
-      </div>
-
+      <SearchInput
+        search={search}
+        setSearch={setSearch}
+        setCurrentPage={setCurrentPage}
+      />
 
       {status === 'loading' ? (
         <p>Đang tải danh sách phim...</p>
