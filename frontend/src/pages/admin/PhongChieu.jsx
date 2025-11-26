@@ -169,6 +169,7 @@ const PhongChieu = () => {
                 </button>
 
                 <DeleteForm
+                  title="Phòng chiếu"
                   itemName={phong.tenPhong}
                   onDelete={() => handleDelete(phong.maPhong)}
                 />

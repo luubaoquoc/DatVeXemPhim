@@ -70,7 +70,7 @@ const AdminSidebar = () => {
         { name: 'Banner', path: '/admin/banner', icon: ImagePlus }
       ]
     },
-    { name: 'Quản lý suất chiếu', path: '/admin/suat-chieu', icon: ClockIcon },
+    { name: 'Quản lý suất chiếu', path: '/admin/quan-ly-suat-chieu', icon: ClockIcon },
 
     { name: 'Quản lý đơn đặt vé', path: '/admin/don-dat-ve', icon: TicketIcon },
     {

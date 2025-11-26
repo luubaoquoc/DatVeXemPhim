@@ -1,4 +1,5 @@
 import { SuatChieu, Phim, PhongChieu, Rap, Ghe } from '../models/index.js';
+import { Op } from 'sequelize';
 
 // GET /api/suatchieu?page=1&limit=20&maPhim=...
 export const listSuatChieus = async (req, res) => {
@@ -17,21 +18,7 @@ export const listSuatChieus = async (req, res) => {
   }
 };
 
-// GET /api/suatchieu/dates?maPhim=1
-export const getDatesForMovie = async (req, res) => {
-  try {
-    const maPhim = Number(req.query.maPhim);
-    if (!maPhim) return res.status(400).json({ message: 'maPhim là bắt buộc' });
 
-    // distinct dates (only date part)
-    const rows = await SuatChieu.findAll({ where: { maPhim }, attributes: ['gioBatDau'] });
-    const dates = Array.from(new Set(rows.map(r => r.gioBatDau ? r.gioBatDau.toISOString().slice(0, 10) : null))).filter(Boolean);
-    return res.json(dates.sort());
-  } catch (error) {
-    console.error('getDatesForMovie error:', error);
-    return res.status(500).json({ message: 'Lỗi server' });
-  }
-};
 
 // GET /api/suatchieu/raps?maPhim=1&date=2025-10-22
 export const getRapsForMovieDate = async (req, res) => {
@@ -65,27 +52,6 @@ export const getRapsForMovieDate = async (req, res) => {
   }
 };
 
-
-
-export const getGheTheoPhong = async (req, res) => {
-  try {
-    const { maPhong } = req.params;
-
-    const ghe = await Ghe.findAll({
-      where: { maPhong },
-      order: [
-        ['hang', 'ASC'],
-        ['soGhe', 'ASC']
-      ]
-    });
-
-    res.json(ghe);
-
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Lỗi khi lấy danh sách ghế" });
-  }
-};
 
 
 // GET /api/suatchieu/:maSuatChieu
@@ -122,18 +88,92 @@ export const getSuatChieu = async (req, res) => {
   }
 };
 
-// POST /api/suatchieu (admin)
 export const createSuatChieu = async (req, res) => {
   try {
-    const { maPhim, maPhong, gioBatDau, gioKetThuc, ngonNgu, giaVeCoBan } = req.body;
-    if (!maPhim || !maPhong || !gioBatDau) return res.status(400).json({ message: 'Thiếu thông tin bắt buộc' });
-    const newSc = await SuatChieu.create({ maPhim, maPhong, gioBatDau, gioKetThuc: gioKetThuc || null, ngonNgu: ngonNgu || null, giaVeCoBan: giaVeCoBan || null });
-    return res.status(201).json({ message: 'Tạo suất chiếu thành công', suatChieu: newSc });
+    const body = req.body;
+
+    // Nếu payload là array → xử lý batch create
+    if (Array.isArray(body)) {
+
+      // Format datetime
+      for (const sc of body) {
+        sc.gioBatDau = new Date(sc.gioBatDau);
+        sc.gioKetThuc = new Date(sc.gioKetThuc);
+      }
+
+      // --- Check trùng giữa các suất trong payload ---
+      for (let i = 0; i < body.length; i++) {
+        for (let j = i + 1; j < body.length; j++) {
+          if (body[i].maPhong === body[j].maPhong) {
+            const A = body[i];
+            const B = body[j];
+
+            if (A.gioBatDau < B.gioKetThuc && A.gioKetThuc > B.gioBatDau) {
+              return res.status(400).json({
+                message: `2 suất trong danh sách bị trùng nhau!`,
+                slotA: A,
+                slotB: B
+              });
+            }
+          }
+        }
+      }
+
+      // --- Check trùng trong DB ---
+      for (const sc of body) {
+        const overlaps = await SuatChieu.findOne({
+          where: {
+            maPhong: sc.maPhong,
+            gioBatDau: { [Op.lt]: sc.gioKetThuc },
+            gioKetThuc: { [Op.gt]: sc.gioBatDau },
+          }
+        });
+
+        if (overlaps) {
+          return res.status(400).json({
+            message: `Suất chiếu bị trùng trong phòng ${sc.maPhong}!`,
+            conflict: overlaps
+          });
+        }
+      }
+
+      // Không trùng → tạo batch
+      const created = await SuatChieu.bulkCreate(body, { returning: true });
+
+      return res.status(201).json({
+        message: 'Tạo nhiều suất chiếu thành công',
+        suatChieus: created
+      });
+    }
+
+    // Xử lý 1 suất (tương tự)
+    body.gioBatDau = new Date(body.gioBatDau);
+    body.gioKetThuc = new Date(body.gioKetThuc);
+
+    const conflict = await SuatChieu.findOne({
+      where: {
+        maPhong: body.maPhong,
+        gioBatDau: { [Op.lt]: body.gioKetThuc },
+        gioKetThuc: { [Op.gt]: body.gioBatDau },
+      }
+    });
+
+    if (conflict) {
+      return res.status(400).json({
+        message: 'Suất chiếu bị trùng giờ trong cùng phòng!',
+        conflict
+      });
+    }
+
+    const newSC = await SuatChieu.create(body);
+    return res.status(201).json({ message: 'Tạo suất chiếu thành công', suatChieu: newSC });
+
   } catch (error) {
     console.error('createSuatChieu error:', error);
     return res.status(500).json({ message: 'Lỗi server' });
   }
 };
+
 
 // PUT /api/suatchieu/:maSuatChieu (admin)
 export const updateSuatChieu = async (req, res) => {

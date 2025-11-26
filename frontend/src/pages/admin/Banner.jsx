@@ -133,7 +133,8 @@ const Banner = () => {
                   <PencilIcon size={18} />
                 </button>
                 <DeleteForm
-                  itemName={item.anh}
+                  title="Banner"
+                  itemName={item.maAnhBanner}
                   onDelete={() => handleDelete(item.maAnhBanner)}
                 />
               </td>

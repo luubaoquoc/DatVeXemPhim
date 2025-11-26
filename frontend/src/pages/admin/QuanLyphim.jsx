@@ -140,6 +140,7 @@ const QuanLyPhim = () => {
                     <PencilIcon size={18} />
                   </button>
                   <DeleteForm
+                    title="Phim"
                     itemName={phim.tenPhim}
                     onDelete={() => handleDelete(phim.maPhim)}
                   />

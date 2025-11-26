@@ -153,6 +153,7 @@ const DaoDien = () => {
                   <PencilIcon size={18} />
                 </button>
                 <DeleteForm
+                  title="Đạo diễn"
                   itemName={item.tenDaoDien}
                   onDelete={() => handleDelete(item.maDaoDien)}
                 />

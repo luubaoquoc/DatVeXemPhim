@@ -145,6 +145,7 @@ const TheLoai = () => {
                   <PencilIcon size={18} />
                 </button>
                 <DeleteForm
+                  title="Thể loại"
                   itemName={item.tenTheLoai}
                   onDelete={() => handleDelete(item.maTheLoai)}
                 />

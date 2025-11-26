@@ -30,6 +30,7 @@ import DienVien from './pages/DienVien'
 import TheLoai from './pages/TheLoai'
 import Banner from './pages/admin/Banner'
 import QuanLyGhe from './pages/admin/QuanLyGhe'
+import QuanLySuatChieu from './pages/admin/QuanLySuatChieu'
 
 const App = () => {
 
@@ -101,6 +102,7 @@ const App = () => {
           <Route path='rap' element={<Rap />} />
           <Route path='phong-chieu' element={<PhongChieu />} />
           <Route path='quan-ly-ghe' element={<QuanLyGhe />} />
+          <Route path='quan-ly-suat-chieu' element={<QuanLySuatChieu />} />
           <Route path='add-shows' element={<AddShows />} />
           <Route path='list-shows' element={<ListShows />} />
           <Route path='list-bookings' element={<ListBookings />} />
