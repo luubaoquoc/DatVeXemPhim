@@ -181,7 +181,7 @@ const DaoDien = () => {
                 <input
                   type="text"
                   name="tenDaoDien"
-                  className="w-full p-2 mb-4 rounded bg-gray-700 border border-gray-600 text-white"
+                  className="w-full p-2 mb-4 rounded bg-[#111] border border-gray-600 text-white"
                   placeholder="Tên đạo diễn..."
                   value={formData.tenDaoDien}
                   onChange={handleChange}
@@ -194,7 +194,7 @@ const DaoDien = () => {
                 <input
                   type="text"
                   name="anhDaiDien"
-                  className="w-full p-2 mb-4 rounded bg-gray-700 border border-gray-600 text-white"
+                  className="w-full p-2 mb-4 rounded bg-[#111] border border-gray-600 text-white"
                   placeholder="URL ảnh đại diện..."
                   value={formData.anhDaiDien}
                   onChange={handleChange}
@@ -206,7 +206,7 @@ const DaoDien = () => {
                 <input
                   type="date"
                   name="ngaySinh"
-                  className="w-full p-2 mb-4 rounded bg-gray-700 border border-gray-600 text-white"
+                  className="w-full p-2 mb-4 rounded bg-[#111] border border-gray-600 text-white"
                   value={formData.ngaySinh}
                   onChange={handleChange}
                 />
@@ -217,7 +217,7 @@ const DaoDien = () => {
                 <textarea
                   name="tieuSu"
                   rows="3"
-                  className="w-full p-2 mb-4 rounded bg-gray-700 border border-gray-600 text-white"
+                  className="w-full p-2 mb-4 rounded bg-[#111] border border-gray-600 text-white"
                   placeholder="Tiểu sử đạo diễn..."
                   value={formData.tieuSu}
                   onChange={handleChange}

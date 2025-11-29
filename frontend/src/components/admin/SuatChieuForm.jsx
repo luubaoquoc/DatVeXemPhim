@@ -82,29 +82,17 @@ const SuatChieuForm = ({ onSubmit, onClose, editItem }) => {
     setFormData({ ...formData, maPhong: selected.value });
   };
 
-  // Submit
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
 
-    try {
-      // Tạo danh sách suất chiếu
-      const payload = timeSlots.map((slot) => ({
-        maPhim: formData.maPhim,
-        maPhong: formData.maPhong,
-        gioBatDau: slot.gioBatDau,
-        gioKetThuc: slot.gioKetThuc,
-        giaVeCoBan: formData.giaVeCoBan,
-      }));
+  // Options cho react-select
+  const phimOptions = phims.map((p) => ({
+    value: p.maPhim,
+    label: `${p.maPhim} - ${p.tenPhim}`,
+  }));
 
-      await onSubmit(payload); // Gửi array lên cha
-    } catch (err) {
-      console.log(err);
-      toast.error("Lỗi khi gửi dữ liệu!");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const phongOptions = phongs.map((pc) => ({
+    value: pc.maPhong,
+    label: pc.tenPhong,
+  }));
 
 
   const updateTimeSlot = (index, field, value) => {
@@ -121,16 +109,38 @@ const SuatChieuForm = ({ onSubmit, onClose, editItem }) => {
   };
 
 
-  // Options cho react-select
-  const phimOptions = phims.map((p) => ({
-    value: p.maPhim,
-    label: `${p.maPhim} - ${p.tenPhim}`,
-  }));
 
-  const phongOptions = phongs.map((pc) => ({
-    value: pc.maPhong,
-    label: pc.tenPhong,
-  }));
+  // Submit
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      // Tạo danh sách suất chiếu
+      const payloadArray = timeSlots.map((slot) => ({
+        maPhim: formData.maPhim,
+        maPhong: formData.maPhong,
+        gioBatDau: slot.gioBatDau,
+        gioKetThuc: slot.gioKetThuc,
+        giaVeCoBan: formData.giaVeCoBan,
+      }));
+
+      if (editItem) {
+        // nếu đang sửa -> chỉ gửi object để update 1 suất
+        await onSubmit(payloadArray[0]);
+      } else {
+        // thêm nhiều suất -> gửi mảng
+        await onSubmit(payloadArray);
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Lỗi khi gửi dữ liệu!");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 ">
@@ -220,19 +230,20 @@ const SuatChieuForm = ({ onSubmit, onClose, editItem }) => {
             ))}
 
             {/* Nút thêm khung giờ */}
-            <button
-              type="button"
-              onClick={addTimeSlot}
-              className="px-3 py-1 bg-primary/80 rounded hover:bg-primary/70 text-sm cursor-pointer"
-            >
-              + Thêm khung giờ
-            </button>
+            {!editItem && (
+              <button
+                type="button"
+                onClick={addTimeSlot}
+                className="px-3 py-1 bg-primary/80 rounded hover:bg-primary/70 text-sm cursor-pointer"
+              >
+                + Thêm khung giờ
+              </button>)}
           </div>
 
 
           {/* Giá vé */}
           <div>
-            <label>Giá vé cơ bản</label>
+            <label>Giá vé </label>
             <input
               type="number"
               name="giaVeCoBan"

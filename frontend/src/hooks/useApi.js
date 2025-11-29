@@ -7,6 +7,9 @@ import { refreshAuth } from "../redux/features/authSlice";
 const useApi = (isProtected = false) => {
   const accessToken = useSelector((state) => state.auth.accessToken)
 
+  // console.log(accessToken);
+
+
   const axiosInstance = useMemo(() => {
     const inst = axios.create({
       baseURL: "http://localhost:5000/api",

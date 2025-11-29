@@ -7,21 +7,26 @@ import toast from 'react-hot-toast'
 import { useDispatch, useSelector } from 'react-redux'
 import { logout } from '../redux/features/authSlice'
 import ProfileSidebar from '../components/ProfileSidebar'
+import ChiTietLichSuDatVe from '../components/ChiTietLichSuDatVe'
 
 
 const LichSuDatVe = () => {
 
-  const user = useSelector((state) => state.auth.user)
+  const api = useApi(true)
   const dispatch = useDispatch()
+  const user = useSelector((state) => state.auth.user)
   const currency = import.meta.env.VITE_CURRENCY || '₫'
   const [bookings, setBookings] = useState([])
   const [isLoading, setIsLoading] = useState(true)
-  const api = useApi(true)
+  const [selectedBooking, setSelectedBooking] = useState(null)
+  const [showDetail, setShowDetail] = useState(false)
 
   const getMyBookings = async () => {
     try {
       setIsLoading(true)
       const res = await api.get('/datve/user')
+      console.log(res.data);
+
       setBookings(res.data || [])
     } catch (error) {
       console.error(error)
@@ -34,6 +39,8 @@ const LichSuDatVe = () => {
   useEffect(() => {
     getMyBookings()
   }, [])
+
+
 
   return !isLoading ? (
     <div className='relative my-40 mb-20 md:px-16 lg:px-40 xl:px-44 overflow-hidden min-h-screen'>
@@ -59,7 +66,12 @@ const LichSuDatVe = () => {
               const isSuccess = item.trangThai === 'Thành công' || thanhToan.trangThai === 'Thành công'
 
               return (
-                <div key={index} className='flex flex-col md:flex-row justify-between bg-primary/8 
+                <div key={index}
+                  onClick={() => {
+                    setSelectedBooking(item);
+                    setShowDetail(true);
+                  }}
+                  className='flex flex-col md:flex-row justify-between bg-primary/8 
               border border-primary/20 rounded-lg mt-4 p-2 max-w-3xl'>
                   <div className='flex flex-col md:flex-row'>
                     <img
@@ -96,7 +108,7 @@ const LichSuDatVe = () => {
                   )} */}
                     </div>
                     <div className='text-sm'>
-                      <p><span className='text-primary'>Ghế: </span>{item.soGhe || 'N/A'}</p>
+                      <p><span className='text-primary'>Ghế: </span>{item.chiTietDatVes.map(ct => `${ct.ghe.hang}${ct.ghe.soGhe}`).join(', ')}</p>
                       <p>
                         <span className='text-primary'>Trạng thái: </span>
                         <b className={isSuccess ? 'text-green-500' : 'text-red-400'}>
@@ -114,6 +126,10 @@ const LichSuDatVe = () => {
           )}
         </div>
       </div>
+      {showDetail &&
+        <ChiTietLichSuDatVe
+          bookings={selectedBooking}
+          onClose={() => setShowDetail(false)} />}
     </div>
   ) : (
     <Loading height="100vh" />

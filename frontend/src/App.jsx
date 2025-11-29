@@ -12,9 +12,6 @@ import { Toaster } from 'react-hot-toast'
 import Footer from './components/Footer'
 import Layout from './pages/admin/Layout'
 import Dashboard from './pages/admin/Dashboard'
-import AddShows from './pages/admin/AddShows'
-import ListShows from './pages/admin/ListShows'
-import ListBookings from './pages/admin/ListBookings'
 import ProtectedRoute from './components/ProtectedRoute'
 import TrangCaNhan from './pages/TrangCaNhan'
 import QuanLyphim from './pages/admin/QuanLyphim'
@@ -31,6 +28,7 @@ import TheLoai from './pages/TheLoai'
 import Banner from './pages/admin/Banner'
 import QuanLyGhe from './pages/admin/QuanLyGhe'
 import QuanLySuatChieu from './pages/admin/QuanLySuatChieu'
+import QuanLyDonDatVe from './pages/admin/QuanLyDonDatVe'
 
 const App = () => {
 
@@ -103,9 +101,7 @@ const App = () => {
           <Route path='phong-chieu' element={<PhongChieu />} />
           <Route path='quan-ly-ghe' element={<QuanLyGhe />} />
           <Route path='quan-ly-suat-chieu' element={<QuanLySuatChieu />} />
-          <Route path='add-shows' element={<AddShows />} />
-          <Route path='list-shows' element={<ListShows />} />
-          <Route path='list-bookings' element={<ListBookings />} />
+          <Route path='quan-ly-don-dat-ve' element={<QuanLyDonDatVe />} />
         </Route>
 
       </Routes>

@@ -148,7 +148,7 @@ const Banner = () => {
         <div className="fixed inset-0 bg-black/70 flex justify-center items-center z-50">
           <div className="bg-black/80 border border-primary p-6 rounded-lg w-96">
             <h2 className="text-lg font-semibold mb-4">
-              {editItem ? 'Sửa đạo diễn' : 'Thêm đạo diễn'}
+              {editItem ? 'Sửa Ảnh Banner' : 'Thêm Ảnh Banner'}
             </h2>
             <form onSubmit={handleSubmit}>
 
@@ -158,7 +158,7 @@ const Banner = () => {
                 <input
                   type="file"
                   accept="image/*"
-                  className="w-full p-2 mb-4 rounded bg-gray-700 border border-gray-600 text-white"
+                  className="w-full p-2 mb-4 rounded bg-[#111] border border-gray-600 text-white"
                   onChange={(e) => {
                     const file = e.target.files[0]
                     if (file) {

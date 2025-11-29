@@ -1,4 +1,5 @@
 import React from "react";
+import { formatDate } from "../../lib/dateFormat";
 
 const PhimDetail = ({ phim, onClose }) => {
   if (!phim) return null;
@@ -21,7 +22,7 @@ const PhimDetail = ({ phim, onClose }) => {
           <div className="flex-1 space-y-2">
             <p><span className="text-primary">Tên phim:</span> {phim.tenPhim}</p>
             <p><span className="text-primary">Thời lượng:</span> {phim.thoiLuong} phút</p>
-            <p><span className="text-primary">Ngày công chiếu:</span> {new Date(phim.ngayCongChieu).toLocaleDateString()}</p>
+            <p><span className="text-primary">Ngày công chiếu:</span> {formatDate(phim.ngayCongChieu)}</p>
             <p><span className="text-primary">Đạo diễn:</span> {phim.daoDien?.tenDaoDien}</p>
             <p><span className="text-primary">Thể loại:</span> {phim.theLoais?.map(t => t.tenTheLoai).join(", ")}</p>
             <p><span className="text-primary">Diễn viên:</span> {phim.dienViens?.map(v => v.tenDienVien).join(", ")}</p>

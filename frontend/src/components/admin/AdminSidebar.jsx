@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { assets } from '../../assets/assets'
 import {
   LayoutDashboardIcon,
   FilmIcon,
@@ -24,14 +23,11 @@ import {
   ImagePlus,
   Armchair
 } from 'lucide-react'
+import { useSelector } from 'react-redux'
 import { NavLink } from 'react-router-dom'
 
 const AdminSidebar = () => {
-  const user = {
-    firstName: 'Admin',
-    lastName: 'User',
-    imageUrl: assets.profile
-  }
+  const user = useSelector((state) => state.auth.user)
 
   const [openMenus, setOpenMenus] = useState({})
 
@@ -72,7 +68,7 @@ const AdminSidebar = () => {
     },
     { name: 'Quản lý suất chiếu', path: '/admin/quan-ly-suat-chieu', icon: ClockIcon },
 
-    { name: 'Quản lý đơn đặt vé', path: '/admin/don-dat-ve', icon: TicketIcon },
+    { name: 'Quản lý đơn đặt vé', path: '/admin/quan-ly-don-dat-ve', icon: TicketIcon },
     {
       name: 'Quản lý rạp',
       icon: Building2Icon,
@@ -104,13 +100,13 @@ const AdminSidebar = () => {
     <div className='h-[calc(100vh-64px)] md:flex flex-col items-center pt-8 max-w-13 md:max-w-60
     border-r border-gray-300/30 w-full text-sm overflow-y-auto bg-gray-950 no-scrollbar sticky top-[64px]'>
       {/* Avatar + tên admin */}
-      <div className='flex flex-col items-center'>
-        <img src={user.imageUrl} alt="" className='h-9 md:h-14 w-9 md:w-14 rounded-full mx-auto' />
-        <p className='mt-2 text-base max-md:hidden text-gray-200'>{user.firstName} {user.lastName}</p>
+      <div className='flex flex-col items-center border-b border-gray-700 pb-6'>
+        <img src={user.anhDaiDien} alt="" className='h-9 md:h-18 w-9 md:w-18 rounded-full mx-auto' />
+        <p className='mt-2 text-xl max-md:hidden font-medium text-gray-200'>{user.hoTen}</p>
       </div>
 
       {/* Danh sách menu */}
-      <div className='w-full mt-6 space-y-2'>
+      <div className='w-full mt-2 space-y-2'>
         {adminNavlinks.map((link, index) => (
           <div key={index} className='mb-1'>
             {/* Mục không có children */}

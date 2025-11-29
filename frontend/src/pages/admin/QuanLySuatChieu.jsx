@@ -62,7 +62,6 @@ const QuanLySuatChieu = () => {
   };
 
   const handleDelete = async (maSuatChieu) => {
-    if (!confirm("Xoá suất chiếu này?")) return;
     try {
       await api.delete(`/suatchieu/${maSuatChieu}`);
       toast.success("Đã xoá!");

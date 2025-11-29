@@ -7,7 +7,15 @@ const ThanhToan = sequelize.define('ThanhToan', {
   phuongThuc: { type: DataTypes.STRING(50), allowNull: true },
   soTien: { type: DataTypes.DECIMAL(10, 2), allowNull: false },
   ngayThanhToan: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
-  trangThai: { type: DataTypes.STRING(50), allowNull: true }
+  trangThai: {
+    type: DataTypes.ENUM(
+      'Chờ xử lý',
+      'Thành công',
+      'Thất bại'
+    ),
+    allowNull: false,
+    defaultValue: 'Chờ xử lý'
+  },
 }, {
   tableName: 'THANH_TOAN',
   timestamps: false

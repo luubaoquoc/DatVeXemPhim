@@ -2,8 +2,105 @@ import sequelize from '../configs/sequelize.js';
 import createMoMoPayment from '../helpers/momo.js';
 import createStripePayment from '../helpers/stripe.js';
 import { createVNPayPayment } from '../helpers/VNPay.js';
-import { DatVe, Phim, PhongChieu, SuatChieu, ThanhToan } from '../models/index.js';
+import ChiTietDatVe from '../models/ChiTietDatVe.js';
+import { DatVe, Ghe, Phim, PhongChieu, SuatChieu, TaiKhoan, ThanhToan } from '../models/index.js';
+import { Op } from 'sequelize';
 
+
+
+
+// GET /api/don-dat-ve
+export const getAllDatVe = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const search = req.query.search?.trim() || "";
+    const status = req.query.status || "";
+    const toDate = req.query.toDate;
+
+    const offset = (page - 1) * limit;
+
+    // WHERE conditions
+    let whereOp = {};
+
+    // 🔍 Search theo maDatVe, tên phim, tên người đặt
+    if (search) {
+      whereOp = {
+        [Op.or]: [
+          { maDatVe: { [Op.like]: `%${search}%` } },
+          // { '$suatChieu.phim.tenPhim$': { [Op.like]: `%${search}%` } },
+          // { '$khachHang.hoTen$': { [Op.like]: `%${search}%` } },
+        ]
+      };
+    }
+
+    // 📅 Lọc theo ngày
+    // if (fromDate && toDate) {
+    //   whereOp.ngayDat = {
+    //     [Op.between]: [new Date(fromDate), new Date(toDate)]
+    //   };
+    // }
+
+    // 🟩 Lọc trạng thái
+    if (status === "success") {
+      whereOp.trangThai = "Thành công";
+    } else if (status === "failed") {
+      whereOp.trangThai = "Thất bại";
+    }
+
+    const totalItems = await DatVe.count({ where: whereOp });
+
+    const datVes = await DatVe.findAll({
+      where: whereOp,
+      offset,
+      limit,
+      include: [
+        {
+          model: TaiKhoan,
+          as: "khachHang",
+          attributes: ["maTaiKhoan", "hoTen", "email"]
+        },
+        {
+          model: SuatChieu,
+          as: "suatChieu",
+          include: [
+            {
+              model: Phim,
+              as: "phim",
+              attributes: ["maPhim", "tenPhim", "poster"]
+            },
+            {
+              model: PhongChieu,
+              as: "phongChieu",
+              attributes: ["maPhong", "tenPhong"]
+            }
+          ]
+        },
+        {
+          model: ChiTietDatVe,
+          as: "chiTietDatVes",
+          include: [{ model: Ghe, as: "ghe" }]
+        },
+        {
+          model: ThanhToan,
+          as: "thanhToan"
+        }
+      ],
+      order: [["ngayDat", "DESC"]]
+    });
+
+    res.json({
+      data: datVes,
+      currentPage: page,
+      totalItems,
+      totalPages: Math.ceil(totalItems / limit)
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Lỗi server" });
+  }
+};
 
 
 
@@ -16,87 +113,95 @@ export const createDatVe = async (req, res) => {
 
     const { maSuatChieu, chiTiet, tongTien, phuongThuc } = req.body;
 
-    let seatLabels = [];
-    if (Array.isArray(chiTiet) && chiTiet.length > 0) {
-      if (typeof chiTiet[0] === 'string') seatLabels = chiTiet;
-      else if (typeof chiTiet[0] === 'object') seatLabels = chiTiet.map(i => i.soGhe || i.maGhe);
-    }
-    seatLabels = seatLabels.filter(Boolean);
-    if (!maSuatChieu || seatLabels.length === 0)
+    if (!maSuatChieu || !Array.isArray(chiTiet) || chiTiet.length === 0)
       return res.status(400).json({ message: 'Dữ liệu đặt vé không hợp lệ' });
 
-    //  Bước 1: Lấy tất cả các ghế đã được đặt cho suất chiếu này (đang chờ hoặc thành công)
-    const existing = await DatVe.findAll({
+    // Format: chiTiet = [{ maGhe, giaVe }, ...]
+    const maGheList = chiTiet.map(g => g.maGhe);
+
+    //  1. Check ghế đã có người giữ chưa
+    const conflict = await ChiTietDatVe.findAll({
       where: {
-        maSuatChieu,
-        trangThai: ['Đang chờ', 'Thành công'],
+        maGhe: maGheList,
       },
-      attributes: ['soGhe'],
-      transaction: t,
-      lock: t.LOCK.UPDATE, // khóa hàng trong transaction
+      include: {
+        model: DatVe,
+        as: 'datVe',
+        where: {
+          maSuatChieu,
+          trangThai: { [Op.in]: ['Đang chờ', 'Thành công'] }
+        }
+      },
+      lock: t.LOCK.UPDATE,
+      transaction: t
     });
 
-    // Gộp lại thành danh sách ghế đang bị chiếm
-    const booked = existing
-      .flatMap(v => String(v.soGhe).split(',').map(s => s.trim()))
-      .filter(Boolean);
-
-    // Kiểm tra trùng
-    const conflict = seatLabels.filter(s => booked.includes(s));
     if (conflict.length > 0) {
       await t.rollback();
+      const gheLoi = conflict.map(c => c.maGhe);
       return res.status(409).json({
-        message: `Các ghế ${conflict.join(', ')} đã có người đặt!`,
+        message: `Ghế ${gheLoi.join(', ')} đã có người đặt`
       });
     }
 
-    const thoihanThanhToan = new Date(Date.now() + 5 * 60 * 1000);
+    const thoiHanThanhToan = new Date(Date.now() + 5 * 60 * 1000);
 
-    // 🟩 Bước 2: Tạo đặt vé mới (lưu trạng thái 'Đang chờ' và tạo bản ghi thanh toán - có hoặc không có phuongThuc)
-    const newDatVe = await DatVe.create({
+    //  2. Tạo DatVe
+    const datVe = await DatVe.create({
       maTaiKhoanDatVe: maTaiKhoan,
       maSuatChieu,
-      ngayDat: new Date(),
-      tongTien: tongTien || 0,
+      tongTien,
+      tongSoGhe: chiTiet.length,
       trangThai: 'Đang chờ',
-      soGhe: seatLabels.join(','),
-      thoiHanThanhToan: thoihanThanhToan,
+      thoiHanThanhToan
     }, { transaction: t });
 
+    //  3. Lưu ChiTietDatVe
+    const ct = chiTiet.map(g => ({
+      maDatVe: datVe.maDatVe,
+      maGhe: g.maGhe,
+      giaVe: g.giaVe,
+    }));
+
+    await ChiTietDatVe.bulkCreate(ct, { transaction: t });
+
+    //  4. Tạo bản ghi thanh toán
     const thanhToan = await ThanhToan.create({
-      maDatVe: newDatVe.maDatVe,
+      maDatVe: datVe.maDatVe,
       phuongThuc: phuongThuc || null,
       soTien: tongTien,
       ngayThanhToan: new Date(),
       trangThai: 'Chờ xử lý',
     }, { transaction: t });
 
-    // Nếu không cung cấp phuongThuc -> chỉ tạo đặt vé (đang chờ) và trả về dữ liệu đặt vé (không gọi cổng thanh toán)
+    //  Nếu chưa chọn phương thức thanh toán -> chỉ giữ ghế
     if (!phuongThuc) {
       await t.commit();
-      return res.status(200).json({
-        message: 'Đặt vé đã được lưu tạm thời (Đang chờ). Vui lòng thực hiện thanh toán trong thời gian giữ ghế.',
-        maDatVe: newDatVe.maDatVe,
-        thoiHanThanhToan: newDatVe.thoiHanThanhToan,
+      return res.json({
+        message: 'Đã giữ ghế. Hãy thanh toán trong thời hạn.',
+        maDatVe: datVe.maDatVe,
+        thoiHanThanhToan
       });
     }
 
-    // 🟦 Bước 3: Nếu có phuongThuc -> gọi cổng thanh toán ngay như trước
+    //  Chọn cổng thanh toán
     let redirectUrl;
-    if (phuongThuc === 'momo') redirectUrl = await createMoMoPayment(newDatVe, tongTien);
-    else if (phuongThuc === 'vnpay') redirectUrl = await createVNPayPayment(newDatVe, tongTien, req);
-    else if (phuongThuc === 'stripe') redirectUrl = await createStripePayment(newDatVe, tongTien);
-
-    if (!redirectUrl) throw new Error('Không tạo được URL thanh toán');
+    if (phuongThuc === 'momo')
+      redirectUrl = await createMoMoPayment(datVe, tongTien);
+    else if (phuongThuc === 'vnpay')
+      redirectUrl = await createVNPayPayment(datVe, tongTien, req);
+    else if (phuongThuc === 'stripe')
+      redirectUrl = await createStripePayment(datVe, tongTien);
 
     await t.commit();
-    return res.status(200).json({
-      message: 'Tạo đơn đặt vé thành công, chuyển sang cổng thanh toán...',
-      redirectUrl,
+
+    return res.json({
+      message: 'Tạo đơn đặt vé thành công',
+      redirectUrl
     });
 
-  } catch (error) {
-    console.error('createDatVe error:', error);
+  } catch (err) {
+    console.error(err);
     await t.rollback();
     return res.status(500).json({ message: 'Lỗi server' });
   }
@@ -118,17 +223,28 @@ export const listMyDatVes = async (req, res) => {
           include: [
             {
               model: Phim,
-              as: 'phim'
+              as: 'phim',
             },
             {
               model: PhongChieu,
-              as: 'phongChieu'
+              as: 'phongChieu',
             }
           ]
         },
         {
           model: ThanhToan,
-          as: 'thanhToan'
+          as: 'thanhToan',
+        },
+        {
+          model: ChiTietDatVe,
+          as: 'chiTietDatVes',
+          attributes: ['maGhe'],
+          include: [
+            {
+              model: Ghe,
+              as: 'ghe',
+            }
+          ],
         }
       ],
       order: [['ngayDat', 'DESC']]
@@ -143,28 +259,41 @@ export const listMyDatVes = async (req, res) => {
 export const getGheDaDat = async (req, res) => {
   try {
     const maSuatChieu = Number(req.params.maSuatChieu);
-    if (!maSuatChieu) {
-      return res.status(400).json({ message: 'Mã suất chiếu không hợp lệ' });
-    }
 
-    // Lấy tất cả đặt vé có cùng mã suất chiếu và không bị hủy/thất bại
-    const datVes = await DatVe.findAll({
-      where: {
-        maSuatChieu,
-        trangThai: ['Đang chờ', 'Thành công'] // tùy bạn muốn include trạng thái nào
-      },
-      attributes: ['soGhe']
+    const rows = await ChiTietDatVe.findAll({
+      include: [
+        {
+          model: DatVe,
+          as: 'datVe', // alias đã define trong association
+          where: {
+            maSuatChieu,
+            trangThai: { [Op.in]: ['Đang chờ', 'Đang thanh toán', 'Thành công'] }
+          },
+          attributes: []
+        },
+        {
+          model: Ghe,
+          as: 'ghe', // alias bạn đặt trong association ChiTietDatVe -> Ghe
+          attributes: ['hang', 'soGhe']
+        }
+      ],
+      attributes: ['maGhe'] // vẫn lấy maGhe để tham chiếu
     });
 
-    // Gộp danh sách ghế
-    const gheDaDat = datVes
-      .flatMap(v => String(v.soGhe).split(',').map(s => s.trim()))
-      .filter(Boolean);
 
-    return res.json({ maSuatChieu, gheDaDat });
-  } catch (error) {
-    console.error('getGheDaDat error:', error);
-    return res.status(500).json({ message: 'Lỗi server' });
+    const gheDaDat = rows.map(r => {
+      const g = r.ghe;
+      return g ? `${g.hang}${g.soGhe}`.toUpperCase() : null;
+    }).filter(Boolean);
+
+    return res.json({
+      maSuatChieu,
+      gheDaDat
+    });
+
+  } catch (e) {
+    console.error(">>> LỖI getGheDaDat:", e);
+    return res.status(500).json({ message: 'Lỗi server', error: e.message });
   }
 };
 
@@ -196,10 +325,19 @@ export const createCheckoutForDatVe = async (req, res) => {
       await t.rollback();
       return res.status(400).json({ message: 'Đặt vé không ở trạng thái đang chờ' });
     }
-    if (datVe.thoiHanThanhToan && new Date(datVe.thoiHanThanhToan) < new Date()) {
-      await t.rollback();
+    if (new Date(datVe.thoiHanThanhToan) < new Date()) {
+      await datVe.update({ trangThai: 'Đã hủy' }, { transaction: t });
+      await t.commit();
       return res.status(400).json({ message: 'Thời gian giữ ghế đã hết' });
     }
+
+    await datVe.update(
+      {
+        trangThai: 'Đang thanh toán',
+        thoiHanThanhToan: new Date(Date.now() + 5 * 60 * 1000)
+      },
+      { transaction: t }
+    );
 
     // update or create payment record
     const thanhToan = await ThanhToan.findOne({ where: { maDatVe }, transaction: t, lock: t.LOCK.UPDATE });
@@ -208,7 +346,13 @@ export const createCheckoutForDatVe = async (req, res) => {
       return res.status(500).json({ message: 'Không tìm thấy bản ghi thanh toán' });
     }
 
-    await thanhToan.update({ phuongThuc, soTien: tongTien || thanhToan.soTien, ngayThanhToan: new Date(), trangThai: 'Chờ xử lý' }, { transaction: t });
+    await thanhToan.update(
+      {
+        phuongThuc, soTien: tongTien || thanhToan.soTien,
+        ngayThanhToan: new Date(),
+        trangThai: 'Đang thanh toán'
+      },
+      { transaction: t });
 
     // call payment provider
     let redirectUrl;
@@ -232,36 +376,34 @@ export const createCheckoutForDatVe = async (req, res) => {
 
 
 // GET /api/datve/:maDatVe - get booking detail (owner or admin)
-export const getDatVe = async (req, res) => {
-  try {
-    const ma = Number(req.params.maDatVe);
-    if (!ma) return res.status(400).json({ message: 'maDatVe không hợp lệ' });
-    const datVe = await DatVe.findByPk(ma);
-    if (!datVe) return res.status(404).json({ message: 'Đặt vé không tồn tại' });
-    // check ownership
-    if (req.user.maTaiKhoan !== datVe.maTaiKhoan && req.user.maVaiTro !== 4) return res.status(403).json({ message: 'Không có quyền truy cập' });
-    const result = datVe.get({ plain: true });
-    // expose parsed seat labels as array for convenience
-    result.soGheList = result.soGhe ? String(result.soGhe).split(',').map(s => s.trim()).filter(Boolean) : [];
-    return res.json(result);
-  } catch (error) {
-    console.error('getDatVe error:', error);
-    return res.status(500).json({ message: 'Lỗi server' });
-  }
-};
+// export const getDatVe = async (req, res) => {
+//   try {
+//     const ma = Number(req.params.maDatVe);
+//     if (!ma) return res.status(400).json({ message: 'maDatVe không hợp lệ' });
+//     const datVe = await DatVe.findByPk(ma);
+//     if (!datVe) return res.status(404).json({ message: 'Đặt vé không tồn tại' });
+//     // check ownership
+//     if (req.user.maTaiKhoan !== datVe.maTaiKhoan && req.user.maVaiTro !== 4) return res.status(403).json({ message: 'Không có quyền truy cập' });
+//     const result = datVe.get({ plain: true });
+//     // expose parsed seat labels as array for convenience
+//     result.soGheList = result.soGhe ? String(result.soGhe).split(',').map(s => s.trim()).filter(Boolean) : [];
+//     return res.json(result);
+//   } catch (error) {
+//     console.error('getDatVe error:', error);
+//     return res.status(500).json({ message: 'Lỗi server' });
+//   }
+// };
 
-// PUT /api/datve/:maDatVe/status (admin only) - update status
-export const updateDatVeStatus = async (req, res) => {
+export const deleteDatVe = async (req, res) => {
   try {
-    const ma = Number(req.params.maDatVe);
-    const { trangThai } = req.body;
-    if (!ma || !trangThai) return res.status(400).json({ message: 'Dữ liệu không hợp lệ' });
-    const datVe = await DatVe.findByPk(ma);
+    const maDatVe = Number(req.params.maDatVe);
+    if (!maDatVe) return res.status(400).json({ message: 'maDatVe không hợp lệ' });
+    const datVe = await DatVe.findByPk(maDatVe);
     if (!datVe) return res.status(404).json({ message: 'Đặt vé không tồn tại' });
-    await datVe.update({ trangThai });
-    return res.json({ message: 'Cập nhật trạng thái thành công', datVe });
+    await datVe.destroy();
+    return res.json({ message: 'Đã xóa đặt vé' });
   } catch (error) {
-    console.error('updateDatVeStatus error:', error);
+    console.error('deleteDatVe error:', error);
     return res.status(500).json({ message: 'Lỗi server' });
   }
 };

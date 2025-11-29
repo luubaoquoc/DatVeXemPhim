@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import { sendVerificationEmail } from "../utils/sendEmail.js";
 
 const createAccessToken = (user) => {
-  return jwt.sign(user, process.env.JWT_ACCESS_SECRET, { expiresIn: "15m" });
+  return jwt.sign(user, process.env.JWT_ACCESS_SECRET, { expiresIn: "1h" });
 };
 
 const createRefreshToken = (user) => {

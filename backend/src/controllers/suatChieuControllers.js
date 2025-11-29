@@ -10,7 +10,22 @@ export const listSuatChieus = async (req, res) => {
     const where = {};
     if (req.query.maPhim) where.maPhim = Number(req.query.maPhim);
 
-    const { count, rows } = await SuatChieu.findAndCountAll({ where, include: [{ model: Phim, as: 'phim', attributes: ['maPhim', 'tenPhim'] }, { model: PhongChieu, as: 'phongChieu', attributes: ['maPhong', 'tenPhong'] }], limit, offset, order: [['maSuatChieu', 'ASC']] });
+    const { count, rows } = await SuatChieu.findAndCountAll(
+      {
+        where, include: [
+          {
+            model: Phim,
+            as: 'phim',
+            attributes: ['maPhim', 'tenPhim']
+          },
+          {
+            model: PhongChieu,
+            as: 'phongChieu',
+            attributes: ['maPhong', 'tenPhong']
+          }
+        ],
+        limit, offset, order: [['maSuatChieu', 'DESC']]
+      });
     return res.json({ total: count, page, limit, data: rows });
   } catch (error) {
     console.error('listSuatChieus error:', error);
@@ -182,6 +197,8 @@ export const updateSuatChieu = async (req, res) => {
     if (!ma) return res.status(400).json({ message: 'maSuatChieu không hợp lệ' });
     const sc = await SuatChieu.findByPk(ma);
     if (!sc) return res.status(404).json({ message: 'Suất chiếu không tồn tại' });
+    console.log(req.body);
+
     await sc.update(req.body);
     return res.json({ message: 'Cập nhật suất chiếu thành công', suatChieu: sc });
   } catch (error) {

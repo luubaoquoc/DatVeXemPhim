@@ -8,7 +8,7 @@ import BlurCircle from '../components/BlurCircle'
 import toast from 'react-hot-toast'
 import useApi from '../hooks/useApi'
 import ThongoTinDatVe from '../components/ThongTinDatVe'
-import GheLayout from '../components/gheLayout'
+import GheLayout from '../components/GheLayout'
 
 const SoDoGheNgoi = () => {
   const { maPhim: _maPhim, maSuatChieu } = useParams()
@@ -72,6 +72,8 @@ const SoDoGheNgoi = () => {
       if (!maSuatChieu) return
       try {
         const res = await api.get(`/datve/ghe-da-dat/${maSuatChieu}`)
+        console.log(res.data.gheDaDat);
+
         // backend nên trả array dạng ['A1','B2', ...]
         const booked = (res.data.gheDaDat || res.data || []).map(s => String(s).trim().toUpperCase())
         setBookedSeats(booked)
@@ -104,12 +106,16 @@ const SoDoGheNgoi = () => {
     try {
       const payload = {
         maSuatChieu,
-        chiTiet: selectedSeats.map(seatId => {
-          const s = seats.find(s => s.maGhe === seatId || s.id === seatId);
-          return s ? `${s.hang}${s.soGhe}` : seatId;
-        }),
         tongTien: selectedSeats.length * (show.giaVeCoBan || 0),
+        chiTiet: selectedSeats.map(seatId => {
+          const s = seats.find(s => `${s.hang}${s.soGhe}` === seatId);
+          return {
+            maGhe: s.maGhe,
+            giaVe: show.giaVeCoBan
+          };
+        }),
       };
+
       const res = await api.post("/datve", payload);
       if (res.data?.maDatVe) {
         navigate("/thanh-toan", {
@@ -134,7 +140,6 @@ const SoDoGheNgoi = () => {
     }
   }
 
-  console.log(bookedSeats);
 
 
   // Giao diện chính

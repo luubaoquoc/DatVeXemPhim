@@ -197,7 +197,7 @@ const PhongChieu = () => {
                 <input
                   type="text"
                   name="tenPhong"
-                  className="w-full p-2 mb-4 rounded bg-gray-700 border border-gray-600 text-white"
+                  className="w-full p-2 mb-4 rounded bg-[#111] border border-gray-600 text-white"
                   placeholder="Tên phòng..."
                   value={formData.tenPhong}
                   onChange={handleChange}
@@ -210,7 +210,7 @@ const PhongChieu = () => {
                 <input
                   type="number"
                   name="tongSoGhe"
-                  className="w-full p-2 mb-4 rounded bg-gray-700 border border-gray-600 text-white"
+                  className="w-full p-2 mb-4 rounded bg-[#111] border border-gray-600 text-white"
                   value={formData.tongSoGhe || ""}
                   onChange={handleChange}
                 />
@@ -220,7 +220,7 @@ const PhongChieu = () => {
                 <label className="block mb-1">Chọn rạp</label>
                 <select
                   name="maRap"
-                  className="w-full p-2 mb-4 rounded bg-gray-700 border border-gray-600 text-white cursor-pointer"
+                  className="w-full p-2 mb-4 rounded bg-[#111] border border-gray-600 text-white cursor-pointer"
                   value={formData.maRap}
                   onChange={handleChange}
                   required

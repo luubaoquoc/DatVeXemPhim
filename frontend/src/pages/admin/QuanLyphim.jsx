@@ -9,6 +9,7 @@ import Pagination from '../../components/admin/Paginnation'
 import DeleteForm from '../../components/admin/DeleteForm'
 import PhimDetail from '../../components/admin/ChiTietPhim'
 import SearchInput from '../../components/SearchInput'
+import { formatDate } from '../../lib/dateFormat'
 
 const QuanLyPhim = () => {
   const api = useApi(true)
@@ -23,6 +24,7 @@ const QuanLyPhim = () => {
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const limit = 5;
+  const [filterStatus, setFilterStatus] = useState("tất cả")
 
   useEffect(() => {
     dispatch(fetchPhims({ page: currentPage, limit, search }))
@@ -84,11 +86,28 @@ const QuanLyPhim = () => {
         </button>
       </div>
 
-      <SearchInput
-        search={search}
-        setSearch={setSearch}
-        setCurrentPage={setCurrentPage}
-      />
+      <div className='flex flex-wrap gap-3 mb-4'>
+        <SearchInput
+          search={search}
+          setSearch={setSearch}
+          setCurrentPage={setCurrentPage}
+        />
+
+        {/* Trạng thái */}
+        <select
+          className="border border-primary/30 rounded-md px-3 py-2 bg-black h-[3rem] outline-none"
+          value={filterStatus}
+          onChange={(e) => {
+            setFilterStatus(e.target.value);
+            setCurrentPage(1);
+          }}
+        >
+          <option value="tất cả">Tất cả trạng thái</option>
+          <option value="Đang chiếu">Đang chiếu</option>
+          <option value="Sắp chiếu">Sắp chiếu</option>
+          <option value="Ngừng chiếu">Ngừng chiếu</option>
+        </select>
+      </div>
 
       {status === 'loading' ? (
         <p>Đang tải danh sách phim...</p>
@@ -101,13 +120,14 @@ const QuanLyPhim = () => {
               <th className="p-2 text-left">Tên phim</th>
               <th className="p-2">Thời lượng</th>
               <th className="p-2">Ngày công chiếu</th>
+              <th className="p-2">Trạng thái</th>
               <th className="p-2">Hành động</th>
             </tr>
           </thead>
           <tbody>
             {phims?.map((phim, index) => (
               <tr key={phim.maPhim} className="text-center border-b border-primary/30">
-                <td className="p-2">{index + 1}</td>
+                <td className="p-2">{(currentPage - 1) * limit + index + 1}</td>
                 <td className="p-2">
                   <img
                     src={phim.poster}
@@ -119,8 +139,11 @@ const QuanLyPhim = () => {
                 <td className="p-2">{phim.thoiLuong || '-'} Phút</td>
                 <td className="p-2">
                   {phim.ngayCongChieu
-                    ? new Date(phim.ngayCongChieu).toLocaleDateString()
+                    ? formatDate(phim.ngayCongChieu)
                     : '-'}
+                </td>
+                <td className='p-2'>
+                  {phim.trangThaiChieu}
                 </td>
                 <td className="p-2">
                   <button

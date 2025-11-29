@@ -55,15 +55,15 @@ const Navbar = () => {
             ${openDienAnhDropdown ? "opacity-100 visible" : "opacity-0 invisible"}
           `}
           >
-            <Link to="/dao-dien" className="flex px-4 py-2 text-sm text-gray-300 hover:bg-primary/20 hover:border-l border-primary">
+            <Link onClick={() => { scrollTo(0, 0); setIsOpen(false) }} to="/dao-dien" className="flex px-4 py-2 text-sm text-gray-300 hover:bg-primary/20 hover:border-l border-primary">
               Đạo Diễn
             </Link>
 
-            <Link to="/dien-vien" className="flex px-4 py-2 text-sm text-gray-300 hover:bg-primary/20 hover:border-l border-primary">
+            <Link onClick={() => { scrollTo(0, 0); setIsOpen(false) }} to="/dien-vien" className="flex px-4 py-2 text-sm text-gray-300 hover:bg-primary/20 hover:border-l border-primary">
               Diễn Viên
             </Link>
 
-            <Link to="/the-loai" className="flex px-4 py-2 text-sm text-gray-300 hover:bg-primary/20 hover:border-l border-primary">
+            <Link onClick={() => { scrollTo(0, 0); setIsOpen(false) }} to="/the-loai" className="flex px-4 py-2 text-sm text-gray-300 hover:bg-primary/20 hover:border-l border-primary">
               Thể Loại
             </Link>
           </div>

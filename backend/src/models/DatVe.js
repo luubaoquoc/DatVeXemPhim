@@ -16,10 +16,11 @@ const DatVe = sequelize.define('DatVe', {
   maSuatChieu: { type: DataTypes.INTEGER, allowNull: false },
   ngayDat: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
   tongTien: { type: DataTypes.DECIMAL(10, 2), allowNull: false },
-  soGhe: { type: DataTypes.STRING, allowNull: false },
+  tongSoGhe: { type: DataTypes.INTEGER, allowNull: false },
   trangThai: {
     type: DataTypes.ENUM(
       'Đang chờ',
+      'Đang thanh toán',
       'Thành công',
       'Thất bại'
     ),

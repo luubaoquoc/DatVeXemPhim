@@ -189,7 +189,7 @@ const Rap = () => {
                 <input
                   type="text"
                   name="tenRap"
-                  className="w-full p-2 mb-4 rounded bg-gray-700 border border-gray-600 text-white"
+                  className="w-full p-2 mb-4 rounded bg-[#111] border border-gray-600 text-white"
                   placeholder="Tên rạp..."
                   value={formData.tenRap}
                   onChange={handleChange}
@@ -201,7 +201,7 @@ const Rap = () => {
                 <input
                   type="text"
                   name="diaChi"
-                  className="w-full p-2 mb-4 rounded bg-gray-700 border border-gray-600 text-white"
+                  className="w-full p-2 mb-4 rounded bg-[#111] border border-gray-600 text-white"
                   value={formData.diaChi || ""}
                   onChange={handleChange}
                 />
@@ -212,7 +212,7 @@ const Rap = () => {
                 <input
                   type="text"
                   name="soDienThoai"
-                  className="w-full p-2 mb-4 rounded bg-gray-700 border border-gray-600 text-white"
+                  className="w-full p-2 mb-4 rounded bg-[#111] border border-gray-600 text-white"
                   value={formData.soDienThoai || ""}
                   onChange={handleChange}
                   required

@@ -297,7 +297,7 @@ const ChiTietPhim = () => {
           <h3 className="text-xl font-medium mb-4 border-l-3 pl-2 border-primary">
             Phim đang chiếu
           </h3>
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-row flex-wrap lg:flex-col gap-6">
             {otherMovies.length > 0
               ? otherMovies.map((m, idx) => (
                 <MoviesCard key={idx} movie={m} />

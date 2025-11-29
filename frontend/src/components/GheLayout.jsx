@@ -8,14 +8,14 @@ const Seat = ({ seat, isBooked, isSelected, onClick, mode }) => {
   const bg = mode === "management"
     ? seat.trangThai
       ? "bg-primary/20"  // khả dụng
-      : "bg-gray-600"    // khóa/hỏng
+      : "bg-red-500"    // khóa/hỏng
     : isBooked
       ? "bg-primary/60 text-white cursor-not-allowed"
       : isSelected
         ? "bg-primary text-white"
         : seat.trangThai
           ? "bg-primary/20"
-          : "bg-gray-600";
+          : "bg-red-500";
 
   return (
     <button

@@ -15,6 +15,7 @@ import Rap from './Rap.js';
 import PhongChieu from './PhongChieu.js';
 import Ghe from './Ghe.js';
 import Phim_UaThich from './Phim_UaThich.js';
+import ChiTietDatVe from './ChiTietDatVe.js';
 
 
 // --- THIẾT LẬP MỐI QUAN HỆ ---
@@ -23,7 +24,8 @@ import Phim_UaThich from './Phim_UaThich.js';
 VaiTro.hasMany(TaiKhoan, { foreignKey: 'maVaiTro', as: 'taiKhoans', onDelete: 'RESTRICT', onUpdate: 'CASCADE' });
 TaiKhoan.belongsTo(VaiTro, { foreignKey: 'maVaiTro', as: 'vaiTro', onDelete: 'RESTRICT', onUpdate: 'CASCADE' });
 
-
+Rap.hasMany(TaiKhoan, { foreignKey: 'maRap', as: 'taiKhoansThuocRap', onDelete: 'SET NULL', onUpdate: 'CASCADE' });
+TaiKhoan.belongsTo(Rap, { foreignKey: 'maRap', as: 'rapLamViec', onDelete: 'SET NULL', onUpdate: 'CASCADE' });
 
 // Phim <-> DienVien (N - M) via Phim_DienVien
 Phim.belongsToMany(DienVien, { through: Phim_DienVien, foreignKey: 'maPhim', otherKey: 'maDienVien', as: 'dienViens' });
@@ -70,14 +72,21 @@ DatVe.belongsTo(SuatChieu, { foreignKey: 'maSuatChieu', as: 'suatChieu' });
 TaiKhoan.hasMany(DatVe, { foreignKey: 'maTaiKhoanDatVe', as: 'datVes' });
 DatVe.belongsTo(TaiKhoan, { foreignKey: 'maTaiKhoanDatVe', as: 'khachHang' });
 
+
+
 // Optional: association for the staff who sold the ticket
 TaiKhoan.hasMany(DatVe, { foreignKey: 'maNhanVienBanVe', as: 'datVeBan' });
 DatVe.belongsTo(TaiKhoan, { foreignKey: 'maNhanVienBanVe', as: 'nhanVien' });
 
+DatVe.hasMany(ChiTietDatVe, { foreignKey: 'maDatVe', as: 'chiTietDatVes', onDelete: 'CASCADE' });
+ChiTietDatVe.belongsTo(DatVe, { foreignKey: 'maDatVe', as: 'datVe' });
+
+Ghe.hasMany(ChiTietDatVe, { foreignKey: 'maGhe', as: 'chiTietDatVes', onDelete: 'CASCADE' });
+ChiTietDatVe.belongsTo(Ghe, { foreignKey: 'maGhe', as: 'ghe' });
 // Previously DatVe had ChiTietDatVe entries linking to Ghe; now seat labels are stored
 // directly on DatVe.soGhe (comma-separated list). No ChiTietDatVe or Ghe associations.
 
-DatVe.hasOne(ThanhToan, { foreignKey: 'maDatVe', as: 'thanhToan' });
+DatVe.hasOne(ThanhToan, { foreignKey: 'maDatVe', as: 'thanhToan', onDelete: 'CASCADE' });
 ThanhToan.belongsTo(DatVe, { foreignKey: 'maDatVe', as: 'datVe' });
 
 // Xuất các models
