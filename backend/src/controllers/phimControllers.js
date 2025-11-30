@@ -211,6 +211,9 @@ export const updatePhim = async (req, res) => {
             {
               folder: 'posters',
               resource_type: 'image',
+              width: 500,
+              height: 750,
+              crop: "fill",
               timeout: 1200
             },
             (error, result) => {

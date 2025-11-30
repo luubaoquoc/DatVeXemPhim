@@ -1,3 +1,5 @@
+import cloudinary from '../configs/cloudinary.js';
+import streamifier from 'streamifier'
 import DienVien from '../models/DienVien.js'
 import { Op } from "sequelize";
 
@@ -44,7 +46,30 @@ export const createDienVien = async (req, res) => {
     if (!ngaySinh || ngaySinh === "") {
       ngaySinh = null;
     }
-    const dienVien = await DienVien.create({ tenDienVien, ngaySinh, tieuSu })
+
+    let anhDaiDien = null;
+    if (req.file) {
+      const result = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          {
+            folder: 'anhDienVien',
+            resource_type: 'image',
+            width: 48,
+            height: 48,
+            crop: "fill",
+          },
+          (error, result) => {
+            if (error) {
+              return reject(error);
+            }
+            resolve(result);
+          }
+        );
+        streamifier.createReadStream(req.file.buffer).pipe(stream);
+      });
+      anhDaiDien = result.secure_url;
+    }
+    const dienVien = await DienVien.create({ tenDienVien, ngaySinh, tieuSu, anhDaiDien })
     res.status(201).json(dienVien)
   } catch (error) {
     res.status(500).json({ message: 'Lỗi khi thêm diễn viên' })
@@ -60,7 +85,30 @@ export const updateDienVien = async (req, res) => {
     }
     const dienVien = await DienVien.findByPk(maDienVien)
     if (!dienVien) return res.status(404).json({ message: 'Không tìm thấy diễn viên' })
-    await dienVien.update({ tenDienVien, ngaySinh, tieuSu })
+
+    let anhDaiDien = null;
+    if (req.file) {
+      const result = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          {
+            folder: 'anhDienVien',
+            resource_type: 'image',
+            width: 48,
+            height: 48,
+            crop: "fill",
+          },
+          (error, result) => {
+            if (error) {
+              return reject(error);
+            }
+            resolve(result);
+          }
+        )
+        streamifier.createReadStream(req.file.buffer).pipe(stream);
+      });
+      anhDaiDien = result.secure_url;
+    }
+    await dienVien.update({ tenDienVien, ngaySinh, tieuSu, anhDaiDien })
     res.json(dienVien)
   } catch (error) {
     res.status(500).json({ message: 'Lỗi khi cập nhật diễn viên' })

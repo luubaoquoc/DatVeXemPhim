@@ -14,7 +14,7 @@ const DienVien = () => {
   const [editItem, setEditItem] = useState(null)
   const [formData, setFormData] = useState({
     tenDienVien: "",
-    anhDaiDien: "",
+    anhDaiDien: null,
     ngaySinh: "",
     tieuSu: ""
   })
@@ -47,7 +47,10 @@ const DienVien = () => {
 
   // Xử lý thay đổi input
   const handleChange = (e) => {
-    const { name, value } = e.target
+    const { name, value, files } = e.target
+    if (files) {
+      return setFormData(prev => ({ ...prev, [name]: files[0] }))
+    }
     setFormData(prev => ({ ...prev, [name]: value }))
   }
 
@@ -57,17 +60,32 @@ const DienVien = () => {
     setLoading(true);
     try {
 
+      const data = new FormData();
+      data.append("tenDienVien", formData.tenDienVien);
+      data.append("ngaySinh", formData.ngaySinh);
+      data.append("tieuSu", formData.tieuSu);
+      if (formData.anhDaiDien instanceof File) {
+        data.append("anhDaiDien", formData.anhDaiDien);
+      }
       if (editItem) {
-        await api.put(`/dienvien/${editItem.maDienVien}`, formData)
+        await api.put(`/dienvien/${editItem.maDienVien}`, data, {
+          headers: {
+            "Content-Type": "multipart/form-data"
+          }
+        })
         toast.success("Cập nhật thành công!")
       } else {
-        await api.post("/dienvien", formData)
+        await api.post("/dienvien", data, {
+          headers: {
+            "Content-Type": "multipart/form-data"
+          }
+        })
         toast.success("Thêm mới thành công!")
       }
 
       setShowModal(false)
       setEditItem(null)
-      setFormData({ tenDienVien: "", anhDaiDien: "", ngaySinh: "", tieuSu: "" })
+      setFormData({ tenDienVien: "", anhDaiDien: null, ngaySinh: "", tieuSu: "" })
       fetchData()
     } catch (error) {
       toast.error(error.response?.data?.message || "Lỗi thao tác!")
@@ -94,7 +112,7 @@ const DienVien = () => {
       setEditItem(item)
       setFormData({
         tenDienVien: item.tenDienVien || "",
-        anhDaiDien: item.anhDaiDien || "",
+        anhDaiDien: item.anhDaiDien || null,
         ngaySinh: item.ngaySinh ? new Date(item.ngaySinh).toISOString().split("T")[0] : "",
         tieuSu: item.tieuSu || ""
       })
@@ -141,7 +159,6 @@ const DienVien = () => {
           {dienViens.map((item, index) => (
             <tr key={item.maDienVien} className=" text-center border-b border-primary/30">
               <td className="p-2">{(currentPage - 1) * limit + index + 1}</td>
-              <td className="p-2 text-left">{item.tenDienVien}</td>
               <td className="p-2 text-left">
                 {item.anhDaiDien ? (
                   <img src={item.anhDaiDien} alt={item.tenDienVien} className="h-12 w-12 object-cover rounded" />
@@ -149,6 +166,7 @@ const DienVien = () => {
                   "Chưa cập nhật"
                 )}
               </td>
+              <td className="p-2 text-left">{item.tenDienVien}</td>
               <td className="p-2 text-left">{formatDate(item.ngaySinh) || "Chưa cập nhật"}</td>
               <td className="p-2 text-left max-w-[250px] truncate">{item.tieuSu || "Chưa cập nhật"}</td>
               <td className="p-2">
@@ -199,15 +217,27 @@ const DienVien = () => {
               </div>
 
               <div>
-                <label className='block mb-1'>Ảnh đại diện (URL)</label>
+                <label className='block mb-1'>Ảnh đại diện</label>
                 <input
-                  type="text"
+                  type="file"
+                  accept="image/*"
                   name="anhDaiDien"
                   className="w-full p-2 mb-4 rounded bg-[#111] border border-gray-600 text-white"
-                  placeholder="URL ảnh đại diện..."
-                  value={formData.anhDaiDien}
                   onChange={handleChange}
                 />
+                {
+                  formData.anhDaiDien instanceof File && (
+                    <img
+                      src={
+                        formData.anhDaiDien instanceof File
+                          ? URL.createObjectURL(formData.anhDaiDien)
+                          : ""
+                      }
+                      alt="Preview"
+                      className="h-20 w-20 object-cover mb-4 rounded"
+                    />
+                  )
+                }
               </div>
 
               <div>

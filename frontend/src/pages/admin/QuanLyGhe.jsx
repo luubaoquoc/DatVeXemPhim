@@ -91,7 +91,7 @@ const QuanLyGhe = () => {
         <select
           value={maPhong}
           onChange={(e) => setMaPhong(e.target.value)}
-          className="p-2 bg-gray-800 border border-gray-600 rounded cursor-pointer"
+          className="border border-primary/30 px-3 py-2 bg-black h-[3rem] outline-none cursor-pointer"
         >
           <option value="">-- Chọn phòng --</option>
           {phongChieus.map(p => (
@@ -102,7 +102,7 @@ const QuanLyGhe = () => {
         <select
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
-          className="p-2 bg-gray-800 border border-gray-600 rounded cursor-pointer"
+          className="border border-primary/30 px-3 py-2 bg-black h-[3rem] outline-none cursor-pointer"
         >
           <option value="all">Tất cả</option>
           <option value="active">Khả dụng</option>

@@ -1,13 +1,17 @@
 import React from "react";
 import { formatDate } from "../../lib/dateFormat";
+import { X } from "lucide-react";
 
 const PhimDetail = ({ phim, onClose }) => {
   if (!phim) return null;
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-      <div className="bg-black/90 border border-primary p-6 rounded-xl w-[750px] text-white max-h-[90vh] overflow-y-auto no-scrollbar">
+      <div className="bg-black/90 border border-primary p-6 rounded-xl w-[750px] text-white max-h-[90vh] overflow-y-auto no-scrollbar relative">
 
+        <div>
+          <X onClick={onClose} className="absolute top-4 right-4 hover:text-red-400 cursor-pointer" />
+        </div>
         <h2 className="text-2xl font-semibold mb-4 text-center bg-gradient-to-r from-primary to-yellow-200 bg-clip-text text-transparent">
           Chi tiết phim
         </h2>
@@ -35,20 +39,10 @@ const PhimDetail = ({ phim, onClose }) => {
 
         <div className="mt-4">
           <p className="font-semibold mb-1 text-primary">Nội dung phim:</p>
-          <p className="bg-[#111] p-3 rounded border border-gray-800 whitespace-pre-wrap">
+          <textarea className="bg-[#111] p-3 rounded border border-gray-800 w-full h-40 resize-none outline-none whitespace-pre-wrap no-scrollbar" readOnly>
             {phim.noiDung}
-          </p>
+          </textarea>
         </div>
-
-        <div className="flex justify-end mt-4">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 bg-gray-700 rounded hover:bg-gray-600 cursor-pointer"
-          >
-            Đóng
-          </button>
-        </div>
-
       </div>
     </div>
   );

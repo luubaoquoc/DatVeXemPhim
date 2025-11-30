@@ -1,3 +1,5 @@
+import cloudinary from '../configs/cloudinary.js';
+import streamifier from 'streamifier'
 import DaoDien from '../models/DaoDien.js'
 import { Op } from "sequelize";
 
@@ -45,7 +47,39 @@ export const createDaoDien = async (req, res) => {
     const existingDaoDien = await DaoDien.findOne({ where: { tenDaoDien } });
     if (existingDaoDien) return res.status(400).json({ message: 'Đạo diễn với tên này đã tồn tại' });
 
-    const daoDien = await DaoDien.create({ tenDaoDien, tieuSu, ngaySinh })
+    let anhDaiDien = null;
+    if (req.file) {
+      const result = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          {
+            folder: 'anhDaoDien',
+            resource_type: 'image',
+            width: 48,
+            height: 48,
+            crop: "fill",
+          },
+          (error, result) => {
+            if (error) {
+              console.error(' Lỗi upload Cloudinary:', error)
+              return reject(error)
+            }
+            resolve(result)
+          }
+        )
+
+        // Dùng streamifier để tạo stream an toàn từ buffer
+        streamifier.createReadStream(req.file.buffer).pipe(stream)
+      })
+
+      anhDaiDien = result.secure_url
+    }
+
+    const daoDien = await DaoDien.create({
+      tenDaoDien,
+      tieuSu,
+      ngaySinh,
+      anhDaiDien
+    })
     res.status(201).json(daoDien)
   } catch (error) {
     console.error(error)
@@ -63,7 +97,43 @@ export const updateDaoDien = async (req, res) => {
     }
     const daoDien = await DaoDien.findByPk(maDaoDien)
     if (!daoDien) return res.status(404).json({ message: 'Không tìm thấy đạo diễn' })
-    await daoDien.update({ tenDaoDien, tieuSu, ngaySinh })
+    let anhDaiDien = null;
+
+    console.log(req.file);
+
+    if (req.file) {
+      const result = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          {
+            folder: 'anhDaoDien',
+            resource_type: 'image',
+            width: 48,
+            height: 48,
+            crop: "fill",
+          },
+          (error, result) => {
+            if (error) {
+              console.error(' Lỗi upload Cloudinary:', error)
+              return reject(error)
+            }
+            resolve(result)
+          }
+        )
+
+        // Dùng streamifier để tạo stream an toàn từ buffer
+        streamifier.createReadStream(req.file.buffer).pipe(stream)
+      })
+
+      anhDaiDien = result.secure_url
+    }
+
+
+    await daoDien.update({
+      tenDaoDien,
+      anhDaiDien,
+      tieuSu,
+      ngaySinh
+    })
     res.json(daoDien)
   } catch (error) {
     console.error(error)
