@@ -18,17 +18,18 @@ import QuanLyphim from './pages/admin/QuanLyphim'
 import ScrollToTop from './components/ScrollToTop'
 import AdminRoute from './components/admin/AdminRoute'
 import DaoDien from './pages/DaoDien'
-import QuanLyDaoDien from './pages/admin/DaoDien'
-import QuanLyDienVien from './pages/admin/DienVien'
-import QuanLyTheLoai from './pages/admin/TheLoai'
-import Rap from './pages/admin/Rap'
-import PhongChieu from './pages/admin/PhongChieu'
+import QuanLyDaoDien from './pages/admin/QuanLyDaoDien'
+import QuanLyDienVien from './pages/admin/QuanLyDienVien'
+import QuanLyTheLoai from './pages/admin/QuanLyTheLoai'
+import Rap from './pages/admin/QuanLyRap'
+import PhongChieu from './pages/admin/QuanLyPhongChieu'
 import DienVien from './pages/DienVien'
 import TheLoai from './pages/TheLoai'
 import Banner from './pages/admin/Banner'
 import QuanLyGhe from './pages/admin/QuanLyGhe'
 import QuanLySuatChieu from './pages/admin/QuanLySuatChieu'
 import QuanLyDonDatVe from './pages/admin/QuanLyDonDatVe'
+import QuanLyTaiKhoan from './pages/admin/QuanLyTaiKhoan'
 
 const App = () => {
 
@@ -92,16 +93,17 @@ const App = () => {
             </AdminRoute>
           }>
           <Route index element={<Dashboard />} />
-          <Route path='phims' element={<QuanLyphim />} />
-          <Route path='dao-dien' element={<QuanLyDaoDien />} />
-          <Route path='dien-vien' element={<QuanLyDienVien />} />
-          <Route path='the-loai' element={<QuanLyTheLoai />} />
+          <Route path='quan-ly-phim' element={<QuanLyphim />} />
+          <Route path='quan-ly-dao-dien' element={<QuanLyDaoDien />} />
+          <Route path='quan-ly-dien-vien' element={<QuanLyDienVien />} />
+          <Route path='quan-ly-the-loai' element={<QuanLyTheLoai />} />
           <Route path='banner' element={<Banner />} />
-          <Route path='rap' element={<Rap />} />
-          <Route path='phong-chieu' element={<PhongChieu />} />
+          <Route path='quan-ly-rap' element={<Rap />} />
+          <Route path='quan-ly-phong-chieu' element={<PhongChieu />} />
           <Route path='quan-ly-ghe' element={<QuanLyGhe />} />
           <Route path='quan-ly-suat-chieu' element={<QuanLySuatChieu />} />
           <Route path='quan-ly-don-dat-ve' element={<QuanLyDonDatVe />} />
+          <Route path='quan-ly-tai-khoan' element={<QuanLyTaiKhoan />} />
         </Route>
 
       </Routes>

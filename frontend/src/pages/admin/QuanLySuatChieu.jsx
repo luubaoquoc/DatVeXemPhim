@@ -77,7 +77,7 @@ const QuanLySuatChieu = () => {
       <div className="flex justify-between mb-6">
         <h1 className="text-3xl font-semibold">Quản lý suất chiếu</h1>
         <button
-          className="bg-primary px-4 py-2 rounded flex items-center gap-2 cursor-pointer"
+          className="bg-primary px-4 py-2 rounded flex items-center gap-2 cursor-pointer hover:bg-primary/80 text-white"
           onClick={() => { setShowModal(true); setEditItem(null); }}
         >
           <PlusIcon size={18} /> Thêm suất chiếu
@@ -126,7 +126,7 @@ const QuanLySuatChieu = () => {
 
               <td className="p-2">
                 <button
-                  className="p-2 text-gray-400 hover:bg-primary/20 rounded cursor-pointer"
+                  className="p-2 text-blue-400 hover:bg-primary/20 rounded cursor-pointer"
                   onClick={() => { setEditItem(sc); setShowModal(true); }}
                 >
                   <PencilIcon size={18} />

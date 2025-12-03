@@ -144,7 +144,7 @@ const DaoDien = () => {
 
         <button
           onClick={() => openModal()}
-          className="bg-primary px-4 py-2 rounded flex items-center gap-2 hover:bg-primary/80"
+          className="bg-primary px-4 py-2 rounded flex items-center gap-2 hover:bg-primary/80 cursor-pointer"
         >
           <PlusIcon size={18} /> Thêm đạo diễn
         </button>
@@ -154,6 +154,7 @@ const DaoDien = () => {
         search={search}
         setSearch={setSearch}
         setCurrentPage={setCurrentPage}
+        item="tên đạo diễn"
       />
 
       {/* TABLE */}
@@ -191,7 +192,7 @@ const DaoDien = () => {
               <td className="p-2 text-center">
                 <button
                   onClick={() => openModal(item)}
-                  className="p-2 text-blue-400 hover:bg-primary/20 rounded"
+                  className="p-2 text-blue-400 hover:bg-primary/20 rounded cursor-pointer"
                 >
                   <PencilIcon size={18} />
                 </button>
@@ -288,7 +289,7 @@ const DaoDien = () => {
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 bg-gray-600 rounded"
+                  className="px-4 py-2 bg-gray-600 rounded cursor-pointer hover:bg-gray-500"
                 >
                   Hủy
                 </button>
@@ -296,7 +297,7 @@ const DaoDien = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className={`px-4 py-2 rounded ${loading ? "bg-primary/40" : "bg-primary"
+                  className={`px-4 py-2 rounded cursor-pointer hover:bg-primary/80 ${loading ? "bg-primary/40" : "bg-primary"
                     } flex items-center gap-2`}
                 >
                   {loading ? "Đang xử lý..." : editItem ? "Cập nhật" : "Thêm"}

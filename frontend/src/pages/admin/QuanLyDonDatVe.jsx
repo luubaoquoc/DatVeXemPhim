@@ -82,6 +82,7 @@ const QuanLyDonDatVe = () => {
           search={search}
           setSearch={setSearch}
           setCurrentPage={setCurrentPage}
+          item="mã vé "
         />
 
         {/* Trạng thái */}

@@ -6,7 +6,7 @@ import cookieParser from "cookie-parser";
 import connectDB from "./configs/db.js";
 import authRoutes from "./routes/authRoutes.js";
 
-import nguoiDungRoutes from './routes/NguoiDungRoutes.js';
+import taiKhoanRoutes from './routes/TaiKhoanRoutes.js';
 import phimRoutes from './routes/PhimRoutes.js';
 import daoDienRoutes from './routes/daoDienRoutes.js';
 import theLoaiRoutes from './routes/theLoaiRoutes.js';
@@ -47,7 +47,7 @@ app.use(cors({
 
 
 app.use("/api/auth", authRoutes);
-app.use('/api/nguoidung', nguoiDungRoutes);
+app.use('/api/taikhoan', taiKhoanRoutes);
 app.use('/api/phim', phimRoutes);
 app.use('/api/daodien', daoDienRoutes);
 app.use('/api/theloai', theLoaiRoutes);

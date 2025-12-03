@@ -114,6 +114,7 @@ const TheLoai = () => {
         search={search}
         setSearch={setSearch}
         setCurrentPage={setCurrentPage}
+        item="tên thể loại"
       />
       <table className="w-full border-b border-primary/30 rounded-lg text-sm">
         <thead className="bg-primary/70 text-white">
@@ -167,7 +168,7 @@ const TheLoai = () => {
                 <input
                   type="text"
                   name="tenTheLoai"
-                  className="w-full p-2 mb-4 rounded bg-gray-700 border border-gray-600 text-white"
+                  className="w-full p-2 mb-4 rounded bg-[#111] border border-gray-600 text-white"
                   placeholder="Tên thể loại..."
                   value={formData.tenTheLoai}
                   onChange={handleChange}
@@ -181,7 +182,7 @@ const TheLoai = () => {
                 <textarea
                   name="moTa"
                   rows="3"
-                  className="w-full p-2 mb-4 rounded bg-gray-700 border border-gray-600 text-white"
+                  className="w-full p-2 mb-4 rounded bg-[#111] border border-gray-600 text-white"
                   placeholder="Mô tả thể loại..."
                   value={formData.moTa}
                   onChange={handleChange}
@@ -192,14 +193,14 @@ const TheLoai = () => {
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 bg-gray-600 rounded cursor-pointer"
+                  className="px-4 py-2 bg-gray-600 rounded cursor-pointer hover:bg-gray-500 text-white"
                 >
                   Hủy
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className={`px-4 py-2 rounded cursor-pointer flex items-center gap-2
+                  className={`px-4 py-2 rounded cursor-pointer flex items-center gap-2 hover:bg-primary/80 text-white
                     ${loading ? 'bg-primary/50 cursor-not-allowed' : 'bg-primary'}
                   `}
                 >

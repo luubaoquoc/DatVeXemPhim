@@ -162,7 +162,7 @@ const ChiTietDonDatVe = ({ bookings, onClose }) => {
           {/* 📌 Nút In Vé PDF */}
           <button
             onClick={generateTicketPDF}
-            className="px-4 py-2 bg-primary rounded cursor-pointer"
+            className="px-4 py-2 bg-primary rounded cursor-pointer hover:bg-primary/80 text-white"
           >
             In vé
           </button>

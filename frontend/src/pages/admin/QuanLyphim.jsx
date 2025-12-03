@@ -91,6 +91,7 @@ const QuanLyPhim = () => {
           search={search}
           setSearch={setSearch}
           setCurrentPage={setCurrentPage}
+          item="tên phim"
         />
 
         {/* Trạng thái */}

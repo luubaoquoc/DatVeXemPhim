@@ -1,20 +1,90 @@
 import cloudinary from '../configs/cloudinary.js';
+import Rap from '../models/Rap.js';
 import TaiKhoan from '../models/TaiKhoan.js';
 import bcrypt from 'bcryptjs';
 import streamifier from 'streamifier'
+import VaiTro from '../models/VaiTro.js';
+import { Op } from 'sequelize';
 
 // GET /api/nguoidung?page=1&limit=20
 export const listUsers = async (req, res) => {
   try {
-    const page = Math.max(1, Number(req.query.page) || 1);
-    const limit = Math.max(1, Number(req.query.limit) || 20);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const search = req.query.search || "";
+
     const offset = (page - 1) * limit;
+    const whereOp = search ? {
+      hoTen: {
+        [Op.like]: `%${search}%`
+      },
+    } : {};
 
-    const { count, rows } = await TaiKhoan.findAndCountAll({ limit, offset, attributes: { exclude: ['matKhau'] }, order: [['maTaiKhoan', 'ASC']] });
 
-    return res.json({ total: count, page, limit, data: rows });
+    // Lấy danh sách phim với phân trang
+    const { count, rows } = await TaiKhoan.findAndCountAll({
+      where: whereOp,
+      include: [
+        { model: Rap, as: 'rapLamViec' },
+        { model: VaiTro, as: 'vaiTro' }
+      ],
+      limit,
+      offset,
+      order: [['maTaiKhoan', 'DESC']]
+    })
+
+
+    return res.json({
+      data: rows,
+      totalItems: count,
+      totalPages: Math.ceil(count / limit),
+      currentPage: page,
+    });
   } catch (error) {
     console.error('listUsers error:', error);
+    return res.status(500).json({ message: 'Lỗi server' });
+  }
+};
+
+
+export const listVaiTro = async (req, res) => {
+  try {
+    const vaiTros = await VaiTro.findAll();
+    return res.json(vaiTros);
+  } catch (error) {
+    console.error('listVaiTro error:', error);
+    return res.status(500).json({ message: 'Lỗi server' });
+  }
+};
+
+
+
+export const createTaiKhoan = async (req, res) => {
+  try {
+    const { hoTen, email, matKhau, soDienThoai, maVaiTro, maRap } = req.body;
+    if (!hoTen || !email || !matKhau) {
+      return res.status(400).json({ message: 'Vui lòng cung cấp đầy đủ thông tin' });
+    }
+    if (soDienThoai && (soDienThoai.length < 10 || soDienThoai.length > 10)) {
+      return res.status(400).json({ message: 'Số điện thoại không hợp lệ' });
+    }
+    const existingUser = await TaiKhoan.findOne({ where: { email } });
+    if (existingUser) {
+      return res.status(400).json({ message: 'Email đã được sử dụng' });
+    }
+    const hashed = await bcrypt.hash(matKhau, 10);
+    const newUser = await TaiKhoan.create({
+      hoTen,
+      email,
+      matKhau: hashed,
+      soDienThoai,
+      emailXacThuc: true,
+      maVaiTro: maVaiTro || 1,
+      maRap: maRap || null,
+    });
+    return res.status(201).json({ message: 'Tạo tài khoản thành công', user: newUser });
+  } catch (error) {
+    console.error('createTaiKhoan error:', error);
     return res.status(500).json({ message: 'Lỗi server' });
   }
 };
@@ -34,6 +104,9 @@ export const getUser = async (req, res) => {
   }
 };
 
+
+
+
 // PUT /api/nguoidung/:maTaiKhoan
 export const updateUser = async (req, res) => {
   try {
@@ -44,15 +117,18 @@ export const updateUser = async (req, res) => {
     if (!user) return res.status(404).json({ message: 'Người dùng không tồn tại' });
 
     // chỉ cho sửa các trường sau
-    const { hoTen, email, soDienThoai } = req.body;
+    const { hoTen, email, soDienThoai, maVaiTro, maRap } = req.body;
 
     if (soDienThoai && (soDienThoai.length < 10 || soDienThoai.length > 10)) {
       return res.status(400).json({ message: 'Số điện thoại không hợp lệ' });
     }
-    const updateData = {};
-    if (hoTen) updateData.hoTen = hoTen;
-    if (email) updateData.email = email;
-    if (soDienThoai) updateData.soDienThoai = soDienThoai;
+    const updateData = {
+      hoTen,
+      email,
+      soDienThoai,
+      maVaiTro,
+      maRap,
+    };
 
     await user.update(updateData);
     const updated = await TaiKhoan.findByPk(ma);

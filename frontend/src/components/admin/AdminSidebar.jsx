@@ -58,11 +58,11 @@ const AdminSidebar = () => {
       name: 'Quản lý phim',
       icon: FilmIcon,
       children: [
-        { name: 'Danh sách phim', path: '/admin/phims', icon: FilmIcon },
-        { name: 'Đạo diễn', path: '/admin/dao-dien', icon: BookUserIcon },
-        { name: 'Diễn viên', path: '/admin/dien-vien', icon: AwardIcon },
-        { name: 'Thể loại', path: '/admin/the-loai', icon: TagsIcon },
-        { name: 'Đánh giá', path: '/admin/danh-gia', icon: StarIcon },
+        { name: 'Danh sách phim', path: '/admin/quan-ly-phim', icon: FilmIcon },
+        { name: 'Đạo diễn', path: '/admin/quan-ly-dao-dien', icon: BookUserIcon },
+        { name: 'Diễn viên', path: '/admin/quan-ly-dien-vien', icon: AwardIcon },
+        { name: 'Thể loại', path: '/admin/quan-ly-the-loai', icon: TagsIcon },
+        { name: 'Đánh giá', path: '/admin/quan-ly-danh-gia', icon: StarIcon },
         { name: 'Banner', path: '/admin/banner', icon: ImagePlus }
       ]
     },
@@ -73,8 +73,8 @@ const AdminSidebar = () => {
       name: 'Quản lý rạp',
       icon: Building2Icon,
       children: [
-        { name: 'Danh sách rạp', path: '/admin/rap', icon: ListIcon },
-        { name: 'Danh sách phòng chiếu', path: '/admin/phong-chieu', icon: DoorOpenIcon },
+        { name: 'Danh sách rạp', path: '/admin/quan-ly-rap', icon: ListIcon },
+        { name: 'Danh sách phòng chiếu', path: '/admin/quan-ly-phong-chieu', icon: DoorOpenIcon },
         { name: 'Quản lý ghế', path: '/admin/quan-ly-ghe', icon: Armchair }
       ]
     },
@@ -85,14 +85,8 @@ const AdminSidebar = () => {
     },
     {
       name: 'Quản lý tài khoản',
+      path: '/admin/quan-ly-tai-khoan',
       icon: UsersIcon,
-      children: [
-        { name: 'Admin', path: '/admin/tai-khoan/admin', icon: UserCogIcon },
-        { name: 'Quản lý rạp', path: '/admin/tai-khoan/quan-ly-rap', icon: UserCheckIcon },
-        { name: 'Nhân viên', path: '/admin/tai-khoan/nhan-vien', icon: UserIcon },
-        { name: 'Khách hàng', path: '/admin/tai-khoan/khach-hang', icon: UserIcon },
-        { name: 'Quản lý Vai trò', path: '/admin/vai-tro', icon: UserCogIcon }
-      ]
     }
   ]
 

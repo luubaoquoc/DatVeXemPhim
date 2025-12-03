@@ -127,6 +127,7 @@ const Rap = () => {
         search={search}
         setSearch={setSearch}
         setCurrentPage={setCurrentPage}
+        item="tên rạp"
       />
 
       {/* Table */}
@@ -150,7 +151,7 @@ const Rap = () => {
               <td className="p-2 text-left">{rap.diaChi}</td>
               <td className="p-2 text-left">{rap.soDienThoai}</td>
 
-              <td className="p-2 flex justify-center gap-3">
+              <td className="p-2 flex justify-center">
                 <button
                   onClick={() => {
                     openModal(rap)
@@ -161,6 +162,7 @@ const Rap = () => {
                 </button>
 
                 <DeleteForm
+                  title="Rạp"
                   itemName={rap.tenRap}
                   onDelete={() => handleDelete(rap.maRap)}
                 />
@@ -223,14 +225,14 @@ const Rap = () => {
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 bg-gray-600 rounded cursor-pointer"
+                  className="px-4 py-2 bg-gray-600 rounded cursor-pointer hover:bg-gray-500 text-white"
                 >
                   Hủy
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className={`px-4 py-2 rounded cursor-pointer flex items-center gap-2
+                  className={`px-4 py-2 rounded cursor-pointer flex items-center gap-2 hover:bg-primary/80 text-white transition 
                   ${loading ? 'bg-primary/50 cursor-not-allowed' : 'bg-primary'}
                 `}
                 >
