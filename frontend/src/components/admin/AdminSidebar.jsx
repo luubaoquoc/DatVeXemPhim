@@ -39,7 +39,7 @@ const AdminSidebar = () => {
   }
 
   const adminNavlinks = [
-    { name: 'Trang chủ', path: '/admin', icon: LayoutDashboardIcon },
+    { name: 'Tổng quan', path: '/admin', icon: LayoutDashboardIcon },
     {
       name: 'Vận hành Rạp',
       icon: TicketIcon,
