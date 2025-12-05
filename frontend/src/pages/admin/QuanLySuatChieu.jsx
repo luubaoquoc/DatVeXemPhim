@@ -126,7 +126,7 @@ const QuanLySuatChieu = () => {
 
               <td className="p-2">
                 <button
-                  className="p-2 text-blue-400 hover:bg-primary/20 rounded cursor-pointer"
+                  className="p-2 text-gray-400 hover:bg-primary/20 rounded cursor-pointer"
                   onClick={() => { setEditItem(sc); setShowModal(true); }}
                 >
                   <PencilIcon size={18} />

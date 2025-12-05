@@ -192,7 +192,7 @@ const DaoDien = () => {
               <td className="p-2 text-center">
                 <button
                   onClick={() => openModal(item)}
-                  className="p-2 text-blue-400 hover:bg-primary/20 rounded cursor-pointer"
+                  className="p-2 text-gray-400 hover:bg-primary/20 rounded cursor-pointer"
                 >
                   <PencilIcon size={18} />
                 </button>

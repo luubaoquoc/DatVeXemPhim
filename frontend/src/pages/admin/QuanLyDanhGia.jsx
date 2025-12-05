@@ -7,12 +7,12 @@ import DeleteForm from "../../components/admin/DeleteForm"
 import SearchInput from "../../components/SearchInput"
 import Loading from "../../components/Loading"
 
-const Rap = () => {
+const QuanLyDanhGia = () => {
   const api = useApi(true)
 
-  const [raps, setRaps] = useState([]);
+  const [danhGias, setDanhGias] = useState([]);
   const [showModal, setShowModal] = useState(false)
-  const [editRap, setEditRap] = useState(null)
+  const [editDanhGia, setEditDanhGia] = useState(null)
   const [formData, setFormData] = useState({
     tenRap: "",
     diaChi: "",
@@ -27,13 +27,13 @@ const Rap = () => {
   // Fetch API
   const fetchData = async () => {
     try {
-      const res = await api.get("/rap", {
+      const res = await api.get("/danhgia", {
         params: { page: currentPage, limit, search }
       })
-      setRaps(res.data.data)
+      setDanhGias(res.data.data)
       setTotalPages(res.data.totalPages)
     } catch {
-      toast.error("Không thể tải danh sách phòng!")
+      toast.error("Không thể tải danh sách đánh giá!")
     }
   }
 
@@ -53,16 +53,16 @@ const Rap = () => {
     e.preventDefault()
     setLoading(true)
     try {
-      if (editRap) {
-        await api.put(`/rap/${editRap.maRap}`, formData)
-        toast.success("Cập nhật rạp thành công!")
+      if (editDanhGia) {
+        await api.put(`/danhgia/${editDanhGia.maDanhGia}`, formData)
+        toast.success("Cập nhật đánh giá thành công!")
       } else {
         await api.post("/rap", formData)
         toast.success("Thêm rạp thành công!")
       }
 
       setShowModal(false)
-      setEditRap(null)
+      setEditDanhGia(null)
       setFormData({
         tenRap: "",
         diaChi: "",
@@ -77,10 +77,10 @@ const Rap = () => {
   }
 
   // Xóa phòng
-  const handleDelete = async (maRap) => {
+  const handleDelete = async (maDanhGia) => {
     try {
-      await api.delete(`/rap/${maRap}`)
-      toast.success("Xoá rạp thành công!")
+      await api.delete(`/danhgia/${maDanhGia}`)
+      toast.success("Xoá đánh giá thành công!")
       fetchData()
     } catch (err) {
       console.log(err);
@@ -92,33 +92,33 @@ const Rap = () => {
   // Mở modal thêm/sửa
   const openModal = (data = null) => {
     if (data) {
-      setEditRap(data)
+      setEditDanhGia(data)
       setFormData({
         tenRap: data.tenRap || "",
         diaChi: data.diaChi || "",
         soDienThoai: data.soDienThoai || ""
       })
     } else {
-      setEditRap(null)
+      setEditDanhGia(null)
       setFormData({ tenRap: "", diaChi: "", soDienThoai: "" })
     }
     setShowModal(true)
   }
 
-  console.log(raps);
+  console.log(danhGias);
   if (loading) return <Loading />
 
 
   return (
     <div className="p-6 text-white">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-semibold">Quản lý rạp</h1>
+        <h1 className="text-3xl font-semibold">Quản lý đánh giá</h1>
 
         <button
           onClick={() => { openModal() }}
           className="bg-primary text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-primary/80 transition cursor-pointer"
         >
-          <PlusIcon size={18} /> Thêm rạp
+          <PlusIcon size={18} /> Thêm đánh giá
         </button>
       </div>
 
@@ -136,25 +136,27 @@ const Rap = () => {
         <thead className="bg-primary/70 text-white">
           <tr>
             <th className="p-2">#</th>
-            <th className="p-2 text-left">Tên rạp</th>
-            <th className="p-2 text-left">Địa chỉ</th>
-            <th className="p-2 text-left">Số điện thoại</th>
+            <th className="p-2 text-left">Tên tài khoản</th>
+            <th className="p-2 text-left">tên phim</th>
+            <th className="p-2 text-left">Điểm</th>
+            <th className="p-2 text-left">Ngày đánh giá</th>
             <th className="p-2">Hành động</th>
           </tr>
         </thead>
 
         <tbody>
-          {raps?.map((rap, index) => (
-            <tr key={rap.maRap} className="text-center border-b border-primary/30">
+          {danhGias?.map((danhGia, index) => (
+            <tr key={danhGia.maDanhGia} className="text-center border-b border-primary/30">
               <td className="p-2">{index + 1}</td>
-              <td className="p-2 font-medium text-left">{rap.tenRap}</td>
-              <td className="p-2 text-left">{rap.diaChi}</td>
-              <td className="p-2 text-left">{rap.soDienThoai}</td>
+              <td className="p-2 font-medium text-left">{danhGia.taiKhoan.hoTen}</td>
+              <td className="p-2 text-left">{danhGia.phim.tenPhim}</td>
+              <td className="p-2 text-left">{danhGia.diem}</td>
+              <td className="p-2 text-left">{danhGia.ngayDanhGia}</td>
 
               <td className="p-2 flex justify-center">
                 <button
                   onClick={() => {
-                    openModal(rap)
+                    openModal(danhGia)
                   }}
                   className="p-2 text-gray-400 hover:bg-primary/20 rounded cursor-pointer"
                 >
@@ -163,8 +165,8 @@ const Rap = () => {
 
                 <DeleteForm
                   title="Rạp"
-                  itemName={rap.tenRap}
-                  onDelete={() => handleDelete(rap.maRap)}
+                  itemName={danhGia.tenTaiKhoan}
+                  onDelete={() => handleDelete(danhGia.maDanhGia)}
                 />
               </td>
             </tr>
@@ -183,7 +185,7 @@ const Rap = () => {
         <div className="fixed inset-0 bg-black/70 flex justify-center items-center z-50">
           <div className="bg-black/80 border border-primary p-6 rounded-lg w-96">
             <h2 className="text-lg font-semibold mb-4">
-              {editRap ? 'Sửa rạp' : 'Thêm rạp'}
+              {editDanhGia ? 'Sửa đánh giá' : 'Thêm đánh giá'}
             </h2>
             <form onSubmit={handleSubmit}>
               <div>
@@ -242,7 +244,7 @@ const Rap = () => {
                       Đang xử lý...
                     </>
                   ) : (
-                    editRap ? 'Cập nhật' : 'Thêm'
+                    editDanhGia ? 'Cập nhật' : 'Thêm'
                   )}
                 </button>
               </div>
@@ -254,4 +256,4 @@ const Rap = () => {
   )
 }
 
-export default Rap
+export default QuanLyDanhGia

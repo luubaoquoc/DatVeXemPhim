@@ -30,6 +30,7 @@ import QuanLyGhe from './pages/admin/QuanLyGhe'
 import QuanLySuatChieu from './pages/admin/QuanLySuatChieu'
 import QuanLyDonDatVe from './pages/admin/QuanLyDonDatVe'
 import QuanLyTaiKhoan from './pages/admin/QuanLyTaiKhoan'
+import QuanLyDanhGia from './pages/admin/QuanLyDanhGia'
 
 const App = () => {
 
@@ -97,6 +98,7 @@ const App = () => {
           <Route path='quan-ly-dao-dien' element={<QuanLyDaoDien />} />
           <Route path='quan-ly-dien-vien' element={<QuanLyDienVien />} />
           <Route path='quan-ly-the-loai' element={<QuanLyTheLoai />} />
+          <Route path='quan-ly-danh-gia' element={<QuanLyDanhGia />} />
           <Route path='banner' element={<Banner />} />
           <Route path='quan-ly-rap' element={<Rap />} />
           <Route path='quan-ly-phong-chieu' element={<PhongChieu />} />
