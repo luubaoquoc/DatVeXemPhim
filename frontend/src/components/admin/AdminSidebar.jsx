@@ -5,11 +5,8 @@ import {
   ClockIcon,
   TicketIcon,
   Building2Icon,
-  UsersIcon,
   ListIcon,
   DoorOpenIcon,
-  UserCogIcon,
-  UserCheckIcon,
   UserIcon,
   ChevronDownIcon,
   ChevronRightIcon,
@@ -21,13 +18,16 @@ import {
   ScanLineIcon,
   ReceiptTextIcon,
   ImagePlus,
-  Armchair
+  Armchair,
+  LogOutIcon
 } from 'lucide-react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { NavLink } from 'react-router-dom'
+import { logout } from '../../redux/features/authSlice'
 
 const AdminSidebar = () => {
   const user = useSelector((state) => state.auth.user)
+  const dispatch = useDispatch()
 
   const [openMenus, setOpenMenus] = useState({})
 
@@ -59,11 +59,11 @@ const AdminSidebar = () => {
       icon: FilmIcon,
       children: [
         { name: 'Danh sách phim', path: '/admin/quan-ly-phim', icon: FilmIcon },
-        { name: 'Đạo diễn', path: '/admin/quan-ly-dao-dien', icon: BookUserIcon },
-        { name: 'Diễn viên', path: '/admin/quan-ly-dien-vien', icon: AwardIcon },
-        { name: 'Thể loại', path: '/admin/quan-ly-the-loai', icon: TagsIcon },
-        { name: 'Đánh giá', path: '/admin/quan-ly-danh-gia', icon: StarIcon },
-        { name: 'Banner', path: '/admin/banner', icon: ImagePlus }
+        { name: 'Danh sách đạo diễn', path: '/admin/quan-ly-dao-dien', icon: BookUserIcon },
+        { name: 'Danh sách diễn viên', path: '/admin/quan-ly-dien-vien', icon: AwardIcon },
+        { name: 'Danh sách thể loại', path: '/admin/quan-ly-the-loai', icon: TagsIcon },
+        { name: 'Danh sách đánh giá', path: '/admin/quan-ly-danh-gia', icon: StarIcon },
+        { name: 'Danh sách banner', path: '/admin/banner', icon: ImagePlus }
       ]
     },
     { name: 'Quản lý suất chiếu', path: '/admin/quan-ly-suat-chieu', icon: ClockIcon },
@@ -75,7 +75,7 @@ const AdminSidebar = () => {
       children: [
         { name: 'Danh sách rạp', path: '/admin/quan-ly-rap', icon: ListIcon },
         { name: 'Danh sách phòng chiếu', path: '/admin/quan-ly-phong-chieu', icon: DoorOpenIcon },
-        { name: 'Quản lý ghế', path: '/admin/quan-ly-ghe', icon: Armchair }
+        { name: 'Danh sách ghế', path: '/admin/quan-ly-ghe', icon: Armchair }
       ]
     },
     {
@@ -86,7 +86,7 @@ const AdminSidebar = () => {
     {
       name: 'Quản lý tài khoản',
       path: '/admin/quan-ly-tai-khoan',
-      icon: UsersIcon,
+      icon: UserIcon,
     }
   ]
 
@@ -94,9 +94,14 @@ const AdminSidebar = () => {
     <div className='h-[calc(100vh-64px)] md:flex flex-col items-center pt-8 max-w-13 md:max-w-60
     border-r border-gray-300/30 w-full text-sm overflow-y-auto bg-gray-950 no-scrollbar sticky top-[64px]'>
       {/* Avatar + tên admin */}
-      <div className='flex flex-col items-center border-b border-gray-700 pb-6'>
+      <div className='flex flex-col items-center border-b border-gray-700 pb-3'>
         <img src={user.anhDaiDien} alt="" className='h-9 md:h-18 w-9 md:w-18 rounded-full mx-auto' />
         <p className='mt-2 text-xl max-md:hidden font-medium text-gray-200'>{user.hoTen}</p>
+        <div onClick={() => dispatch(logout())}
+          className='flex items-center mt-2 gap-2 border p-2 border-red-400 rounded cursor-pointer hover:text-red-400 transition'>
+          <LogOutIcon className='size-4 text-red-400' />
+          <button className=' text-red-400 cursor-pointer'>Đăng xuất</button>
+        </div>
       </div>
 
       {/* Danh sách menu */}

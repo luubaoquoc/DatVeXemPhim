@@ -238,26 +238,29 @@ const DaoDien = () => {
 
               {/* Ảnh */}
               <div>
-                <label className="block mb-1">Ảnh đại diện</label>
-                <input
-                  type="file"
-                  name="anhDaiDien"
-                  accept="image/*"
-                  className="w-full p-2 mb-2 rounded bg-[#111] border border-gray-600"
-                  onChange={handleChange}
-                />
-
-                {formData.anhDaiDien && (
-                  <img
-                    src={
-                      formData.anhDaiDien instanceof File
-                        ? URL.createObjectURL(formData.anhDaiDien)
-                        : formData.anhDaiDien
-                    }
-                    className="h-20 w-20 object-cover rounded mt-2"
-                    alt="preview"
+                <label className='block mb-1'>Ảnh đại diện</label>
+                <div className="flex gap-3">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    name="anhDaiDien"
+                    className="w-full h-[3rem] p-2 mb-4 rounded bg-[#111] border border-gray-600 text-white"
+                    onChange={handleChange}
                   />
-                )}
+                  {
+                    formData.anhDaiDien && (
+                      <img
+                        src={
+                          formData.anhDaiDien instanceof File
+                            ? URL.createObjectURL(formData.anhDaiDien)
+                            : formData.anhDaiDien
+                        }
+                        alt="Preview"
+                        className="h-20 w-20 object-cover mb-4 rounded"
+                      />
+                    )
+                  }
+                </div>
               </div>
 
               {/* Ngày sinh */}

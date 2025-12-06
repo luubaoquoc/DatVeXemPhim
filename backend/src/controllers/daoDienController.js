@@ -18,9 +18,9 @@ export const getAllDaoDien = async (req, res) => {
           [Op.like]: `%${search}%`
         }
       },
-      order: [["maDaoDien", "DESC"]],
       offset: offset,
       limit: limit,
+      order: [["maDaoDien", "DESC"]],
     });
 
     return res.json({

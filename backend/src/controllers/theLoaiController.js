@@ -8,16 +8,15 @@ export const getAllTheLoai = async (req, res) => {
     const search = req.query.search || "";
 
     const offset = (page - 1) * limit;
+    const where = search
+      ? { tenTheLoai: { [Op.like]: `%${search}%` } }
+      : {};
 
     const { count, rows } = await TheLoai.findAndCountAll({
-      where: {
-        tenTheLoai: {
-          [Op.like]: `%${search}%`
-        }
-      },
-      order: [["maTheLoai", "DESC"]],
-      offset: offset,
+      where,
       limit: limit,
+      offset: offset,
+      order: [["maTheLoai", "DESC"]],
     });
 
     return res.json({

@@ -8,12 +8,16 @@ import streamifier from 'streamifier'
 
 export const listPhims = async (req, res) => {
   try {
+    const trangThaiChieu = req.query.trangThaiChieu || "";
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const search = req.query.search || "";
 
     const offset = (page - 1) * limit;
-    const whereOp = search ? { tenPhim: { [Op.like]: `%${search}%` } } : {};
+    const whereOp = {
+      ...(search && { tenPhim: { [Op.like]: `%${search}%` } }),
+      ...(trangThaiChieu && { trangThaiChieu: trangThaiChieu })
+    };
 
     // Tổng số phim
     const totalItems = await Phim.count({ where: whereOp });

@@ -3,11 +3,11 @@ import React from 'react'
 
 const SearchInput = ({ search, setSearch, setCurrentPage, item = "item" }) => {
   return (
-    <div className="mb-4 border border-primary/30 p-1 w-74 rounded flex items-center">
+    <div className="mb-4 border border-primary/70 p-1 w-74 flex items-center bg-black">
       <input
         type="text"
         placeholder={`Tìm kiếm theo ${item}...`}
-        className="p-2 rounded bg-black/20 border-none text-white w-64 outline-none"
+        className="p-2 rounded border-none text-white w-64 outline-none"
         value={search}
         onChange={(e) => {
           setSearch(e.target.value);

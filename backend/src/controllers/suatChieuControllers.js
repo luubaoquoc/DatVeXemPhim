@@ -6,13 +6,28 @@ export const listSuatChieus = async (req, res) => {
   try {
     const page = Math.max(1, Number(req.query.page) || 1);
     const limit = Math.max(1, Number(req.query.limit) || 20);
+    const search = req.query.search || "";
+
     const offset = (page - 1) * limit;
-    const where = {};
-    if (req.query.maPhim) where.maPhim = Number(req.query.maPhim);
+    const filterPhong = req.query.maPhong || "";
+    const filterDate = req.query.date || "";
+    const where = {
+      ...(search && { '$phim.tenPhim$': { [Op.like]: `%${search}%` } }),
+      ...(filterPhong && { maPhong: filterPhong }),
+      ...(filterDate && {
+        gioBatDau: {
+          [Op.between]: [
+            new Date(filterDate + 'T00:00:00'),
+            new Date(filterDate + 'T23:59:59')
+          ]
+        }
+      })
+    }
 
     const { count, rows } = await SuatChieu.findAndCountAll(
       {
-        where, include: [
+        where,
+        include: [
           {
             model: Phim,
             as: 'phim',
@@ -24,9 +39,16 @@ export const listSuatChieus = async (req, res) => {
             attributes: ['maPhong', 'tenPhong']
           }
         ],
-        limit, offset, order: [['maSuatChieu', 'DESC']]
+        limit,
+        offset,
+        order: [['maSuatChieu', 'DESC']]
       });
-    return res.json({ total: count, page, limit, data: rows });
+    return res.json({
+      totalItems: count,
+      totalPages: Math.ceil(count / limit),
+      currentPage: page,
+      data: rows
+    });
   } catch (error) {
     console.error('listSuatChieus error:', error);
     return res.status(500).json({ message: 'Lỗi server' });

@@ -1,6 +1,7 @@
 import DanhGia from "../models/DanhGia.js";
 import Phim from "../models/Phim.js";
 import TaiKhoan from "../models/TaiKhoan.js";
+import { Op } from "sequelize";
 
 export const listDanhGias = async (req, res) => {
   try {
@@ -9,9 +10,9 @@ export const listDanhGias = async (req, res) => {
     const search = req.query.search || "";
     const offset = (page - 1) * limit;
 
-    const where = search
-      ? { hoTen: { [Op.like]: `%${search}%` } }
-      : {};
+    const where = {
+      ...(search && { '$phim.tenPhim$': { [Op.like]: `%${search}%` } })
+    }
 
     const { count, rows } = await DanhGia.findAndCountAll({
       where,
@@ -44,7 +45,25 @@ export const listDanhGias = async (req, res) => {
   }
 };
 
+export const updateDanhGia = async (req, res) => {
+  try {
+    const { maDanhGia } = req.params;
+    const { diem } = req.body;
 
+    const danhGia = await DanhGia.findByPk(maDanhGia);
+    if (!danhGia) {
+      return res.status(404).json({ message: "Đánh giá không tồn tại" });
+    }
+
+    danhGia.diem = diem;
+    await danhGia.save();
+
+    res.json({ message: "Cập nhật thành công", data: danhGia });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Lỗi Server" });
+  }
+};
 
 
 export const deleteDanhGia = async (req, res) => {

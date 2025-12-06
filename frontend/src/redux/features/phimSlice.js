@@ -2,9 +2,9 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import API from '../../lib/axios.js'
 
 export const fetchPhims = createAsyncThunk('phim/fetchPhims', async (params = {}, { rejectWithValue }) => {
-  const { page = 1, limit = 10, search = "" } = params
+  const { page = 1, limit = 10, search = "", trangThaiChieu = "" } = params
   try {
-    const res = await API.get('/phim', { params: { page, limit, search } })
+    const res = await API.get('/phim', { params: { page, limit, search, trangThaiChieu } })
     return res.data || []
   } catch (err) {
     return rejectWithValue(err.response?.data?.message || err.message)

@@ -7,19 +7,25 @@ import Pagination from "../../components/admin/Paginnation";
 import isoTimeFormat from "../../lib/isoTimeFormat";
 import { formatDate } from "../../lib/dateFormat";
 import DeleteForm from "../../components/admin/DeleteForm";
+import SearchInput from "../../components/SearchInput";
 
 const QuanLySuatChieu = () => {
-  const api = useApi(true);
+  const api = useApi(true)
 
-  const [suatChieus, setSuatChieus] = useState([]);
-  const [showModal, setShowModal] = useState(false);
-  const [editItem, setEditItem] = useState(null);
+  const [suatChieus, setSuatChieus] = useState([])
+  const [phong, setPhong] = useState([])
+  const [showModal, setShowModal] = useState(false)
+  const [editItem, setEditItem] = useState(null)
 
-  // const [search, setSearch] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const limit = 10
 
-  const limit = 10;
+  const [search, setSearch] = useState("")
+  const [filterPhong, setFilterPhong] = useState("")
+  const [filterDate, setFilterDate] = useState("");
+
+  console.log(suatChieus);
 
   const fetchSuatChieus = async () => {
     try {
@@ -27,50 +33,62 @@ const QuanLySuatChieu = () => {
         params: {
           page: currentPage,
           limit,
-          // search: search || undefined,
+          search: search,
+          maPhong: filterPhong,
+          date: filterDate,
         },
       });
 
-      setSuatChieus(res.data.data);  // <<== backend trả data
-      setTotalPages(Math.ceil(res.data.total / limit));
+      setSuatChieus(res.data.data);
+      setTotalPages(res.data.totalPages)
     } catch (error) {
       console.log(error);
-      toast.error("Lỗi tải danh sách suất chiếu!");
+      toast.error("Lỗi tải danh sách suất chiếu!")
     }
   };
 
+  const fetchPhongs = async () => {
+    const res = await api.get("/phongChieu")
+    setPhong(res.data.data)
+  };
+
+
   useEffect(() => {
-    fetchSuatChieus();
-  }, [currentPage]);
+    fetchSuatChieus()
+    fetchPhongs()
+  }, [currentPage, search, filterPhong, filterDate]);
 
   const handleSubmit = async (data) => {
     try {
       if (editItem) {
-        await api.put(`/suatchieu/${editItem.maSuatChieu}`, data);
-        toast.success("Cập nhật suất chiếu thành công!");
+        await api.put(`/suatchieu/${editItem.maSuatChieu}`, data)
+        toast.success("Cập nhật suất chiếu thành công!")
       } else {
-        await api.post("/suatchieu", data);
-        toast.success("Thêm suất chiếu thành công!");
+        await api.post("/suatchieu", data)
+        toast.success("Thêm suất chiếu thành công!")
       }
 
       setShowModal(false);
       setEditItem(null);
-      fetchSuatChieus(); // <<== FIX
+      fetchSuatChieus();
     } catch (e) {
-      toast.error(e.response?.data?.message || "Lỗi thao tác!");
+      toast.error(e.response?.data?.message || "Lỗi thao tác!")
     }
   };
 
   const handleDelete = async (maSuatChieu) => {
     try {
-      await api.delete(`/suatchieu/${maSuatChieu}`);
+      await api.delete(`/suatchieu/${maSuatChieu}`)
       toast.success("Đã xoá!");
 
-      fetchSuatChieus(); // <<== FIX
+      fetchSuatChieus();
     } catch {
       toast.error("Xoá thất bại!");
     }
-  };
+  }
+
+  console.log(phong);
+
 
   return (
     <div className="p-6 text-white">
@@ -84,7 +102,40 @@ const QuanLySuatChieu = () => {
         </button>
       </div>
 
+      <div className='flex flex-wrap gap-3 mb-4'>
+        <SearchInput
+          search={search}
+          setSearch={setSearch}
+          setCurrentPage={setCurrentPage}
+          item="tên phim"
+        />
 
+        <select
+          className="border border-primary/70 px-3 py-2 bg-black h-[3rem] outline-none cursor-pointer"
+          value={filterPhong}
+          onChange={(e) => {
+            setFilterPhong(e.target.value);
+            setCurrentPage(1);
+          }}
+        >
+          <option value="">Tất cả phòng</option>
+          {phong.map(phong => (
+            <option key={phong.maPhong} value={phong.maPhong}>
+              {phong.tenPhong}
+            </option>
+          ))}
+        </select>
+        <input
+          type="date"
+          className="border border-primary/70 px-3 py-2 bg-black h-[3rem] outline-none cursor-pointer"
+          value={filterDate}
+          onChange={(e) => {
+            setFilterDate(e.target.value)
+            setCurrentPage(1)
+          }}
+        />
+
+      </div>
 
       <table className="w-full border-b border-primary/30">
         <thead className="bg-primary/70">
@@ -106,7 +157,7 @@ const QuanLySuatChieu = () => {
               key={sc.maSuatChieu}
               className="border-b border-primary/20 text-center"
             >
-              <td className="p-2">{index + 1}</td>
+              <td className="p-2">{(currentPage - 1) * limit + index + 1}</td>
               <td className="p-2">{sc.phim?.tenPhim || sc.maPhim}</td>
               <td className="p-2">{sc.phongChieu?.tenPhong}</td>
 

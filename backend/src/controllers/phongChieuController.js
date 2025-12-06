@@ -5,11 +5,6 @@ import Rap from "../models/Rap.js";
 
 // Tính layout dựa theo tổng số ghế
 const getLayoutFromTotal = (total) => {
-  // if (total === 120) return { rows: 10, cols: 12 };
-  // if (total === 100) return { rows: 10, cols: 10 };
-  // if (total === 90) return { rows: 10, cols: 9 };
-  // if (total === 72) return { rows: 8, cols: 9 };
-  // if (total === 60) return { rows: 6, cols: 10 };
 
   // fallback auto như hình vuông
   const cols = Math.ceil(Math.sqrt(total));
@@ -46,14 +41,16 @@ const generateSeats = (maPhong, tongSoGhe) => {
 export const listPhongChieu = async (req, res) => {
   try {
 
+    const maRap = req.query.maRap || "";
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const search = req.query.search || "";
 
     const offset = (page - 1) * limit;
-    const whereOp = search
-      ? { tenPhong: { [Op.like]: `%${search}%` } }
-      : {};
+    const whereOp = {
+      ...(search && { tenPhong: { [Op.like]: `%${search}%` } }),
+      ...(maRap && { maRap: maRap })
+    };
 
     const totalItems = await PhongChieu.count({ where: whereOp });
 
@@ -67,7 +64,7 @@ export const listPhongChieu = async (req, res) => {
       limit: limit,
     });
     res.json({
-      items: rows,
+      data: rows,
       totalItems,
       totalPages: Math.ceil(totalItems / limit),
       currentPage: page

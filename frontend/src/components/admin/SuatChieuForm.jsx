@@ -30,7 +30,7 @@ const SuatChieuForm = ({ onSubmit, onClose, editItem }) => {
         ]);
 
         setPhims(p.data.data);
-        setPhongs(pc.data.items);
+        setPhongs(pc.data.data);
       } catch (err) {
         console.log(err);
         toast.error("Không thể tải dữ liệu!");

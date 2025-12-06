@@ -5,7 +5,7 @@ import { Op } from "sequelize";
 export const listGheByPhong = async (req, res) => {
   try {
     const { maPhong } = req.query;
-    if (!maPhong) return res.status(400).json({ message: "Thiếu maPhong" });
+    if (!maPhong) return res.status(400).json({ message: "Phòng không hợp lệ" });
 
     const ghe = await Ghe.findAll({
       where: { maPhong },

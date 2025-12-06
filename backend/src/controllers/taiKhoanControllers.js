@@ -6,22 +6,24 @@ import streamifier from 'streamifier'
 import VaiTro from '../models/VaiTro.js';
 import { Op } from 'sequelize';
 
-// GET /api/nguoidung?page=1&limit=20
+// GET /api/taikhoan?page=1&limit=20
 export const listUsers = async (req, res) => {
   try {
+    const maVaiTro = req.query.maVaiTro || "";
+    const maRap = req.query.maRap || "";
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const search = req.query.search || "";
 
     const offset = (page - 1) * limit;
-    const whereOp = search ? {
-      hoTen: {
-        [Op.like]: `%${search}%`
-      },
-    } : {};
+    const whereOp = {
+      ...(search && { hoTen: { [Op.like]: `%${search}%` } }),
+      ...(maVaiTro && { maVaiTro: maVaiTro }),
+      ...(maRap && { maRap: maRap }),
+    };
 
 
-    // Lấy danh sách phim với phân trang
+    // Lấy danh sách tài khoản với phân trang
     const { count, rows } = await TaiKhoan.findAndCountAll({
       where: whereOp,
       include: [
@@ -89,7 +91,7 @@ export const createTaiKhoan = async (req, res) => {
   }
 };
 
-// GET /api/nguoidung/:maTaiKhoan
+// GET /api/taikhoan/:maTaiKhoan
 export const getUser = async (req, res) => {
   try {
     const ma = Number(req.params.maTaiKhoan);
@@ -107,7 +109,7 @@ export const getUser = async (req, res) => {
 
 
 
-// PUT /api/nguoidung/:maTaiKhoan
+// PUT /api/taikhoan/:maTaiKhoan
 export const updateUser = async (req, res) => {
   try {
     const ma = Number(req.params.maTaiKhoan);
@@ -139,7 +141,7 @@ export const updateUser = async (req, res) => {
   }
 };
 
-// DELETE /api/nguoidung/:maTaiKhoan
+// DELETE /api/taikhoan/:maTaiKhoan
 export const deleteUser = async (req, res) => {
   try {
     const ma = Number(req.params.maTaiKhoan);
@@ -200,7 +202,7 @@ export const uploadAvatar = async (req, res) => {
   }
 };
 
-// PUT /api/nguoidung/:maTaiKhoan/change-password
+// PUT /api/taikhoan/:maTaiKhoan/change-password
 export const changePassword = async (req, res) => {
   try {
     const ma = Number(req.params.maTaiKhoan);

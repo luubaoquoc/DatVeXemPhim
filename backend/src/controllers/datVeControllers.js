@@ -28,8 +28,6 @@ export const getAllDatVe = async (req, res) => {
       whereOp = {
         [Op.or]: [
           { maDatVe: { [Op.like]: `%${search}%` } },
-          // { '$suatChieu.phim.tenPhim$': { [Op.like]: `%${search}%` } },
-          // { '$khachHang.hoTen$': { [Op.like]: `%${search}%` } },
         ]
       };
     }

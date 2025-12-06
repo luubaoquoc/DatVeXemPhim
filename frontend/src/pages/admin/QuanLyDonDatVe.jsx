@@ -24,6 +24,8 @@ const QuanLyDonDatVe = () => {
   const [detailDonDatVe, setDetailDonDatVe] = useState(null);
 
 
+  console.log(donDatVe);
+
 
   const fetchOrders = async () => {
     try {
@@ -87,7 +89,7 @@ const QuanLyDonDatVe = () => {
 
         {/* Trạng thái */}
         <select
-          className="border border-primary/30 px-3 py-2 bg-black h-[3rem] outline-none"
+          className="border border-primary/70 px-3 py-2 bg-black h-[3rem] outline-none"
           value={filterStatus}
           onChange={(e) => {
             setFilterStatus(e.target.value);

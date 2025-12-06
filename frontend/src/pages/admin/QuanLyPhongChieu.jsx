@@ -22,16 +22,17 @@ const PhongChieu = () => {
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const limit = 10
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false)
+  const [filterStatus, setFilterStatus] = useState("")
 
 
   // Fetch API
   const fetchData = async () => {
     try {
       const res = await api.get("/phongchieu", {
-        params: { page: currentPage, limit, search }
+        params: { page: currentPage, limit, search, maRap: filterStatus }
       })
-      setPhongChieus(res.data.items)
+      setPhongChieus(res.data.data)
       setTotalPages(res.data.totalPages)
     } catch {
       toast.error("Không thể tải danh sách phòng!")
@@ -49,7 +50,7 @@ const PhongChieu = () => {
   useEffect(() => {
     fetchData()
     fetchRaps()
-  }, [currentPage, search])
+  }, [currentPage, search, filterStatus])
 
   // Xử lý thay đổi input
   const handleChange = (e) => {
@@ -130,14 +131,31 @@ const PhongChieu = () => {
         </button>
       </div>
 
-      {/* Search */}
-      <SearchInput
-        search={search}
-        setSearch={setSearch}
-        setCurrentPage={setCurrentPage}
-        item="tên rạp"
-      />
+      <div className='flex flex-wrap gap-3 mb-4'>
+        <SearchInput
+          search={search}
+          setSearch={setSearch}
+          setCurrentPage={setCurrentPage}
+          item="tên phòng"
+        />
 
+        {/*Lọc Rạp */}
+        <select
+          className="border border-primary/70 px-3 py-2 bg-black h-[3rem] outline-none cursor-pointer"
+          value={filterStatus}
+          onChange={(e) => {
+            setFilterStatus(e.target.value);
+            setCurrentPage(1);
+          }}
+        >
+          <option value="">Tất cả rạp</option>
+          {
+            raps.map(rap => (
+              <option key={rap.maRap} value={rap.maRap}>{rap.tenRap}</option>
+            ))
+          }
+        </select>
+      </div>
       {/* Table */}
 
       <table className="w-full border-b border-primary/30 rounded-lg text-sm">

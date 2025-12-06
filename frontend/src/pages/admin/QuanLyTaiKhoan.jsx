@@ -28,6 +28,8 @@ const QuanLyTaiKhoan = () => {
   const [totalPages, setTotalPages] = useState(1)
   const limit = 10
   const [loading, setLoading] = useState(false)
+  const [filterRole, setFilterRole] = useState("")
+  const [filterRap, setFilterRap] = useState("")
 
 
   const isRapRequired = Number(formData.maVaiTro) === 2 || Number(formData.maVaiTro) === 3;
@@ -37,7 +39,7 @@ const QuanLyTaiKhoan = () => {
   const fetchData = async () => {
     try {
       const res = await api.get("/taikhoan", {
-        params: { page: currentPage, limit, search }
+        params: { page: currentPage, limit, search, maVaiTro: filterRole, maRap: filterRap }
       })
       setTaiKhoans(res.data.data)
       setTotalPages(res.data.totalPages)
@@ -71,7 +73,7 @@ const QuanLyTaiKhoan = () => {
     fetchData()
     fetchVaiTros()
     fetchRaps()
-  }, [currentPage, search])
+  }, [currentPage, search, filterRole, filterRap])
 
   // Xử lý thay đổi input
   const handleChange = (e) => {
@@ -174,17 +176,48 @@ const QuanLyTaiKhoan = () => {
         </button>
       </div>
 
-      {/* Search */}
-      <SearchInput
+      <div className='flex flex-wrap gap-3 mb-4'>
+        <SearchInput
+          search={search}
+          setSearch={setSearch}
+          setCurrentPage={setCurrentPage}
+          item="tên tài khoản"
+        />
 
-        search={search}
-        setSearch={setSearch}
-        setCurrentPage={setCurrentPage}
-        item="họ tên"
-      />
+        {/* Trạng thái */}
+        <select
+          className="border border-primary/70 px-3 py-2 bg-black h-[3rem] outline-none cursor-pointer"
+          value={filterRole}
+          onChange={(e) => {
+            setFilterRole(e.target.value);
+            setCurrentPage(1);
+          }}
+        >
+          <option value="">Tất cả vai trò</option>
+          {vaiTros.map(vaiTro => (
+            <option key={vaiTro.maVaiTro} value={vaiTro.maVaiTro}>
+              {vaiTro.tenVaiTro}
+            </option>
+          ))}
+        </select>
+        <select
+          className="border border-primary/70 px-3 py-2 bg-black h-[3rem] outline-none cursor-pointer"
+          value={filterRap}
+          onChange={(e) => {
+            setFilterRap(e.target.value);
+            setCurrentPage(1);
+          }}
+        >
+          <option value="">Tất cả rạp</option>
+          {raps.map(rap => (
+            <option key={rap.maRap} value={rap.maRap}>
+              {rap.tenRap}
+            </option>
+          ))}
+        </select>
+      </div>
 
       {/* Table */}
-
       <table className="w-full border-b border-primary/30 rounded-lg text-sm">
         <thead className="bg-primary/70 text-white">
           <tr>
@@ -193,6 +226,7 @@ const QuanLyTaiKhoan = () => {
             <th className="p-2 text-left">Họ tên</th>
             <th className="p-2 text-left">Email</th>
             <th className="p-2 text-left">Vai trò</th>
+            <th className="p-2 text-left">Rạp</th>
             <th className="p-2">Hành động</th>
           </tr>
         </thead>
@@ -205,6 +239,7 @@ const QuanLyTaiKhoan = () => {
               <td className="p-2 font-medium text-left">{taiKhoan.hoTen}</td>
               <td className="p-2 text-left">{taiKhoan.email}</td>
               <td className="p-2 text-left">{taiKhoan.vaiTro?.tenVaiTro}</td>
+              <td className="p-2 text-left">{taiKhoan.rapLamViec ? taiKhoan.rapLamViec.tenRap : "-"}</td>
 
               <td className="p-2 flex justify-center">
                 <button

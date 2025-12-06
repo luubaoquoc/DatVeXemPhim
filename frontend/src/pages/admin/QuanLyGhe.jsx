@@ -16,7 +16,7 @@ const QuanLyGhe = () => {
   const fetchPhong = async () => {
     try {
       const res = await api.get("/phongchieu", { params: { page: 1, limit: 9999 } });
-      setPhongChieus(res.data.items || []);
+      setPhongChieus(res.data.data || []);
     } catch (err) {
       console.error(err);
       toast.error("Không tải được danh sách phòng");
@@ -91,7 +91,7 @@ const QuanLyGhe = () => {
         <select
           value={maPhong}
           onChange={(e) => setMaPhong(e.target.value)}
-          className="border border-primary/30 px-3 py-2 bg-black h-[3rem] outline-none cursor-pointer"
+          className="border border-primary/70 px-3 py-2 bg-black h-[3rem] outline-none cursor-pointer"
         >
           <option value="">-- Chọn phòng --</option>
           {phongChieus.map(p => (
@@ -102,7 +102,7 @@ const QuanLyGhe = () => {
         <select
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
-          className="border border-primary/30 px-3 py-2 bg-black h-[3rem] outline-none cursor-pointer"
+          className="border border-primary/70 px-3 py-2 bg-black h-[3rem] outline-none cursor-pointer"
         >
           <option value="all">Tất cả</option>
           <option value="active">Khả dụng</option>

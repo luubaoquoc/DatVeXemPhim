@@ -24,11 +24,11 @@ const QuanLyPhim = () => {
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const limit = 5;
-  const [filterStatus, setFilterStatus] = useState("tất cả")
+  const [filterStatus, setFilterStatus] = useState("")
 
   useEffect(() => {
-    dispatch(fetchPhims({ page: currentPage, limit, search }))
-  }, [dispatch, currentPage, search])
+    dispatch(fetchPhims({ page: currentPage, limit, search, trangThaiChieu: filterStatus }))
+  }, [dispatch, currentPage, search, filterStatus])
 
 
   const handleSubmit = async (formData) => {
@@ -69,6 +69,8 @@ const QuanLyPhim = () => {
   }
 
   console.log(phims);
+  console.log(filterStatus);
+
 
 
   return (
@@ -96,14 +98,14 @@ const QuanLyPhim = () => {
 
         {/* Trạng thái */}
         <select
-          className="border border-primary/30 px-3 py-2 bg-black h-[3rem] outline-none cursor-pointer"
+          className="border border-primary/70 px-3 py-2 bg-black h-[3rem] outline-none cursor-pointer"
           value={filterStatus}
           onChange={(e) => {
             setFilterStatus(e.target.value);
             setCurrentPage(1);
           }}
         >
-          <option value="tất cả">Tất cả trạng thái</option>
+          <option value="">Tất cả trạng thái</option>
           <option value="Đang chiếu">Đang chiếu</option>
           <option value="Sắp chiếu">Sắp chiếu</option>
           <option value="Ngừng chiếu">Ngừng chiếu</option>
