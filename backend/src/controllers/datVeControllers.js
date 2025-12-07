@@ -405,3 +405,83 @@ export const deleteDatVe = async (req, res) => {
     return res.status(500).json({ message: 'Lỗi server' });
   }
 };
+
+
+export const getThongTinDatVe = async (req, res) => {
+  const { maDatVe } = req.params;
+
+  try {
+    const datVe = await DatVe.findOne({
+      where: { maDatVe },
+      include: [
+        {
+          model: TaiKhoan,
+          as: 'khachHang',
+          attributes: ['maTaiKhoan', 'hoTen', 'email']
+        },
+        {
+          model: SuatChieu,
+          as: 'suatChieu',
+          include: [
+            { model: Phim, as: 'phim' },
+            { model: PhongChieu, as: 'phongChieu' }
+          ]
+        },
+        {
+          model: ThanhToan,
+          as: 'thanhToan',
+        },
+        {
+          model: ChiTietDatVe,
+          as: 'chiTietDatVes',
+          attributes: ['maGhe'],
+          include: [{ model: Ghe, as: 'ghe' }],
+        }
+      ]
+    });
+
+    //  Không tìm thấy mã đặt vé
+    if (!datVe) {
+      return res.status(404).json({ message: "Không tìm thấy vé" });
+    }
+
+    //  Vé chưa thanh toán
+    if (datVe.trangThai !== "Thành công" && datVe.trangThai !== "Đã check-in") {
+      return res.status(400).json({ message: "Vé chưa thanh toán thành công" });
+    }
+
+    //  OK → trả về thông tin vé
+    return res.json(datVe);
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Lỗi server", error });
+  }
+};
+
+
+
+export const checkInDatVe = async (req, res) => {
+  try {
+    const maDatVe = Number(req.params.maDatVe);
+    if (!maDatVe) return res.status(400).json({ message: 'Mã đặt vé không hợp lệ' });
+
+    const datVe = await DatVe.findByPk(maDatVe);
+
+    if (!datVe) {
+      return res.status(404).json({ message: 'Không tìm thấy đơn đặt vé' });
+    }
+
+    if (datVe.trangThai !== "Thành công") {
+      return res.status(400).json({ message: 'Vé chưa thanh toán thành công, không thể check-in' });
+    }
+
+    await datVe.update({ trangThai: 'Đã check-in' });
+
+    return res.json({ message: 'Check-in thành công', datVe });
+
+  } catch (error) {
+    console.error("checkInDatVe error:", error);
+    return res.status(500).json({ message: 'Lỗi server' });
+  }
+};

@@ -22,7 +22,8 @@ const DatVe = sequelize.define('DatVe', {
       'Đang chờ',
       'Đang thanh toán',
       'Thành công',
-      'Thất bại'
+      'Thất bại',
+      'Đã check-in'
     ),
     allowNull: false,
     defaultValue: 'Đang chờ'

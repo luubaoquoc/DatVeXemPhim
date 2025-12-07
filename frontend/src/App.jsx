@@ -31,6 +31,7 @@ import QuanLySuatChieu from './pages/admin/QuanLySuatChieu'
 import QuanLyDonDatVe from './pages/admin/QuanLyDonDatVe'
 import QuanLyTaiKhoan from './pages/admin/QuanLyTaiKhoan'
 import QuanLyDanhGia from './pages/admin/QuanLyDanhGia'
+import CheckInVe from './pages/admin/CheckInVe'
 
 const App = () => {
 
@@ -94,6 +95,7 @@ const App = () => {
             </AdminRoute>
           }>
           <Route index element={<Dashboard />} />
+          <Route path='van-hanh/check-in' element={<CheckInVe />} />
           <Route path='quan-ly-phim' element={<QuanLyphim />} />
           <Route path='quan-ly-dao-dien' element={<QuanLyDaoDien />} />
           <Route path='quan-ly-dien-vien' element={<QuanLyDienVien />} />
