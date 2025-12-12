@@ -30,7 +30,7 @@ const TrangCaNhan = () => {
     setStatus("loading");
 
     try {
-      const res = await api.put(`/nguoidung/${user.maTaiKhoan}`, formData);
+      const res = await api.put(`/taikhoan/${user.maTaiKhoan}`, formData);
       toast.success("Cập nhật thông tin thành công");
       dispatch(updateProfile(res.data.user));
       setStatus("success");
@@ -45,7 +45,7 @@ const TrangCaNhan = () => {
     setStatus("loading");
 
     try {
-      await api.put(`/nguoidung/${user.maTaiKhoan}/change-password`, data);
+      await api.put(`/taikhoan/${user.maTaiKhoan}/change-password`, data);
       toast.success("Đổi mật khẩu thành công");
       setShowChangePass(false);
       setStatus("success");
@@ -57,7 +57,7 @@ const TrangCaNhan = () => {
   };
 
   return (
-    <div className="relative my-40 mb-20 md:px-16 lg:px-40 xl:px-44 overflow-hidden min-h-screen">
+    <div className="relative mt-40 mb-20 md:px-16 lg:px-40 xl:px-44 overflow-hidden min-h-screen">
       <div className="flex flex-col md:flex-row max-md:px-10">
 
         {/* LEFT SIDE */}

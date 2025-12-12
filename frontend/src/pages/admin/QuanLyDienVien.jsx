@@ -198,14 +198,14 @@ const DienVien = () => {
 
       {/* Modal thêm/sửa */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/70 flex justify-center items-center z-50">
+        <div className="fixed inset-0 bg-black/80 flex justify-center items-center z-50">
           <div className="bg-black/80 border border-primary p-6 rounded-lg w-96">
-            <h2 className="text-lg font-semibold mb-4">
+            <h2 className="text-2xl font-semibold mb-4 text-primary text-center">
               {editItem ? 'Sửa diễn viên' : 'Thêm diễn viên'}
             </h2>
             <form onSubmit={handleSubmit}>
               <div>
-                <label className='block mb-1'>Tên Diễn Viên</label>
+                <label className='block mb-1 font-medium text-primary'>Tên Diễn Viên</label>
                 <input
                   type="text"
                   name="tenDienVien"
@@ -218,7 +218,7 @@ const DienVien = () => {
               </div>
 
               <div>
-                <label className='block mb-1'>Ảnh đại diện</label>
+                <label className='block mb-1 font-medium text-primary'>Ảnh đại diện</label>
                 <div className="flex gap-3">
                   <input
                     type="file"
@@ -244,7 +244,7 @@ const DienVien = () => {
               </div>
 
               <div>
-                <label className='block mb-1'>Ngày sinh</label>
+                <label className='block mb-1 font-medium text-primary'>Ngày sinh</label>
                 <input
                   type="date"
                   name="ngaySinh"
@@ -255,7 +255,7 @@ const DienVien = () => {
               </div>
 
               <div>
-                <label className='block mb-1'>Tiểu sử</label>
+                <label className='block mb-1 font-medium text-primary'>Tiểu sử</label>
                 <textarea
                   name="tieuSu"
                   rows="3"
@@ -270,7 +270,7 @@ const DienVien = () => {
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 bg-gray-600 rounded cursor-pointer hover:bg-gray-500 text-white"
+                  className="px-4 py-2 bg-gray-700 rounded cursor-pointer hover:bg-gray-600 text-white"
                 >
                   Hủy
                 </button>
@@ -278,7 +278,7 @@ const DienVien = () => {
                   type="submit"
                   disabled={loading}
                   className={`px-4 py-2 rounded cursor-pointer flex items-center gap-2 hover:bg-primary/80 text-white
-                  ${loading ? 'bg-primary/50 cursor-not-allowed' : 'bg-primary'}
+                  ${loading ? 'bg-primary/50 cursor-not-allowed' : 'bg-primary hover:bg-primary/80'}
                 `}
                 >
                   {loading ? (

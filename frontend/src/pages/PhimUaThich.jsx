@@ -52,7 +52,7 @@ const PhimUaThich = () => {
         {/* RIGHT CARD */}
         <div className="flex-2 bg-black/30 p-8 shadow-lg border-l border-primary/20 w-full">
           <h3 className="text-lg font-semibold text-white mb-6">Phim ưa thích</h3>
-          <div className='flex flex-wrap gap-6 justify-center'>
+          <div className='flex flex-wrap gap-6 justify-center  h-[60vh] overflow-y-auto no-scrollbar'>
             {movies.length === 0 ? (
               <p className='text-gray-400 mt-10'>Bạn chưa thích phim nào.</p>
             ) : (

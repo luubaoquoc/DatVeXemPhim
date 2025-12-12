@@ -90,7 +90,7 @@ const OtpModal = ({ email, otp, setOtp, setShowOtpModal, setIsLogin }) => {
       <div className="bg-black/90 p-6 rounded-lg shadow-lg w-80 text-center relative border border-primary">
         {/* Nút đóng */}
         <button
-          className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+          className="absolute top-2 right-2 text-gray-500 hover:text-red-500 cursor-pointer"
           onClick={() => setShowOtpModal(false)}
         >
           ✕
@@ -113,14 +113,14 @@ const OtpModal = ({ email, otp, setOtp, setShowOtpModal, setIsLogin }) => {
                 ref={(el) => (inputsRef.current[index] = el)}
                 onChange={(e) => handleChange(e, index)}
                 onKeyDown={(e) => handleKeyDown(e, index)}
-                className="w-10 h-12 text-center border border-gray-300 rounded text-lg font-semibold text-black focus:border-blue-500 focus:outline-none"
+                className="w-10 h-12 text-center border border-gray-300 rounded text-lg font-semibold text-white focus:border-blue-500 focus:outline-none"
               />
             ))}
         </div>
 
         {/* Nút xác nhận */}
         <button
-          className="bg-primary text-white px-4 py-2 rounded w-full hover:bg-primary/90"
+          className="bg-primary text-white px-4 py-2 rounded w-full hover:bg-primary/90 cursor-pointer"
           onClick={handleVerify}
         >
           Xác nhận
@@ -131,7 +131,7 @@ const OtpModal = ({ email, otp, setOtp, setShowOtpModal, setIsLogin }) => {
           Chưa nhận được mã?{' '}
           <button
             onClick={handleResendOtp}
-            className={`text-blue-600 font-medium hover:underline ${timer > 0 ? 'opacity-50 cursor-not-allowed' : ''
+            className={`text-blue-600 font-medium hover:underline cursor-pointer ${timer > 0 ? 'opacity-50 cursor-not-allowed' : ''
               }`}
             disabled={isResending || timer > 0}
           >

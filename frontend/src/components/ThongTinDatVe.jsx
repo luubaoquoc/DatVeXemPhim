@@ -20,15 +20,17 @@ const ThongoTinDatVe = (
 ) => {
 
 
+  console.log(phim);
+
 
 
 
   return (
-    <div className="bg-primary/10 border border-primary/20 rounded-lg p-6 w-full md:w-[320px] h-max text-white">
+    <div className="bg-primary/10 border border-primary/20 rounded-lg p-2 w-full md:w-[350px] h-max text-white">
       <img
         src={poster || phim?.poster}
         alt={phim?.tenPhim || "Poster"}
-        className="rounded-lg mb-4 w-full h-70 object-cover"
+        className="rounded-lg mb-4 w-full h-90 max-md:h-[480px] object-cover"
       />
       <div className="mb-4">
         <h2 className="font-semibold text-lg mb-2">

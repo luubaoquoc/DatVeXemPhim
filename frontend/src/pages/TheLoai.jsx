@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import MoviesCard from '../components/MoviesCard'
 import { ChevronRight } from 'lucide-react'
 import { fetchPhims } from '../redux/features/phimSlice'
+import BlurCircle from '../components/BlurCircle'
 
 const TheLoai = () => {
 
@@ -36,6 +37,8 @@ const TheLoai = () => {
   return (
     <div className="px-6 md:px-16 lg:px-40 pt-30 md:pt-50">
       <div className="flex flex-col lg:flex-row gap-10 max-w-7xl mx-auto">
+        <BlurCircle top='100px' left='100px' />
+        <BlurCircle bottom='0px' right='100px' />
         <div className="flex-2">
           <h2 className="text-2xl font-medium mb-8 lg:text-left border-l-3 border-primary pl-2">Thể Loại</h2>
           <div className="flex flex-row flex-wrap gap-3">

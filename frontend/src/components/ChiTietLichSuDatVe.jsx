@@ -31,7 +31,7 @@ const ChiTietLichSuDatVe = (
       <div className="bg-black/90 border border-primary p-6 rounded-xl w-[750px] text-white max-h-[90vh] overflow-y-auto no-scrollbar">
 
         <h2 className="text-2xl font-semibold mb-4 text-center bg-gradient-to-r from-primary to-yellow-200 bg-clip-text text-transparent">
-          Chi tiết vé đặt
+          Chi tiết vé
         </h2>
 
         <div className="flex gap-6">

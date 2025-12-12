@@ -5,13 +5,13 @@ import {
   suaPhongChieu,
   xoaPhongChieu
 } from "../controllers/phongChieuController.js";
-import { authenticateToken, isAdmin } from "../middleware/authMiddleware.js";
+import { authenticateToken, hasRole } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.get("/", authenticateToken, isAdmin, listPhongChieu);                // Lấy danh sách phòng
-router.post("/", authenticateToken, isAdmin, themMoiPhongChieu);            // Thêm phòng + tạo ghế
-router.put("/:maPhong", authenticateToken, isAdmin, suaPhongChieu);              // Sửa phòng + cập nhật ghế
-router.delete("/:maPhong", authenticateToken, isAdmin, xoaPhongChieu);           // Xóa phòng + ghế
+router.get("/", authenticateToken, hasRole(3, 4), listPhongChieu);
+router.post("/", authenticateToken, hasRole(3, 4), themMoiPhongChieu);
+router.put("/:maPhong", authenticateToken, hasRole(3, 4), suaPhongChieu);
+router.delete("/:maPhong", authenticateToken, hasRole(3, 4), xoaPhongChieu);
 
 export default router;

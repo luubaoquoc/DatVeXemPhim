@@ -48,10 +48,10 @@ const AdminSidebar = () => {
         { name: 'Check-in & Quét vé', path: '/admin/van-hanh/check-in', icon: ScanLineIcon },   // Dành cho: NVR (Bắt buộc)
 
         // Module tạo và in vé mới tại quầy POS
-        { name: 'Bán vé tại quầy (POS)', path: '/admin/van-hanh/ban-ve-pos', icon: ReceiptTextIcon }, // Dành cho: NVR (Bắt buộc)
+        { name: 'Bán vé tại quầy (POS)', path: '/admin/van-hanh/ban-ve-tai-quay', icon: ReceiptTextIcon }, // Dành cho: NVR (Bắt buộc)
 
         // Xem lịch sử bán hàng cá nhân (dựa trên maNhanVienBan)
-        { name: 'Lịch sử giao dịch NV', path: '/admin/van-hanh/lich-su-giao-dich', icon: ListIcon } // Dành cho: NVR (Xem)
+        { name: 'Lịch sử giao dịch NV', path: '/admin/van-hanh/lich-su-ban-ve', icon: ListIcon } // Dành cho: NVR (Xem)
       ]
     },
     {

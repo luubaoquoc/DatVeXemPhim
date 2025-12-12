@@ -1,18 +1,54 @@
-import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import { ChevronDown, HeartIcon, HistoryIcon, LogOutIcon, MenuIcon, SearchIcon, UserIcon, XIcon } from 'lucide-react'
 import { useDispatch, useSelector } from 'react-redux'
 import { logout } from '../redux/features/authSlice'
 import Dangnhap from './Dangnhap'
+import useApi from '../hooks/useApi'
 
 const Navbar = () => {
+
+  const publicApi = useApi();
 
   const [isOpen, setIsOpen] = useState(false)
   const [showLogin, setShowLogin] = useState(false)
   const [openDienAnhDropdown, setOpenDienAnhDropdown] = useState(false)
   const [openDropdown, setOpenDropdown] = useState(false)
+
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+
+  const location = useLocation();
+  const current = location.pathname;
   const dispatch = useDispatch()
   const user = useSelector((state) => state.auth.user)
+
+  const isActive = (path) => current === path;
+
+
+  const handleSearch = (value) => {
+    setSearchTerm(value);
+  };
+
+
+  useEffect(() => {
+    if (!searchTerm.trim()) {
+      setSearchResults([]);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      try {
+        const res = await publicApi.get(`/phim?search=${searchTerm}`);
+        setSearchResults(res.data.data);
+      } catch (error) {
+        console.log(error);
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
 
 
@@ -35,9 +71,18 @@ const Navbar = () => {
         <XIcon className='md:hidden absolute top-6 right-6 w-6 h-6 cursor-pointer'
           onClick={() => setIsOpen(!isOpen)} />
 
-        <Link onClick={() => { scrollTo(0, 0); setIsOpen(false) }} to='/' className='hover:text-primary'> Trang Chủ</Link>
-        <Link onClick={() => { scrollTo(0, 0); setIsOpen(false) }} to='/phims' className='hover:text-primary'> Phim</Link>
-        <Link onClick={() => { scrollTo(0, 0); setIsOpen(false) }} to='/lich-chieu' className='hover:text-primary'> Lịch Chiếu</Link>
+        <Link onClick={() => { scrollTo(0, 0); setIsOpen(false) }}
+          to='/' className={`hover:text-primary ${isActive("/") ? "text-primary" : ""}`}>
+          Trang Chủ
+        </Link>
+        <Link onClick={() => { scrollTo(0, 0); setIsOpen(false) }}
+          to='/phims' className={`hover:text-primary ${isActive("/phims") ? "text-primary" : ""}`}>
+          Phim
+        </Link>
+        <Link onClick={() => { scrollTo(0, 0); setIsOpen(false) }}
+          to='/lich-chieu' className={`hover:text-primary ${isActive("/lich-chieu") ? "text-primary" : ""}`}>
+          Lịch Chiếu
+        </Link>
         <div
           className="relative group"
           onClick={() => setOpenDienAnhDropdown(prev => !prev)}
@@ -55,25 +100,76 @@ const Navbar = () => {
             ${openDienAnhDropdown ? "opacity-100 visible" : "opacity-0 invisible"}
           `}
           >
-            <Link onClick={() => { scrollTo(0, 0); setIsOpen(false) }} to="/dao-dien" className="flex px-4 py-2 text-sm text-gray-300 hover:bg-primary/20 hover:border-l border-primary">
+            <Link
+              onClick={() => { scrollTo(0, 0); setIsOpen(false) }}
+              to="/dao-dien"
+              className={`flex px-4 py-2 text-sm text-gray-300 hover:bg-primary/20 hover:border-l border-primary ${isActive("/dao-dien") ? "text-primary" : ""}`}>
               Đạo Diễn
             </Link>
 
-            <Link onClick={() => { scrollTo(0, 0); setIsOpen(false) }} to="/dien-vien" className="flex px-4 py-2 text-sm text-gray-300 hover:bg-primary/20 hover:border-l border-primary">
+            <Link onClick={() => { scrollTo(0, 0); setIsOpen(false) }} to="/dien-vien"
+              className={`flex px-4 py-2 text-sm text-gray-300 hover:bg-primary/20 hover:border-l border-primary ${isActive("/dien-vien") ? "text-primary" : ""}`}>
               Diễn Viên
             </Link>
 
-            <Link onClick={() => { scrollTo(0, 0); setIsOpen(false) }} to="/the-loai" className="flex px-4 py-2 text-sm text-gray-300 hover:bg-primary/20 hover:border-l border-primary">
+            <Link onClick={() => { scrollTo(0, 0); setIsOpen(false) }} to="/the-loai"
+              className={`flex px-4 py-2 text-sm text-gray-300 hover:bg-primary/20 hover:border-l border-primary ${isActive("/the-loai") ? "text-primary" : ""}`}>
               Thể Loại
             </Link>
           </div>
         </div>
 
-        <Link onClick={() => { scrollTo(0, 0); setIsOpen(false) }} to='/rap' className='hover:text-primary'> Rạp</Link>
+        <Link onClick={() => { scrollTo(0, 0); setIsOpen(false) }} to='/rap'
+          className={`hover:text-primary ${isActive("/rap") ? "text-primary" : ""}`}> Rạp</Link>
       </div>
 
       <div className='flex items-center gap-8'>
-        <SearchIcon className='max-md:hidden w-6 h-6 cursor-pointer' />
+        <div className="relative">
+          <SearchIcon
+            className="w-6 h-6 cursor-pointer"
+            onClick={() => setShowSearch(prev => !prev)}
+          />
+
+          {showSearch && (
+            <div className="absolute right-0 mt-3 w-80 bg-black/80 backdrop-blur p-3 rounded-lg border border-primary">
+              <input
+                type="text"
+                autoFocus
+                value={searchTerm}
+                onChange={(e) => handleSearch(e.target.value)}
+                placeholder="Tìm phim..."
+                className="w-full bg-transparent border border-primary/50 text-gray-200 px-3 py-2 rounded-md outline-none"
+              />
+
+              {/* KẾT QUẢ SEARCH */}
+              {searchResults.length > 0 && (
+                <div className="mt-3 max-h-80 overflow-y-auto space-y-2">
+                  {searchResults.map((phim) => (
+                    <Link
+                      key={phim.maPhim}
+                      to={`/phims/${phim.maPhim}`}
+                      onClick={() => {
+                        scrollTo(0, 0);
+                        setShowSearch(false);
+                        setSearchTerm("");
+                      }}
+                      className="flex items-center gap-3 bg-white/5 hover:bg-primary/20 transition p-2 rounded-md"
+                    >
+                      <img src={phim.poster} alt="" className="w-12 h-16 object-cover rounded-md" />
+                      <span className="text-gray-200 text-sm">{phim.tenPhim}</span>
+                    </Link>
+                  ))}
+                </div>
+              )}
+
+              {/* Không có kết quả */}
+              {searchTerm && searchResults.length === 0 && (
+                <p className="text-gray-400 text-sm mt-2 text-center">Không tìm thấy phim</p>
+              )}
+            </div>
+          )}
+        </div>
+
         {!user ? (
           <button onClick={() => setShowLogin(true)}
             className='px-4 py-1 sm:px-7 sm:py-2 bg-primary hover:bg-primary-dull transition

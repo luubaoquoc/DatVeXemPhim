@@ -5,7 +5,6 @@ import useApi from "../../hooks/useApi"
 import Pagination from "../../components/admin/Paginnation"
 import DeleteForm from "../../components/admin/DeleteForm"
 import SearchInput from "../../components/SearchInput"
-import Loading from "../../components/Loading"
 
 const QuanLyTaiKhoan = () => {
   const api = useApi(true)
@@ -160,7 +159,6 @@ const QuanLyTaiKhoan = () => {
   }
 
   console.log(taiKhoans);
-  if (loading) return <Loading />
 
 
   return (
@@ -176,7 +174,7 @@ const QuanLyTaiKhoan = () => {
         </button>
       </div>
 
-      <div className='flex flex-wrap gap-3 mb-4'>
+      <div className='flex flex-wrap gap-3'>
         <SearchInput
           search={search}
           setSearch={setSearch}
@@ -270,14 +268,14 @@ const QuanLyTaiKhoan = () => {
       />
 
       {showModal && (
-        <div className="fixed inset-0 bg-black/70 flex justify-center items-center z-50">
+        <div className="fixed inset-0 bg-black/80 flex justify-center items-center z-50">
           <div className="bg-black/80 border border-primary p-6 rounded-lg w-96">
-            <h2 className="text-lg font-semibold mb-4">
+            <h2 className="text-2xl font-semibold mb-4 text-primary text-center">
               {editTaiKhoan ? 'Sửa tài khoản' : 'Thêm tài khoản'}
             </h2>
             <form onSubmit={handleSubmit}>
               <div>
-                <label className='block mb-1'>Họ tên</label>
+                <label className='block mb-1 font-medium text-primary'>Họ tên</label>
                 <input
                   type="text"
                   name="hoTen"
@@ -289,7 +287,7 @@ const QuanLyTaiKhoan = () => {
                 />
               </div>
               <div>
-                <label className='block mb-1'>Email</label>
+                <label className='block mb-1 font-medium text-primary'>Email</label>
                 <input
                   type="email"
                   name="email"
@@ -303,7 +301,7 @@ const QuanLyTaiKhoan = () => {
               <div>
                 {!editTaiKhoan && (
                   <>
-                    <label className="block mb-1">Mật khẩu</label>
+                    <label className="block mb-1 font-medium text-primary">Mật khẩu</label>
                     <input
                       type="password"
                       name="matKhau"
@@ -317,7 +315,7 @@ const QuanLyTaiKhoan = () => {
 
               </div>
               <div>
-                <label className="block mb-1">Số điện thoại</label>
+                <label className="block mb-1 font-medium text-primary">Số điện thoại</label>
                 <input
                   type="text"
                   name="soDienThoai"
@@ -328,7 +326,7 @@ const QuanLyTaiKhoan = () => {
               </div>
 
               <div>
-                <label className="block mb-1">Chọn vai trò</label>
+                <label className="block mb-1 font-medium text-primary">Chọn vai trò</label>
                 <select
                   name="maVaiTro"
                   className="w-full p-2 mb-4 rounded bg-[#111] border border-gray-600 text-white cursor-pointer"
@@ -346,7 +344,7 @@ const QuanLyTaiKhoan = () => {
 
               {isRapRequired && (
                 <div>
-                  <label className="block mb-1">Chọn rạp</label>
+                  <label className="block mb-1 font-medium text-primary">Chọn rạp</label>
                   <select
                     name="maRap"
                     className="w-full p-2 mb-4 rounded bg-[#111] border border-gray-600 text-white cursor-pointer"

@@ -21,7 +21,7 @@ const ProfileSidebar = ({ user, dispatch, logout }) => {
 
     try {
       const res = await api.put(
-        `/nguoidung/${user.maTaiKhoan}/avatar`,
+        `/taikhoan/${user.maTaiKhoan}/avatar`,
         formData,
         { headers: { "Content-Type": "multipart/form-data" } }
       );

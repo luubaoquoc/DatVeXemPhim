@@ -9,18 +9,19 @@ const SuatChieuForm = ({ onSubmit, onClose, editItem }) => {
   const [formData, setFormData] = useState({
     maPhim: "",
     maPhong: "",
-    gioBatDau: "",
-    gioKetThuc: "",
     giaVeCoBan: "",
+    thoiLuong: 0,
   });
-  const [timeSlots, setTimeSlots] = useState([
-    { gioBatDau: "", gioKetThuc: "" }
-  ])
-  const [phims, setPhims] = useState([])
-  const [phongs, setPhongs] = useState([])
-  const [loading, setLoading] = useState(false)
 
-  // Fetch phim + phòng
+  const [timeSlots, setTimeSlots] = useState([{ gioBatDau: "", gioKetThuc: "" }]);
+
+  const [phims, setPhims] = useState([]);
+  const [phongs, setPhongs] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  /* ==============================
+     FETCH PHIM + PHÒNG
+  =============================== */
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -40,14 +41,11 @@ const SuatChieuForm = ({ onSubmit, onClose, editItem }) => {
     fetchData();
   }, [api]);
 
-  // Nếu đang sửa
+  /* ==============================
+     EDIT MODE (Load dữ liệu cũ)
+  =============================== */
   useEffect(() => {
     if (editItem) {
-      setFormData({
-        maPhim: editItem.maPhim,
-        maPhong: editItem.maPhong,
-        giaVeCoBan: editItem.giaVeCoBan,
-      });
 
       const toLocalInput = (dateString) => {
         const d = new Date(dateString);
@@ -55,35 +53,41 @@ const SuatChieuForm = ({ onSubmit, onClose, editItem }) => {
         return d.toISOString().slice(0, 16);
       };
 
-      setTimeSlots([
-        {
-          gioBatDau: toLocalInput(editItem.gioBatDau),
-          gioKetThuc: toLocalInput(editItem.gioKetThuc),
-        },
-      ]);
+      setFormData({
+        maPhim: editItem.maPhim,
+        maPhong: editItem.maPhong,
+        giaVeCoBan: editItem.giaVeCoBan,
+        thoiLuong: editItem?.phim?.thoiLuong || 0, // lấy từ include
+      });
 
+      setTimeSlots([{
+        gioBatDau: toLocalInput(editItem.gioBatDau),
+        gioKetThuc: toLocalInput(editItem.gioKetThuc),
+      }]);
     }
   }, [editItem]);
 
 
-  // Handle change input
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-
-    setFormData({ ...formData, [name]: value });
-  };
-
-  // Handle selects
+  /* ==============================
+     HANDLE SELECT PHIM
+  =============================== */
   const handleSelectPhim = (selected) => {
-    setFormData({ ...formData, maPhim: selected.value });
+    const phim = phims.find((p) => p.maPhim === selected.value);
+
+    setFormData({
+      ...formData,
+      maPhim: selected.value,
+      thoiLuong: phim?.thoiLuong || 0,
+    });
   };
 
   const handleSelectPhong = (selected) => {
     setFormData({ ...formData, maPhong: selected.value });
   };
 
-
-  // Options cho react-select
+  /* ==============================
+     OPTIONS for react-select
+  =============================== */
   const phimOptions = phims.map((p) => ({
     value: p.maPhim,
     label: `${p.maPhim} - ${p.tenPhim}`,
@@ -95,11 +99,32 @@ const SuatChieuForm = ({ onSubmit, onClose, editItem }) => {
   }));
 
 
+  /* ==============================
+     TÍNH GIỜ KẾT THÚC AN TOÀN
+  =============================== */
+  const calcEndTime = (start, duration) => {
+    if (!start || duration <= 0) return "";
+    const d = new Date(start);
+    if (isNaN(d)) return "";
+    d.setMinutes(d.getMinutes() + duration);
+    d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+    return d.toISOString().slice(0, 16);
+  };
+
+  /* ==============================
+     UPDATE SLOT
+  =============================== */
   const updateTimeSlot = (index, field, value) => {
     const updated = [...timeSlots];
     updated[index][field] = value;
+
+    if (field === "gioBatDau" && formData.thoiLuong > 0) {
+      updated[index].gioKetThuc = calcEndTime(value, formData.thoiLuong);
+    }
+
     setTimeSlots(updated);
   };
+
   const addTimeSlot = () => {
     setTimeSlots([...timeSlots, { gioBatDau: "", gioKetThuc: "" }]);
   };
@@ -109,14 +134,29 @@ const SuatChieuForm = ({ onSubmit, onClose, editItem }) => {
   };
 
 
-
-  // Submit
+  /* ==============================
+     SUBMIT
+  =============================== */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
+    // Validate
+    for (const slot of timeSlots) {
+      if (!slot.gioBatDau || !slot.gioKetThuc) {
+        toast.error("Vui lòng nhập đầy đủ thời gian!");
+        setLoading(false);
+        return;
+      }
+
+      if (slot.gioKetThuc === "Invalid date") {
+        toast.error("Giờ kết thúc không hợp lệ!");
+        setLoading(false);
+        return;
+      }
+    }
+
     try {
-      // Tạo danh sách suất chiếu
       const payloadArray = timeSlots.map((slot) => ({
         maPhim: formData.maPhim,
         maPhong: formData.maPhong,
@@ -126,12 +166,11 @@ const SuatChieuForm = ({ onSubmit, onClose, editItem }) => {
       }));
 
       if (editItem) {
-        // nếu đang sửa -> chỉ gửi object để update 1 suất
         await onSubmit(payloadArray[0]);
       } else {
-        // thêm nhiều suất -> gửi mảng
         await onSubmit(payloadArray);
       }
+
     } catch (err) {
       console.log(err);
       toast.error("Lỗi khi gửi dữ liệu!");
@@ -141,20 +180,22 @@ const SuatChieuForm = ({ onSubmit, onClose, editItem }) => {
   };
 
 
-
+  /* ==============================
+     JSX RETURN
+  =============================== */
   return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 ">
+    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 ">
       <div className="bg-black/90 border border-primary p-6 rounded-xl w-[650px] text-white overflow-y-auto max-h-[90vh] no-scrollbar">
 
-        <h2 className="text-2xl font-semibold mb-4 text-center bg-gradient-to-r from-primary to-yellow-200 bg-clip-text text-transparent">
+        <h2 className="text-2xl font-semibold mb-4 text-center text-primary">
           {editItem ? "Sửa suất chiếu" : "Thêm suất chiếu mới"}
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
 
-          {/* Chọn phim */}
+          {/* PHIM */}
           <div className="flex flex-col gap-1">
-            <label className="font-medium">Phim</label>
+            <label className="block mb-1 font-medium text-primary">Phim</label>
             <Select
               className="react-select-container"
               classNamePrefix="react-select"
@@ -166,9 +207,9 @@ const SuatChieuForm = ({ onSubmit, onClose, editItem }) => {
             />
           </div>
 
-          {/* Chọn phòng */}
+          {/* PHÒNG */}
           <div className="flex flex-col gap-1">
-            <label className="font-medium">Phòng chiếu</label>
+            <label className="block mb-1 font-medium text-primary">Phòng chiếu</label>
             <Select
               className="react-select-container"
               classNamePrefix="react-select"
@@ -176,52 +217,45 @@ const SuatChieuForm = ({ onSubmit, onClose, editItem }) => {
               value={phongOptions.find((pc) => pc.value === formData.maPhong) || null}
               onChange={handleSelectPhong}
               placeholder="Chọn phòng..."
-              isSearchable
             />
           </div>
 
-          {/* Nhiều khung giờ suất chiếu */}
+          {/* KHUNG GIỜ */}
           <div className="space-y-3">
-            <label className="font-medium">Khung giờ suất chiếu</label>
+            <label className="block mb-1 font-medium text-primary">Khung giờ suất chiếu</label>
 
             {timeSlots.map((slot, index) => (
-              <div
-                key={index}
-                className="p-3 border border-gray-700 bg-[#111]/60 rounded-lg space-y-2"
-              >
-                {/* Giờ bắt đầu */}
+              <div key={index} className="p-3 border border-gray-700 bg-[#111]/60 rounded-lg space-y-2">
+
+                {/* Bắt đầu */}
                 <div>
-                  <label>Giờ bắt đầu</label>
+                  <label className="block mb-1 font-medium text-primary">Giờ bắt đầu</label>
                   <input
                     type="datetime-local"
                     value={slot.gioBatDau}
-                    onChange={(e) =>
-                      updateTimeSlot(index, "gioBatDau", e.target.value)
-                    }
-                    className="w-full p-2 rounded bg-[#111] border border-gray-700"
+                    onChange={(e) => updateTimeSlot(index, "gioBatDau", e.target.value)}
+                    className="w-full p-2 bg-[#111] border border-gray-700 rounded"
                     required
                   />
                 </div>
 
-                {/* Giờ kết thúc */}
+                {/* Kết thúc */}
                 <div>
-                  <label>Giờ kết thúc</label>
+                  <label className="block mb-1 font-medium text-primary">Giờ kết thúc</label>
                   <input
                     type="datetime-local"
                     value={slot.gioKetThuc}
-                    onChange={(e) =>
-                      updateTimeSlot(index, "gioKetThuc", e.target.value)
-                    }
-                    className="w-full p-2 rounded bg-[#111] border border-gray-700"
+                    onChange={(e) => updateTimeSlot(index, "gioKetThuc", e.target.value)}
+                    className="w-full p-2 bg-[#111] border border-gray-700 rounded"
+                    required
                   />
                 </div>
 
-                {/* Nút xóa */}
                 {index > 0 && (
                   <button
                     type="button"
                     onClick={() => removeTimeSlot(index)}
-                    className="text-red-400 hover:text-red-300 text-sm cursor-pointer"
+                    className="text-red-400 hover:text-red-300 text-sm"
                   >
                     Xóa khung giờ
                   </button>
@@ -229,32 +263,31 @@ const SuatChieuForm = ({ onSubmit, onClose, editItem }) => {
               </div>
             ))}
 
-            {/* Nút thêm khung giờ */}
             {!editItem && (
               <button
                 type="button"
                 onClick={addTimeSlot}
-                className="px-3 py-1 bg-primary/80 rounded hover:bg-primary/70 text-sm cursor-pointer"
+                className="px-3 py-1 bg-primary/80 rounded hover:bg-primary/70 text-sm"
               >
                 + Thêm khung giờ
-              </button>)}
+              </button>
+            )}
           </div>
 
-
-          {/* Giá vé */}
+          {/* GIÁ VÉ */}
           <div>
-            <label>Giá vé </label>
+            <label className="font-medium text-primary">Giá vé</label>
             <input
               type="number"
               name="giaVeCoBan"
               value={formData.giaVeCoBan}
-              onChange={handleChange}
+              onChange={(e) => setFormData({ ...formData, giaVeCoBan: e.target.value })}
               className="w-full p-2 rounded bg-[#111] border border-gray-700"
               placeholder="Nhập giá vé..."
             />
           </div>
 
-          {/* Buttons */}
+          {/* BUTTONS */}
           <div className="flex justify-end gap-2 mt-4">
             <button
               type="button"
@@ -275,11 +308,7 @@ const SuatChieuForm = ({ onSubmit, onClose, editItem }) => {
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                   Đang xử lý...
                 </>
-              ) : editItem ? (
-                "Cập nhật"
-              ) : (
-                "Thêm mới"
-              )}
+              ) : editItem ? "Cập nhật" : "Thêm mới"}
             </button>
           </div>
         </form>

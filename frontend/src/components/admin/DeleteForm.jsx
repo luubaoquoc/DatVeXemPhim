@@ -28,7 +28,7 @@ const DeleteForm = ({ title = "item", itemName = "item", onDelete }) => {
 
       {/* Modal confirm */}
       {show && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
           <div className="bg-black/90 border border-primary p-6 rounded-lg w-[350px] shadow-lg">
             <h2 className="text-lg font-semibold mb-3">
               Xác nhận xoá <span className="text-lg text-primary ">{title} {itemName}</span>

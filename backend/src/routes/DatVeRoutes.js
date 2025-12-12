@@ -1,20 +1,20 @@
 import express from 'express';
 import {
-  getAllDatVe, createDatVe, listMyDatVes,
-  // getDatVe, 
-  getGheDaDat, createCheckoutForDatVe, deleteDatVe, checkInDatVe, getThongTinDatVe
+  getAllDatVe, createDatVe, listMyDatVes, getGheDaDat, createCheckoutForDatVe,
+  deleteDatVe, checkInDatVe, getThongTinDatVe, BanVeTaiQuay
 } from '../controllers/datVeControllers.js';
-import { authenticateToken, isAdmin } from '../middleware/authMiddleware.js';
+import { authenticateToken, hasRole } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-router.get('/', authenticateToken, isAdmin, getAllDatVe)
+router.get('/', authenticateToken, hasRole(2, 3, 4), getAllDatVe)
 router.post('/', authenticateToken, createDatVe);
 router.post('/:maDatVe/checkout', authenticateToken, createCheckoutForDatVe);
-router.get('/:maDatVe/checkin', authenticateToken, isAdmin, getThongTinDatVe);
-router.post('/:maDatVe/checkin', authenticateToken, isAdmin, checkInDatVe);
+router.get('/:maChiTiet/checkin', authenticateToken, hasRole(2, 3, 4), getThongTinDatVe);
+router.post('/:maChiTiet/checkin', authenticateToken, hasRole(2, 3, 4), checkInDatVe);
+router.post('/thanhtoan', authenticateToken, hasRole(2, 3, 4), BanVeTaiQuay);
 router.get('/user', authenticateToken, listMyDatVes);
 router.get('/ghe-da-dat/:maSuatChieu', authenticateToken, getGheDaDat);
-router.delete('/:maDatVe', authenticateToken, isAdmin, deleteDatVe);
+router.delete('/:maDatVe', authenticateToken, hasRole(3, 4), deleteDatVe);
 
 export default router;

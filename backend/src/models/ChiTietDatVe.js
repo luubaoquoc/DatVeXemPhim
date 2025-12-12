@@ -35,7 +35,7 @@ const ChiTietDatVe = sequelize.define('ChiTietDatVe', {
   },
 
   trangThai: {
-    type: DataTypes.ENUM('Đã giữ', 'Đã thanh toán', 'Thất bại'),
+    type: DataTypes.ENUM('Đã giữ', 'Đã thanh toán', 'Thất bại', 'Đã check-in'),
     defaultValue: 'Đã giữ'
   }
 

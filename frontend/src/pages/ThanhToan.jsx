@@ -34,7 +34,7 @@ const ThanhToan = () => {
         if (prev <= 1) {
           clearInterval(timer)
           toast.error('Đã hết thời gian giữ ghế! Vui lòng chọn lại.')
-          navigate(`/chon-ghe/${movie.maPhim}/${date}/${maSuatChieu}`)
+          navigate(`/chon-ghe/${maSuatChieu}`)
           return 0
         }
         return prev - 1

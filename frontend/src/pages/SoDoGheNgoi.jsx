@@ -46,7 +46,7 @@ const SoDoGheNgoi = () => {
       if (!maPhong) return;
       try {
 
-        const res = await publicApi.get(`/ghe`, { params: { maPhong } })
+        const res = await api.get(`/ghe`, { params: { maPhong } })
         // expected res.data = array of seats: { maGhe, maPhong, hang, soGhe, trangThai, ...}
         const data = res.data.items || res.data || []
         // normalize seat items to have id = hang + soGhe
@@ -65,6 +65,8 @@ const SoDoGheNgoi = () => {
 
     fetchSeats()
   }, [show, publicApi])
+
+  console.log('Selected Seats:', selectedSeats);
 
   // Lấy danh sách ghế đã đặt cho suất chiếu này
   useEffect(() => {

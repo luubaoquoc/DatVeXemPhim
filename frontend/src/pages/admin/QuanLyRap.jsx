@@ -5,7 +5,6 @@ import useApi from "../../hooks/useApi"
 import Pagination from "../../components/admin/Paginnation"
 import DeleteForm from "../../components/admin/DeleteForm"
 import SearchInput from "../../components/SearchInput"
-import Loading from "../../components/Loading"
 
 const Rap = () => {
   const api = useApi(true)
@@ -106,7 +105,6 @@ const Rap = () => {
   }
 
   console.log(raps);
-  if (loading) return <Loading />
 
 
   return (
@@ -180,14 +178,14 @@ const Rap = () => {
       />
 
       {showModal && (
-        <div className="fixed inset-0 bg-black/70 flex justify-center items-center z-50">
+        <div className="fixed inset-0 bg-black/80 flex justify-center items-center z-50">
           <div className="bg-black/80 border border-primary p-6 rounded-lg w-96">
-            <h2 className="text-lg font-semibold mb-4">
+            <h2 className="text-2xl font-semibold mb-4 text-primary text-center">
               {editRap ? 'Sửa rạp' : 'Thêm rạp'}
             </h2>
             <form onSubmit={handleSubmit}>
               <div>
-                <label className='block mb-1'>Tên rạp</label>
+                <label className='block mb-1 font-medium text-primary'>Tên rạp</label>
                 <input
                   type="text"
                   name="tenRap"
@@ -199,7 +197,7 @@ const Rap = () => {
                 />
               </div>
               <div>
-                <label className='block mb-1'>Địa chỉ</label>
+                <label className='block mb-1 font-medium text-primary'>Địa chỉ</label>
                 <input
                   type="text"
                   name="diaChi"
@@ -210,7 +208,7 @@ const Rap = () => {
               </div>
 
               <div>
-                <label className="block mb-1">Số điện thoại</label>
+                <label className="block mb-1 font-medium text-primary">Số điện thoại</label>
                 <input
                   type="text"
                   name="soDienThoai"

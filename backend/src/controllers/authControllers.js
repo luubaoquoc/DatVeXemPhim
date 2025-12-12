@@ -181,7 +181,7 @@ export const login = async (req, res) => {
     res.status(200).json({
       message: "Đăng nhập thành công",
       accessToken,
-      user
+      user: user.maTaiKhoan,
     });
   } catch (error) {
     console.error(error.message);

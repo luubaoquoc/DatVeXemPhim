@@ -137,6 +137,7 @@ const DaoDien = () => {
   }
 
 
+
   return (
     <div className="p-6 text-white">
       <div className="flex justify-between items-center mb-6">
@@ -216,16 +217,16 @@ const DaoDien = () => {
 
       {/* MODAL */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/70 flex justify-center items-center z-50">
+        <div className="fixed inset-0 bg-black/80 flex justify-center items-center z-50">
           <div className="bg-black/80 border border-primary p-6 rounded-lg w-96">
-            <h2 className="text-lg font-semibold mb-4">
+            <h2 className="text-2xl font-semibold mb-4 text-primary text-center">
               {editItem ? "Sửa đạo diễn" : "Thêm đạo diễn"}
             </h2>
 
             <form onSubmit={handleSubmit}>
               {/* Tên */}
               <div>
-                <label className="block mb-1">Tên Đạo Diễn</label>
+                <label className="block mb-1 font-medium text-primary">Tên Đạo Diễn</label>
                 <input
                   type="text"
                   name="tenDaoDien"
@@ -238,7 +239,7 @@ const DaoDien = () => {
 
               {/* Ảnh */}
               <div>
-                <label className='block mb-1'>Ảnh đại diện</label>
+                <label className='block mb-1 font-medium text-primary'>Ảnh đại diện</label>
                 <div className="flex gap-3">
                   <input
                     type="file"
@@ -265,7 +266,7 @@ const DaoDien = () => {
 
               {/* Ngày sinh */}
               <div>
-                <label className="block mb-1">Ngày sinh</label>
+                <label className="block mb-1 font-medium text-primary">Ngày sinh</label>
                 <input
                   type="date"
                   name="ngaySinh"
@@ -277,7 +278,7 @@ const DaoDien = () => {
 
               {/* Tiểu sử */}
               <div>
-                <label className="block mb-1">Tiểu sử</label>
+                <label className="block mb-1 font-medium text-primary">Tiểu sử</label>
                 <textarea
                   name="tieuSu"
                   className="w-full p-2 mb-4 rounded bg-[#111] border border-gray-600"
@@ -292,7 +293,7 @@ const DaoDien = () => {
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 bg-gray-600 rounded cursor-pointer hover:bg-gray-500"
+                  className="px-4 py-2 bg-gray-700 rounded cursor-pointer hover:bg-gray-600"
                 >
                   Hủy
                 </button>
@@ -300,10 +301,17 @@ const DaoDien = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className={`px-4 py-2 rounded cursor-pointer hover:bg-primary/80 ${loading ? "bg-primary/40" : "bg-primary"
-                    } flex items-center gap-2`}
+                  className={`px-4 py-2 rounded cursor-pointer hover:bg-primary/80 
+                    ${loading ? "bg-primary/50 cursor-not-allowed" : "bg-primary hover:bg-primary/80"} flex items-center gap-2`}
                 >
-                  {loading ? "Đang xử lý..." : editItem ? "Cập nhật" : "Thêm"}
+                  {loading ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Đang xử lý...
+                    </>
+                  ) : (
+                    editItem ? 'Cập nhật' : 'Thêm'
+                  )}
                 </button>
               </div>
             </form>

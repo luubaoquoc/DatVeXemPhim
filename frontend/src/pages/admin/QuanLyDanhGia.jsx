@@ -5,7 +5,6 @@ import useApi from "../../hooks/useApi";
 import Pagination from "../../components/admin/Paginnation";
 import DeleteForm from "../../components/admin/DeleteForm";
 import SearchInput from "../../components/SearchInput";
-import Loading from "../../components/Loading";
 
 const QuanLyDanhGia = () => {
   const api = useApi(true);
@@ -116,10 +115,10 @@ const QuanLyDanhGia = () => {
               <td className="p-2">{d.diem}</td>
               <td className="p-2">{new Date(d.ngayDanhGia).toLocaleDateString()}</td>
 
-              <td className="p-2 text-center flex gap-2 justify-center">
+              <td className="p-2 text-center flex justify-center">
                 <button
                   onClick={() => openEdit(d)}
-                  className="p-2 text-gray-400 hover:bg-primary/20 rounded"
+                  className="p-2 text-gray-400 hover:bg-primary/20 rounded cursor-pointer transition"
                 >
                   <PencilIcon size={18} />
                 </button>
@@ -139,12 +138,12 @@ const QuanLyDanhGia = () => {
 
       {/* MODAL UPDATE */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/70 flex justify-center items-center z-50">
+        <div className="fixed inset-0 bg-black/80 flex justify-center items-center z-50">
           <div className="bg-black/80 border border-primary p-6 rounded-lg w-80">
-            <h2 className="text-lg font-semibold mb-4">Sửa điểm đánh giá</h2>
+            <h2 className="text-2xl font-semibold mb-4 text-primary text-center">Sửa điểm đánh giá</h2>
 
             <form onSubmit={handleUpdate}>
-              <label className="block mb-1">Điểm (0 – 10)</label>
+              <label className="block mb-1 font-medium text-primary">Điểm (0 – 10)</label>
               <input
                 type="number"
                 min="0"
@@ -160,13 +159,14 @@ const QuanLyDanhGia = () => {
                 <button
                   onClick={() => setShowModal(false)}
                   type="button"
-                  className="px-4 py-2 bg-gray-600 rounded cursor-pointer"
+                  className="px-4 py-2 bg-gray-700 rounded cursor-pointer hover:bg-gray-600 text-white"
                 >
                   Hủy
                 </button>
                 <button
                   type="submit"
-                  className={`px-4 py-2 rounded text-white cursor-pointer hover:bg-primary/80 ${loading ? "bg-primary/40" : "bg-primary"}`}>
+                  className={`px-4 py-2 rounded text-white cursor-pointer hover:bg-primary/80 
+                  ${loading ? "bg-primary/50 cursor-not-allowed" : "bg-primary hover:bg-primary/80"}`}>
                   {loading ? "Đang xử lý..." : "Cập nhật"}
                 </button>
               </div>

@@ -3,7 +3,7 @@ import createMoMoPayment from '../helpers/momo.js';
 import createStripePayment from '../helpers/stripe.js';
 import { createVNPayPayment } from '../helpers/VNPay.js';
 import ChiTietDatVe from '../models/ChiTietDatVe.js';
-import { DatVe, Ghe, Phim, PhongChieu, SuatChieu, TaiKhoan, ThanhToan } from '../models/index.js';
+import { DatVe, Ghe, Phim, PhongChieu, Rap, SuatChieu, TaiKhoan, ThanhToan } from '../models/index.js';
 import { Op } from 'sequelize';
 
 
@@ -16,14 +16,13 @@ export const getAllDatVe = async (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
     const search = req.query.search?.trim() || "";
     const status = req.query.status || "";
-    const toDate = req.query.toDate;
 
     const offset = (page - 1) * limit;
 
     // WHERE conditions
     let whereOp = {};
 
-    // 🔍 Search theo maDatVe, tên phim, tên người đặt
+    //  Search theo maDatVe, tên phim, tên người đặt
     if (search) {
       whereOp = {
         [Op.or]: [
@@ -32,14 +31,9 @@ export const getAllDatVe = async (req, res) => {
       };
     }
 
-    // 📅 Lọc theo ngày
-    // if (fromDate && toDate) {
-    //   whereOp.ngayDat = {
-    //     [Op.between]: [new Date(fromDate), new Date(toDate)]
-    //   };
-    // }
 
-    // 🟩 Lọc trạng thái
+
+    //  Lọc trạng thái
     if (status === "success") {
       whereOp.trangThai = "Thành công";
     } else if (status === "failed") {
@@ -59,6 +53,11 @@ export const getAllDatVe = async (req, res) => {
           attributes: ["maTaiKhoan", "hoTen", "email"]
         },
         {
+          model: TaiKhoan,
+          as: "nhanVien",
+          attributes: ["maTaiKhoan", "hoTen", "email"]
+        },
+        {
           model: SuatChieu,
           as: "suatChieu",
           include: [
@@ -70,7 +69,8 @@ export const getAllDatVe = async (req, res) => {
             {
               model: PhongChieu,
               as: "phongChieu",
-              attributes: ["maPhong", "tenPhong"]
+              attributes: ["maPhong", "tenPhong", "maRap"],
+              include: [{ model: Rap, as: 'rap', attributes: ['maRap', 'tenRap'] }]
             }
           ]
         },
@@ -116,6 +116,8 @@ export const createDatVe = async (req, res) => {
 
     // Format: chiTiet = [{ maGhe, giaVe }, ...]
     const maGheList = chiTiet.map(g => g.maGhe);
+    console.log(maGheList);
+
 
     //  1. Check ghế đã có người giữ chưa
     const conflict = await ChiTietDatVe.findAll({
@@ -212,8 +214,36 @@ export const listMyDatVes = async (req, res) => {
   try {
     const maTaiKhoan = req.user?.maTaiKhoan;
     if (!maTaiKhoan) return res.status(401).json({ message: 'Chưa xác thực' });
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const search = req.query.search?.trim() || "";
+    const offset = (page - 1) * limit;
+
+    const datveConditions = {
+      [Op.or]: [
+        { maTaiKhoanDatVe: maTaiKhoan },
+        { maNhanVienBanVe: maTaiKhoan }
+      ]
+    };
+
+    const searchCondition = search ? {
+      maDatVe: { [Op.like]: `%${search}%` }
+    } : {};
+
+    const totalItems = await DatVe.count({
+      where: {
+        ...datveConditions,
+        ...searchCondition
+      },
+    });
+
+
     const rows = await DatVe.findAll({
-      where: { maTaiKhoanDatVe: maTaiKhoan },
+      where: {
+        ...datveConditions,
+        ...searchCondition
+      },
       include: [
         {
           model: SuatChieu,
@@ -226,6 +256,7 @@ export const listMyDatVes = async (req, res) => {
             {
               model: PhongChieu,
               as: 'phongChieu',
+              include: [{ model: Rap, as: 'rap' }]
             }
           ]
         },
@@ -245,9 +276,16 @@ export const listMyDatVes = async (req, res) => {
           ],
         }
       ],
+      offset,
+      limit,
       order: [['ngayDat', 'DESC']]
     });
-    return res.json(rows);
+    return res.json({
+      data: rows,
+      totalItems,
+      currentPage: page,
+      totalPages: Math.ceil(totalItems / limit),
+    });
   } catch (error) {
     console.error('listMyDatVes error:', error);
     return res.status(500).json({ message: 'Lỗi server' });
@@ -408,50 +446,47 @@ export const deleteDatVe = async (req, res) => {
 
 
 export const getThongTinDatVe = async (req, res) => {
-  const { maDatVe } = req.params;
+  const maChiTiet = Number(req.params.maChiTiet);
+  console.log(maChiTiet);
+
 
   try {
-    const datVe = await DatVe.findOne({
-      where: { maDatVe },
+    const Ve = await ChiTietDatVe.findOne({
+      where: { maChiTiet },
       include: [
         {
-          model: TaiKhoan,
-          as: 'khachHang',
-          attributes: ['maTaiKhoan', 'hoTen', 'email']
-        },
-        {
-          model: SuatChieu,
-          as: 'suatChieu',
+          model: DatVe,
+          as: 'datVe',
           include: [
-            { model: Phim, as: 'phim' },
-            { model: PhongChieu, as: 'phongChieu' }
+            {
+              model: SuatChieu,
+              as: 'suatChieu',
+              include: [
+                { model: Phim, as: 'phim' },
+                { model: PhongChieu, as: 'phongChieu', include: [{ model: Rap, as: 'rap' }] }
+              ]
+            },
           ]
         },
         {
-          model: ThanhToan,
-          as: 'thanhToan',
-        },
-        {
-          model: ChiTietDatVe,
-          as: 'chiTietDatVes',
-          attributes: ['maGhe'],
-          include: [{ model: Ghe, as: 'ghe' }],
+          model: Ghe,
+          as: 'ghe'
         }
       ]
     });
 
     //  Không tìm thấy mã đặt vé
-    if (!datVe) {
+    if (!Ve) {
       return res.status(404).json({ message: "Không tìm thấy vé" });
     }
 
     //  Vé chưa thanh toán
-    if (datVe.trangThai !== "Thành công" && datVe.trangThai !== "Đã check-in") {
+    if (Ve.trangThai !== "Đã thanh toán" && Ve.trangThai !== "Đã check-in") {
       return res.status(400).json({ message: "Vé chưa thanh toán thành công" });
     }
 
     //  OK → trả về thông tin vé
-    return res.json(datVe);
+    return res.json(Ve);
 
   } catch (error) {
     console.error(error);
@@ -463,16 +498,16 @@ export const getThongTinDatVe = async (req, res) => {
 
 export const checkInDatVe = async (req, res) => {
   try {
-    const maDatVe = Number(req.params.maDatVe);
-    if (!maDatVe) return res.status(400).json({ message: 'Mã đặt vé không hợp lệ' });
+    const maChiTiet = Number(req.params.maChiTiet);
+    if (!maChiTiet) return res.status(400).json({ message: 'Mã đặt vé không hợp lệ' });
 
-    const datVe = await DatVe.findByPk(maDatVe);
+    const datVe = await ChiTietDatVe.findByPk(maChiTiet);
 
     if (!datVe) {
       return res.status(404).json({ message: 'Không tìm thấy đơn đặt vé' });
     }
 
-    if (datVe.trangThai !== "Thành công") {
+    if (datVe.trangThai !== "Đã thanh toán") {
       return res.status(400).json({ message: 'Vé chưa thanh toán thành công, không thể check-in' });
     }
 
@@ -482,6 +517,103 @@ export const checkInDatVe = async (req, res) => {
 
   } catch (error) {
     console.error("checkInDatVe error:", error);
+    return res.status(500).json({ message: 'Lỗi server' });
+  }
+};
+
+
+export const BanVeTaiQuay = async (req, res) => {
+  const t = await sequelize.transaction();
+  try {
+    const maTaiKhoan = req.user?.maTaiKhoan;
+    if (!maTaiKhoan) return res.status(401).json({ message: 'Chưa xác thực' });
+    const { maSuatChieu, seats } = req.body;
+    console.log(req.body);
+
+
+    if (!maSuatChieu || !Array.isArray(seats) || seats.length === 0)
+      return res.status(400).json({ message: 'Dữ liệu đặt vé không hợp lệ' });
+    // Format: seats = [{ maGhe, giaVe }, ...]
+    const maGheList = seats?.map(g => g.maGhe);
+
+    console.log(maGheList);
+
+    //  1. Check ghế đã có người giữ chưa
+    const conflict = await ChiTietDatVe.findAll({
+      where: {
+        maGhe: maGheList,
+      },
+      include: {
+        model: DatVe,
+        as: 'datVe',
+        where: {
+          maSuatChieu,
+          trangThai: { [Op.in]: ['Đang chờ', 'Thành công'] }
+        }
+      },
+      lock: t.LOCK.UPDATE,
+      transaction: t
+    });
+    if (conflict.length > 0) {
+      await t.rollback();
+      const gheLoi = conflict.map(c => c.maGhe);
+      return res.status(409).json({
+        message: `Ghế ${gheLoi.join(', ')} đã có người đặt`
+      });
+    }
+    const tongTien = seats.reduce((sum, g) => sum + (g.giaVe || 0), 0);
+
+    //  2. Tạo DatVe
+    const datVe = await DatVe.create({
+      maNhanVienBanVe: maTaiKhoan,
+      maSuatChieu,
+      tongTien,
+      tongSoGhe: seats.length,
+      trangThai: 'Thành công',
+      thoiHanThanhToan: null
+    }, { transaction: t });
+    //  3. Lưu ChiTietDatVe
+    const ct = seats.map(g => ({
+      maDatVe: datVe.maDatVe,
+      maGhe: g.maGhe,
+      giaVe: g.giaVe,
+      trangThai: 'Đã thanh toán'
+    }));
+    await ChiTietDatVe.bulkCreate(ct, { transaction: t });
+    //  4. Tạo bản ghi thanh toán
+    await ThanhToan.create({
+      maDatVe: datVe.maDatVe,
+      phuongThuc: 'Tại quầy',
+      soTien: tongTien,
+      ngayThanhToan: new Date(),
+      trangThai: 'Thành công',
+    }, { transaction: t });
+
+    const booking = await DatVe.findOne({
+      where: { maDatVe: datVe.maDatVe },
+      include: [
+        {
+          model: SuatChieu,
+          as: "suatChieu",
+          include: [
+            { model: Phim, as: "phim" },
+            { model: PhongChieu, as: "phongChieu", include: [{ model: Rap, as: "rap" }] }
+          ]
+        },
+        {
+          model: ChiTietDatVe,
+          as: "chiTietDatVes",
+          include: [{ model: Ghe, as: "ghe" }]
+        }
+      ],
+      transaction: t
+    });
+
+    await t.commit();
+    return res.json(booking);
+  } catch (err) {
+    console.error(err);
+    await t.rollback();
     return res.status(500).json({ message: 'Lỗi server' });
   }
 };

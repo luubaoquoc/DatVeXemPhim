@@ -101,7 +101,7 @@ const TheLoai = () => {
   return (
     <div className="p-6 text-white">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-xl font-semibold">Quản lý Thể loại</h1>
+        <h1 className="text-3xl font-semibold">Quản lý Thể loại</h1>
         <button
           onClick={() => openModal()}
           className="bg-primary text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-primary/80 transition cursor-pointer"
@@ -157,14 +157,14 @@ const TheLoai = () => {
 
       {/* Modal thêm/sửa */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/70 flex justify-center items-center z-50">
+        <div className="fixed inset-0 bg-black/80 flex justify-center items-center z-50">
           <div className="bg-black/80 border border-primary p-6 rounded-lg w-96">
-            <h2 className="text-lg font-semibold mb-4">
+            <h2 className="text-2xl font-semibold mb-4 text-primary text-center">
               {editItem ? 'Sửa thể loại' : 'Thêm thể loại'}
             </h2>
             <form onSubmit={handleSubmit}>
               <div>
-                <label className='block mb-1'>Tên Thể Loại</label>
+                <label className='block mb-1 font-medium text-primary'>Tên Thể Loại</label>
                 <input
                   type="text"
                   name="tenTheLoai"
@@ -178,7 +178,7 @@ const TheLoai = () => {
 
 
               <div>
-                <label className='block mb-1'>Mô tả</label>
+                <label className='block mb-1 font-medium text-primary'>Mô tả</label>
                 <textarea
                   name="moTa"
                   rows="3"

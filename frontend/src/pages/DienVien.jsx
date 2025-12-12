@@ -8,6 +8,7 @@ import { fetchPhims } from '../redux/features/phimSlice'
 import Pagination from '../components/admin/Paginnation'
 import { formatDate } from '../lib/dateFormat'
 import SearchInput from '../components/SearchInput'
+import BlurCircle from '../components/BlurCircle'
 
 const DienVien = () => {
 
@@ -47,10 +48,13 @@ const DienVien = () => {
   return (
     <div className="px-6 md:px-16 lg:px-40 pt-30 md:pt-50">
       <div className="flex flex-col lg:flex-row gap-10 max-w-7xl mx-auto">
+        <BlurCircle top='100px' left='100px' />
+        <BlurCircle bottom='0px' right='100px' />
         <div className="flex-2">
           <h2 className="text-2xl font-medium mb-8 lg:text-left border-l-3 border-primary pl-2">Diễn Viên</h2>
 
           <SearchInput
+            item="diễn viên"
             search={search}
             setSearch={setSearch}
             setCurrentPage={setCurrentPage}

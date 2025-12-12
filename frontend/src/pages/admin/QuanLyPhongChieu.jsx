@@ -131,7 +131,7 @@ const PhongChieu = () => {
         </button>
       </div>
 
-      <div className='flex flex-wrap gap-3 mb-4'>
+      <div className='flex flex-wrap gap-3'>
         <SearchInput
           search={search}
           setSearch={setSearch}
@@ -205,14 +205,14 @@ const PhongChieu = () => {
       />
 
       {showModal && (
-        <div className="fixed inset-0 bg-black/70 flex justify-center items-center z-50">
+        <div className="fixed inset-0 bg-black/80 flex justify-center items-center z-50">
           <div className="bg-black/80 border border-primary p-6 rounded-lg w-96">
-            <h2 className="text-lg font-semibold mb-4">
+            <h2 className="text-2xl font-semibold mb-4 text-primary text-center">
               {editPhong ? 'Sửa phòng chiếu' : 'Thêm phòng chiếu'}
             </h2>
             <form onSubmit={handleSubmit}>
               <div>
-                <label className='block mb-1'>Tên Phòng</label>
+                <label className='block mb-1 font-medium text-primary'>Tên Phòng</label>
                 <input
                   type="text"
                   name="tenPhong"
@@ -225,7 +225,7 @@ const PhongChieu = () => {
               </div>
 
               <div>
-                <label className='block mb-1'>Tổng ghế</label>
+                <label className='block mb-1 font-medium text-primary'>Tổng ghế</label>
                 <input
                   type="number"
                   name="tongSoGhe"
@@ -236,7 +236,7 @@ const PhongChieu = () => {
               </div>
 
               <div>
-                <label className="block mb-1">Chọn rạp</label>
+                <label className="block mb-1 font-medium text-primary">Chọn rạp</label>
                 <select
                   name="maRap"
                   className="w-full p-2 mb-4 rounded bg-[#111] border border-gray-600 text-white cursor-pointer"

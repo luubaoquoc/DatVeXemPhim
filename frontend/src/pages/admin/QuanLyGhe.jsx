@@ -77,7 +77,7 @@ const QuanLyGhe = () => {
   return (
     <div className="p-6 text-white">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">Quản lý ghế</h1>
+        <h1 className="text-3xl font-semibold">Quản lý ghế</h1>
         <button
           onClick={() => { fetchSeats(maPhong); toast.success("Làm mới"); }}
           className="px-3 py-2 bg-primary rounded flex items-center gap-2 cursor-pointer"

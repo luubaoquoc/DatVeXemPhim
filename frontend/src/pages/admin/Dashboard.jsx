@@ -157,7 +157,7 @@ const Dashboard = () => {
 
   return (
     <div className="p-6 text-white">
-      <h1 className="text-2xl font-semibold mb-6">Dashboard • GoCinema</h1>
+      <h1 className="text-3xl font-semibold mb-6">Tổng quan • GoCinema</h1>
 
       {/* CARDS */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
@@ -183,7 +183,7 @@ const Dashboard = () => {
           icon={<UserPlusIcon />}
           label="Người dùng mới"
           value={dashboard.cards.userMoi}
-          color="text-purple-500"
+          color="text-gray-500"
         />
       </div>
 
