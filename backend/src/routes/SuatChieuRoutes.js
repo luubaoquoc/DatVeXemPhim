@@ -1,12 +1,13 @@
 import express from 'express';
-import { listSuatChieus, getSuatChieu, createSuatChieu, updateSuatChieu, deleteSuatChieu, getRapsForMovieDate } from '../controllers/suatChieuControllers.js';
+import { listSuatChieus, getSuatChieu, createSuatChieu, updateSuatChieu, deleteSuatChieu, getRapsForMovieDate, getLichChieuByRapDate } from '../controllers/suatChieuControllers.js';
 import { authenticateToken, hasRole } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
 
-router.get('/raps', getRapsForMovieDate);
 router.get('/', listSuatChieus);
+router.get('/raps', getRapsForMovieDate);
+router.get('/lich-chieu-rap', getLichChieuByRapDate);
 router.get('/:maSuatChieu', getSuatChieu);
 
 

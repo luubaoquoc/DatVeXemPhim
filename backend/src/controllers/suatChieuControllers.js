@@ -89,6 +89,60 @@ export const getRapsForMovieDate = async (req, res) => {
   }
 };
 
+// GET /api/suatchieu/lich-chieu-rap?maRap=1&date=2025-10-22
+export const getLichChieuByRapDate = async (req, res) => {
+  try {
+    const { maRap, date } = req.query;
+    if (!maRap || !date)
+      return res.status(400).json({ message: "maRap và date là bắt buộc" });
+
+    const start = new Date(date + "T00:00:00");
+    const end = new Date(date + "T23:59:59");
+
+    const rows = await SuatChieu.findAll({
+      where: { gioBatDau: { [Op.between]: [start, end] } },
+      include: [
+        {
+          model: PhongChieu,
+          as: "phongChieu",
+          where: { maRap },
+          include: [{ model: Rap, as: "rap" }]
+        },
+        {
+          model: Phim,
+          as: "phim",
+          attributes: ["maPhim", "tenPhim", "poster", "thoiLuong", "noiDung"]
+        }
+      ]
+    });
+
+    const map = {};
+
+    for (const sc of rows) {
+      const phim = sc.phim;
+      if (!map[phim.maPhim]) {
+        map[phim.maPhim] = {
+          maPhim: phim.maPhim,
+          tenPhim: phim.tenPhim,
+          poster: phim.poster,
+          thoiLuong: phim.thoiLuong,
+          noiDung: phim.noiDung,
+          suatChieus: []
+        };
+      }
+
+      map[phim.maPhim].suatChieus.push({
+        maSuatChieu: sc.maSuatChieu,
+        gioBatDau: sc.gioBatDau
+      });
+    }
+
+    res.json(Object.values(map));
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Lỗi server" });
+  }
+};
 
 
 // GET /api/suatchieu/:maSuatChieu

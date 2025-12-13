@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom'
 import timeFormat from '../lib/timeFormat'
 
 const MoviesCard = ({ movie }) => {
-  console.log(movie);
 
   const navigate = useNavigate()
   return (

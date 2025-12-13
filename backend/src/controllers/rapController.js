@@ -20,7 +20,7 @@ export const getRaps = async (req, res) => {
       where,
       limit,
       offset,
-      order: [["maRap", "DESC"]]
+      order: [["maRap", "ASC"]]
     });
 
     return res.json({

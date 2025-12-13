@@ -21,7 +21,7 @@ import DaoDien from './pages/DaoDien'
 import QuanLyDaoDien from './pages/admin/QuanLyDaoDien'
 import QuanLyDienVien from './pages/admin/QuanLyDienVien'
 import QuanLyTheLoai from './pages/admin/QuanLyTheLoai'
-import Rap from './pages/admin/QuanLyRap'
+import QuanLyRap from './pages/admin/QuanLyRap'
 import PhongChieu from './pages/admin/QuanLyPhongChieu'
 import DienVien from './pages/DienVien'
 import TheLoai from './pages/TheLoai'
@@ -34,6 +34,12 @@ import QuanLyDanhGia from './pages/admin/QuanLyDanhGia'
 import CheckInVe from './pages/admin/CheckInVe'
 import BanVeTaiQuay from './pages/admin/BanVeTaiQuay'
 import LichSuBanVe from './pages/admin/LichSuBanVe'
+import GioiThieu from './pages/GioiThieu'
+import LienHe from './pages/LienHe'
+import ChinhSachBaoMat from './pages/ChinhSachBaoMat'
+import LichChieu from './pages/LichChieu'
+import ChiTietLichChieu from './pages/ChiTietLichChieu'
+import Rap from './pages/Rap'
 
 const App = () => {
 
@@ -46,12 +52,17 @@ const App = () => {
       {!isAdminRoute && <Navbar />}
       <Routes>
         <Route path='/' element={<TrangChu />} />
+        <Route path='/gioi-thieu' element={<GioiThieu />} />
+        <Route path='/chinh-sach-bao-mat' element={<ChinhSachBaoMat />} />
+        <Route path='/lien-he' element={<LienHe />} />
         <Route path='/phims' element={<Phims />} />
         <Route path='/phims/:maPhim' element={<ChiTietPhim />} />
+        <Route path='/lich-chieu' element={<LichChieu />} />
+        <Route path='/lich-chieu/:maRap' element={<ChiTietLichChieu />} />
         <Route path='/dao-dien' element={<DaoDien />} />
         <Route path='/dien-vien' element={<DienVien />} />
         <Route path='/the-loai' element={<TheLoai />} />
-        <Route path='/phims/:maPhim' element={<ChiTietPhim />} />
+        <Route path='/raps/:maRap' element={<Rap />} />
 
         <Route
           path="/chon-ghe/:maSuatChieu"
@@ -90,6 +101,11 @@ const App = () => {
             </ProtectedRoute>
           } />
 
+
+
+
+
+        {/* Admin routes */}
         <Route path='/admin/*'
           element={
             <AdminRoute>
@@ -106,7 +122,7 @@ const App = () => {
           <Route path='quan-ly-the-loai' element={<QuanLyTheLoai />} />
           <Route path='quan-ly-danh-gia' element={<QuanLyDanhGia />} />
           <Route path='banner' element={<Banner />} />
-          <Route path='quan-ly-rap' element={<Rap />} />
+          <Route path='quan-ly-rap' element={<QuanLyRap />} />
           <Route path='quan-ly-phong-chieu' element={<PhongChieu />} />
           <Route path='quan-ly-ghe' element={<QuanLyGhe />} />
           <Route path='quan-ly-suat-chieu' element={<QuanLySuatChieu />} />

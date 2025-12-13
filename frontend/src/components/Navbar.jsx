@@ -15,6 +15,10 @@ const Navbar = () => {
   const [openDienAnhDropdown, setOpenDienAnhDropdown] = useState(false)
   const [openDropdown, setOpenDropdown] = useState(false)
 
+  const [rap, setRap] = useState([])
+  const [openRapDropdown, setOpenRapDropdown] = useState(false)
+
+
   const [showSearch, setShowSearch] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState([]);
@@ -26,6 +30,18 @@ const Navbar = () => {
 
   const isActive = (path) => current === path;
 
+
+  useEffect(() => {
+    const fetchRaps = async () => {
+      try {
+        const res = await publicApi.get('/rap');
+        setRap(res.data.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchRaps();
+  }, []);
 
   const handleSearch = (value) => {
     setSearchTerm(value);
@@ -119,8 +135,34 @@ const Navbar = () => {
           </div>
         </div>
 
-        <Link onClick={() => { scrollTo(0, 0); setIsOpen(false) }} to='/rap'
-          className={`hover:text-primary ${isActive("/rap") ? "text-primary" : ""}`}> Rạp</Link>
+        <div
+          className="relative group"
+          onClick={() => setOpenRapDropdown(prev => !prev)}
+          onMouseLeave={() => setOpenRapDropdown(false)}
+        >
+          <div className="flex items-center gap-1 cursor-pointer hover:text-primary">
+            <span>Rạp/Giá vé</span>
+            <ChevronDown className=" w-4 h-4 text-gray-400" />
+          </div>
+          <div
+            className={`absolute right-[-70px] mt-2 w-48 max-h-60 overflow-y-auto bg-black/90 shadow-lg rounded-lg border-b py-2 z-50
+            transition-all duration-200
+            ${openRapDropdown || "group-hover:opacity-100 group-hover:visible"}
+            ${openRapDropdown ? "opacity-100 visible" : "opacity-0 invisible"}
+          `}
+          >
+            {rap.map((r) => (
+              <Link
+                key={r.maRap}
+                onClick={() => { scrollTo(0, 0); setIsOpen(false) }}
+                to={`/raps/${r.maRap}`}
+                className={`flex px-4 py-2 text-sm text-gray-300 hover:bg-primary/20 hover:border-l border-primary ${isActive(`/raps/${r.maRap}`) ? "text-primary" : ""}`}>
+                {r.tenRap}
+              </Link>
+            ))}
+          </div>
+
+        </div>
       </div>
 
       <div className='flex items-center gap-8'>
