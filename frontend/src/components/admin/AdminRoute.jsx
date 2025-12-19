@@ -1,21 +1,20 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
 import { Navigate, useLocation } from 'react-router-dom'
-import toast from 'react-hot-toast'
 
 const AdminRoute = ({ children }) => {
-  const { user } = useSelector((state) => state.auth)
+  const { user, loading } = useSelector((state) => state.auth)
   const location = useLocation()
+
+  if (loading) return null // Hoặc hiển thị spinner/loading indicator
 
   // Chưa đăng nhập → về trang chủ
   if (!user) {
-    toast.error('Vui lòng đăng nhập để truy cập trang quản trị!')
     return <Navigate to="/" state={{ from: location }} replace />
   }
 
   // Không phải admin → chặn truy cập
-  if (user.maVaiTro !== 4) {
-    toast.error('Bạn không có quyền truy cập trang quản trị!')
+  if (user.vaiTro !== 4 && user.vaiTro !== 3 && user.vaiTro !== 2) {
     return <Navigate to="/" replace />
   }
 

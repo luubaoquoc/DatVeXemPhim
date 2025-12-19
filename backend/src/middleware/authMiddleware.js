@@ -85,3 +85,49 @@ export const isSelfOrManagerOrAdmin = (req, res, next) => {
 
   return res.status(403).json({ message: 'Không có quyền thực hiện hành động này' });
 };
+
+
+export const optionalAuth = async (req, res, next) => {
+  try {
+    const authHeader =
+      req.headers.authorization || req.headers['x-access-token'];
+
+    // Không có token → cho qua
+    if (!authHeader) {
+      req.user = null;
+      return next();
+    }
+
+    const token = authHeader.startsWith('Bearer ')
+      ? authHeader.split(' ')[1]
+      : authHeader;
+
+    if (!token) {
+      req.user = null;
+      return next();
+    }
+
+    jwt.verify(token, process.env.JWT_ACCESS_SECRET, async (err, decoded) => {
+      if (err) {
+        req.user = null;
+        return next();
+      }
+
+      const user = await TaiKhoan.findByPk(decoded.maTaiKhoan);
+      if (!user) {
+        req.user = null;
+        return next();
+      }
+
+      const u = user.get({ plain: true });
+      delete u.matKhau;
+
+      req.user = u;
+      next();
+    });
+  } catch (error) {
+    console.error('optionalAuth error:', error);
+    req.user = null;
+    next();
+  }
+};

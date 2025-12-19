@@ -15,7 +15,7 @@ const DaoDien = () => {
 
   const [formData, setFormData] = useState({
     tenDaoDien: '',
-    anhDaiDien: null,       // File hoặc URL
+    anhDaiDien: null,
     ngaySinh: '',
     tieuSu: ''
   })

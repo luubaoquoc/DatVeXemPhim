@@ -97,7 +97,8 @@ export const updateDaoDien = async (req, res) => {
     }
     const daoDien = await DaoDien.findByPk(maDaoDien)
     if (!daoDien) return res.status(404).json({ message: 'Không tìm thấy đạo diễn' })
-    let anhDaiDien = null;
+
+    let anhDaiDien = daoDien.anhDaiDien;
 
     console.log(req.file);
 

@@ -60,7 +60,7 @@ const QuanLyDonDatVe = () => {
 
 
 
-  // Xóa đạo diễn
+  // Xóa đơn đặt vé
   const handleDelete = async (maDatVe) => {
     try {
       await api.delete(`/datve/${maDatVe}`)

@@ -1,58 +1,125 @@
-import { Op, fn, col, literal } from "sequelize";
-import ThanhToan from "../models/ThanhToan.js";
-import DatVe from "../models/DatVe.js";
-import SuatChieu from "../models/SuatChieu.js";
-import TaiKhoan from "../models/TaiKhoan.js";
-import Phim from "../models/Phim.js";
+import { Op, fn, col, literal } from "sequelize"
+import {
+  ThanhToan,
+  DatVe,
+  SuatChieu,
+  PhongChieu,
+  Rap,
+  TaiKhoan,
+  Phim
+} from "../models/index.js"
 
-// ==========================================
-// 1. API DASHBOARD MẶC ĐỊNH
-// ==========================================
+
+
+// ==================== DASHBOARD ====================
 export const getDashboardData = async (req, res) => {
   try {
-    // ----------------- 1. CARDS -----------------
+    const { maVaiTro, maRap: maRapUser } = req.user
+    const maRap = maVaiTro === 3 || maVaiTro === 2 ? maRapUser : req.query.maRap
 
-    // Doanh thu hôm nay
-    const doanhThuHomNay = await ThanhToan.sum("soTien", {
+
+    // ===== CARDS =====
+    // ===== DOANH THU HÔM NAY =====
+    const doanhThuHomNay = await ThanhToan.findOne({
+      attributes: [[fn("SUM", col("ThanhToan.soTien")), "tong"]],
+      include: [{
+        model: DatVe,
+        as: "datVe",
+        attributes: [],
+        required: true,
+        include: [{
+          model: SuatChieu,
+          as: "suatChieu",
+          attributes: [],
+          required: true,
+          include: [{
+            model: PhongChieu,
+            as: "phongChieu",
+            attributes: [],
+            required: true,
+            where: maRap ? { maRap } : {}
+          }]
+        }]
+      }],
       where: {
         trangThai: "Thành công",
         [Op.and]: literal("DATE(ngayThanhToan) = CURDATE()")
-      }
-    }) || 0;
+      },
+      raw: true
+    })
 
-    // Vé bán hôm nay
+    const doanhThu = doanhThuHomNay?.tong || 0
+
+
     const veBanHomNay = await DatVe.count({
+      include: [{
+        model: SuatChieu,
+        as: "suatChieu",
+        required: true,
+        include: [{
+          model: PhongChieu,
+          as: "phongChieu",
+          where: maRap ? { maRap } : {}
+        }]
+      }],
       where: {
         trangThai: "Thành công",
         [Op.and]: literal("DATE(ngayDat) = CURDATE()")
       }
-    });
+    })
 
-    // Suất chiếu hôm nay
+
     const suatChieuHomNay = await SuatChieu.count({
+      include: [{
+        model: PhongChieu,
+        as: "phongChieu",
+        where: maRap ? { maRap } : {}
+      }],
       where: literal("DATE(gioBatDau) = CURDATE()")
-    });
+    })
 
-    // Người dùng mới hôm nay
+
     const userMoi = await TaiKhoan.count({
       where: literal("DATE(ngayTao) = CURDATE()")
-    });
+    })
 
-    // ----------------- 2. DOANH THU 7 NGÀY -----------------
+    // ===== DOANH THU 7 NGÀY =====
     const doanhThu7Ngay = await ThanhToan.findAll({
       attributes: [
         [fn("DATE", col("ngayThanhToan")), "ngay"],
-        [fn("SUM", col("soTien")), "tong"],
+        [fn("SUM", col("ThanhToan.soTien")), "tong"]
       ],
+      include: [{
+        model: DatVe,
+        as: "datVe",
+        attributes: [],
+        required: true,
+        include: [{
+          model: SuatChieu,
+          as: "suatChieu",
+          attributes: [],
+          required: true,
+          include: [{
+            model: PhongChieu,
+            as: "phongChieu",
+            attributes: [],
+            where: maRap ? { maRap } : {}
+          }]
+        }]
+      }],
       where: {
         trangThai: "Thành công",
-        [Op.and]: literal("ngayThanhToan >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)")
+        ngayThanhToan: {
+          [Op.gte]: literal("DATE_SUB(CURDATE(), INTERVAL 6 DAY)")
+        }
       },
       group: [literal("DATE(ngayThanhToan)")],
       order: literal("ngay ASC"),
-    });
+      raw: true
+    })
 
-    // ----------------- 3. TOP PHIM TUẦN -----------------
+
+    // ===== TOP PHIM =====
     const topPhimTuan = await DatVe.findAll({
       attributes: [
         [col("suatChieu.phim.maPhim"), "maPhim"],
@@ -60,20 +127,27 @@ export const getDashboardData = async (req, res) => {
         [col("suatChieu.phim.poster"), "poster"],
         [fn("COUNT", col("DatVe.maDatVe")), "soVe"]
       ],
-      include: [
-        {
-          model: SuatChieu,
-          as: "suatChieu",
-          attributes: [],
-          include: [
-            {
-              model: Phim,
-              as: "phim",
-              attributes: []
-            }
-          ]
-        }
-      ],
+      include: [{
+        model: SuatChieu,
+        as: "suatChieu",
+        required: true,
+        attributes: [],
+        include: [
+          {
+            model: Phim,
+            as: "phim",
+            required: true,
+            attributes: []
+          },
+          {
+            model: PhongChieu,
+            as: "phongChieu",
+            required: true,
+            attributes: [],
+            where: maRap ? { maRap } : {}
+          }
+        ]
+      }],
       where: {
         trangThai: "Thành công",
         ngayDat: {
@@ -84,121 +158,95 @@ export const getDashboardData = async (req, res) => {
       order: [[fn("COUNT", col("DatVe.maDatVe")), "DESC"]],
       limit: 5,
       raw: true
-    });
+    })
 
 
-    // ----------------- 4. DOANH THU 12 THÁNG -----------------
-    const doanhThuTheoThang = await ThanhToan.findAll({
-      attributes: [
-        [fn("DATE_FORMAT", col("ngayThanhToan"), "%Y-%m"), "thang"],
-        [fn("SUM", col("soTien")), "tong"],
-      ],
-      where: {
-        trangThai: "Thành công",
-        [Op.and]: literal("ngayThanhToan >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)")
-      },
-      group: [literal("DATE_FORMAT(ngayThanhToan, '%Y-%m')")],
-      order: literal("thang ASC"),
-    });
-
-    // Trả về frontend
     res.json({
       cards: {
-        doanhThuHomNay,
+        doanhThu,
         veBanHomNay,
         suatChieuHomNay,
         userMoi
       },
       doanhThu7Ngay,
-      doanhThuTheoThang,
       topPhimTuan
-    });
+    })
 
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ message: "Lỗi server" });
+    console.log(err)
+    res.status(500).json({ message: "Lỗi server dashboard" })
   }
-};
+}
 
-
-// ==========================================
-// 2. API FILTER DASHBOARD (tùy chọn)
-// ==========================================
+// ==================== FILTER ====================
 export const filterDashboard = async (req, res) => {
   try {
-    const { type, from, to, month, year } = req.query;
-    let start, end;
-    let results = [];
+    const { type, from, to, month, year } = req.query
+    const { maVaiTro, maRap: maRapUser } = req.user
+    const maRap = maVaiTro === 2 || maVaiTro === 3 ? maRapUser : req.query.maRap
 
-    // ----- 1. Lọc theo ngày tùy chọn -----
+    const includeRap = [{
+      model: DatVe,
+      as: "datVe",
+      required: true,
+      attributes: [],
+      include: [{
+        model: SuatChieu,
+        as: "suatChieu",
+        attributes: [],
+        required: true,
+        include: [{
+          model: PhongChieu,
+          as: "phongChieu",
+          attributes: [],
+          required: true,
+          where: maRap ? { maRap } : {}
+        }]
+      }]
+    }]
+
+    let start, end, attributes, group
+
     if (type === "date") {
-      start = new Date(from);
-      start.setHours(0, 0, 0, 0);
-
-      end = new Date(to);
-      end.setHours(23, 59, 59, 999);
-
-      results = await ThanhToan.findAll({
-        attributes: [
-          [fn("DATE", col("ngayThanhToan")), "label"],
-          [fn("SUM", col("soTien")), "tong"],
-        ],
-        where: {
-          trangThai: "Thành công",
-          ngayThanhToan: { [Op.between]: [start, end] },
-        },
-        group: [literal("DATE(ngayThanhToan)")],
-        order: literal("label ASC"),
-      });
+      start = new Date(from)
+      end = new Date(to)
+      attributes = [[fn("DATE", col("ngayThanhToan")), "label"]]
+      group = [literal("DATE(ngayThanhToan)")]
     }
 
-    // ----- 2. Lọc theo tháng -----
     if (type === "month") {
-      start = new Date(year, month - 1, 1);
-      end = new Date(year, month, 0, 23, 59, 59);
-
-      results = await ThanhToan.findAll({
-        attributes: [
-          [fn("DATE", col("ngayThanhToan")), "label"],
-          [fn("SUM", col("soTien")), "tong"],
-        ],
-        where: {
-          trangThai: "Thành công",
-          ngayThanhToan: {
-            [Op.between]: [start, end],
-          },
-        },
-        group: [literal("DATE(ngayThanhToan)")],
-        order: literal("label ASC"),
-      });
+      start = new Date(year, month - 1, 1)
+      end = new Date(year, month, 0, 23, 59, 59)
+      attributes = [[fn("DATE", col("ngayThanhToan")), "label"]]
+      group = [literal("DATE(ngayThanhToan)")]
     }
 
-    // ----- 3. Lọc theo năm -----
     if (type === "year") {
-      start = new Date(year, 0, 1);
-      end = new Date(year, 11, 31, 23, 59, 59);
-
-      results = await ThanhToan.findAll({
-        attributes: [
-          [fn("DATE_FORMAT", col("ngayThanhToan"), "%Y-%m"), "label"],
-          [fn("SUM", col("soTien")), "tong"],
-        ],
-        where: {
-          trangThai: "Thành công",
-          ngayThanhToan: { [Op.between]: [start, end] },
-        },
-        group: [literal("DATE_FORMAT(ngayThanhToan, '%Y-%m')")],
-        order: literal("label ASC"),
-      });
+      start = new Date(year, 0, 1)
+      end = new Date(year, 11, 31, 23, 59, 59)
+      attributes = [[fn("DATE_FORMAT", col("ngayThanhToan"), "%Y-%m"), "label"]]
+      group = [literal("DATE_FORMAT(ngayThanhToan, '%Y-%m')")]
     }
 
-    return res.json({
-      data: results,
-    });
+    const data = await ThanhToan.findAll({
+      attributes: [
+        ...attributes,
+        [fn("SUM", col("soTien")), "tong"]
+      ],
+      include: includeRap,
+      where: {
+        trangThai: "Thành công",
+        ngayThanhToan: { [Op.between]: [start, end] }
+      },
+      group,
+      order: literal("label ASC"),
+      raw: true
+    })
+
+    res.json({ data })
 
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ message: "Lỗi server filter" });
+    console.log(err)
+    res.status(500).json({ message: "Lỗi filter dashboard" })
   }
-};
-
+}

@@ -50,7 +50,7 @@ const TrailerSection = () => {
 
   return (
     <div className='px-6 md:px-16 lg:px-44 py-20 overflow-hidden'>
-      <p className='text-gray-300 font-medium text-lg max-w-[960px]'>
+      <p className='text-gray-300 text-2xl font-medium max-w-[960px]'>
         Trailers
       </p>
 
@@ -59,7 +59,7 @@ const TrailerSection = () => {
 
         {currentTrailer && (
           <ReactPlayer
-            src={currentTrailer.trailer}    // dùng src, không dùng src!
+            src={currentTrailer.trailer}
             controls={false}
             className='mx-auto max-w-full'
             width='960px'

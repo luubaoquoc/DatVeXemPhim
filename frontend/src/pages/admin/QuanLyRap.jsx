@@ -16,6 +16,8 @@ const Rap = () => {
     tenRap: "",
     diaChi: "",
     soDienThoai: "",
+    hinhAnh: null,
+    srcMap: "",
   })
   const [search, setSearch] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
@@ -43,8 +45,12 @@ const Rap = () => {
 
   // Xử lý thay đổi input
   const handleChange = (e) => {
-    const { name, value } = e.target
+    const { name, value, files } = e.target
+    if (files) {
+      return setFormData(prev => ({ ...prev, [name]: files[0] }))
+    }
     setFormData(prev => ({ ...prev, [name]: value }))
+
   }
 
   // Submit Form
@@ -52,11 +58,29 @@ const Rap = () => {
     e.preventDefault()
     setLoading(true)
     try {
+
+      const formDataObj = new FormData()
+      formDataObj.append("tenRap", formData.tenRap)
+      formDataObj.append("diaChi", formData.diaChi)
+      formDataObj.append("soDienThoai", formData.soDienThoai)
+      formDataObj.append("srcMap", formData.srcMap)
+
+      if (formData.hinhAnh instanceof File) {
+        formDataObj.append("hinhAnh", formData.hinhAnh)
+      }
       if (editRap) {
-        await api.put(`/rap/${editRap.maRap}`, formData)
+        await api.put(`/rap/${editRap.maRap}`, formDataObj, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
         toast.success("Cập nhật rạp thành công!")
       } else {
-        await api.post("/rap", formData)
+        await api.post("/rap", formDataObj, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
         toast.success("Thêm rạp thành công!")
       }
 
@@ -66,6 +90,8 @@ const Rap = () => {
         tenRap: "",
         diaChi: "",
         soDienThoai: "",
+        hinhAnh: null,
+        srcMap: "",
       })
       fetchData()
     } catch (err) {
@@ -95,11 +121,13 @@ const Rap = () => {
       setFormData({
         tenRap: data.tenRap || "",
         diaChi: data.diaChi || "",
-        soDienThoai: data.soDienThoai || ""
+        soDienThoai: data.soDienThoai || "",
+        hinhAnh: data.hinhAnh || null,
+        srcMap: data.srcMap || "",
       })
     } else {
       setEditRap(null)
-      setFormData({ tenRap: "", diaChi: "", soDienThoai: "" })
+      setFormData({ tenRap: "", diaChi: "", soDienThoai: "", hinhAnh: null, srcMap: "" })
     }
     setShowModal(true)
   }
@@ -134,6 +162,7 @@ const Rap = () => {
         <thead className="bg-primary/70 text-white">
           <tr>
             <th className="p-2">#</th>
+            <th className="p-2 text-left">Hình ảnh</th>
             <th className="p-2 text-left">Tên rạp</th>
             <th className="p-2 text-left">Địa chỉ</th>
             <th className="p-2 text-left">Số điện thoại</th>
@@ -145,11 +174,18 @@ const Rap = () => {
           {raps?.map((rap, index) => (
             <tr key={rap.maRap} className="text-center border-b border-primary/30">
               <td className="p-2">{index + 1}</td>
+              <td className="p-2">
+                <img
+                  src={rap.hinhAnh || "Chưa cập nhật"}
+                  alt={rap.tenRap}
+                  className="w-16 h-16 object-cover rounded"
+                />
+              </td>
               <td className="p-2 font-medium text-left">{rap.tenRap}</td>
               <td className="p-2 text-left">{rap.diaChi}</td>
               <td className="p-2 text-left">{rap.soDienThoai}</td>
 
-              <td className="p-2 flex justify-center">
+              <td className="p-2">
                 <button
                   onClick={() => {
                     openModal(rap)
@@ -179,46 +215,84 @@ const Rap = () => {
 
       {showModal && (
         <div className="fixed inset-0 bg-black/80 flex justify-center items-center z-50">
-          <div className="bg-black/80 border border-primary p-6 rounded-lg w-96">
-            <h2 className="text-2xl font-semibold mb-4 text-primary text-center">
-              {editRap ? 'Sửa rạp' : 'Thêm rạp'}
+          <div className="bg-black/80 border border-primary p-6 rounded-lg w-200 overflow-y-auto max-h-[90vh]">
+            <h2 className="text-2xl font-semibold mb-6 text-primary text-center">
+              {editRap ? 'Sửa Rạp' : 'Thêm Rạp'}
             </h2>
             <form onSubmit={handleSubmit}>
-              <div>
-                <label className='block mb-1 font-medium text-primary'>Tên rạp</label>
-                <input
-                  type="text"
-                  name="tenRap"
-                  className="w-full p-2 mb-4 rounded bg-[#111] border border-gray-600 text-white"
-                  placeholder="Tên rạp..."
-                  value={formData.tenRap}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div>
-                <label className='block mb-1 font-medium text-primary'>Địa chỉ</label>
-                <input
-                  type="text"
-                  name="diaChi"
-                  className="w-full p-2 mb-4 rounded bg-[#111] border border-gray-600 text-white"
-                  value={formData.diaChi || ""}
-                  onChange={handleChange}
-                />
-              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <div>
+                    <label className='block mb-1 font-medium text-primary'>Tên rạp</label>
+                    <input
+                      type="text"
+                      name="tenRap"
+                      className="w-full p-2 mb-4 rounded bg-[#111] border border-gray-600 text-white"
+                      placeholder="Tên rạp..."
+                      value={formData.tenRap}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className='block mb-1 font-medium text-primary'>Địa chỉ</label>
+                    <input
+                      type="text"
+                      name="diaChi"
+                      className="w-full p-2 mb-4 rounded bg-[#111] border border-gray-600 text-white"
+                      value={formData.diaChi || ""}
+                      onChange={handleChange}
+                    />
+                  </div>
 
+                  <div>
+                    <label className="block mb-1 font-medium text-primary">Số điện thoại</label>
+                    <input
+                      type="text"
+                      name="soDienThoai"
+                      className="w-full p-2 mb-4 rounded bg-[#111] border border-gray-600 text-white"
+                      value={formData.soDienThoai || ""}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className='block mb-1 font-medium text-primary'>Hình ảnh</label>
+                  <div className="">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      name="hinhAnh"
+                      className="w-full h-[3rem] p-2 mb-4 rounded bg-[#111] border border-gray-600 text-white"
+                      onChange={handleChange}
+                    />
+                    {
+                      formData.hinhAnh && (
+                        <img
+                          src={
+                            formData.hinhAnh instanceof File
+                              ? URL.createObjectURL(formData.hinhAnh)
+                              : formData.hinhAnh
+                          }
+                          alt="Preview"
+                          className="h-auto w-full object-cover mb-4 rounded"
+                        />
+                      )
+                    }
+                  </div>
+                </div>
+              </div>
               <div>
-                <label className="block mb-1 font-medium text-primary">Số điện thoại</label>
+                <label className='block mb-1 font-medium text-primary'>Src Map</label>
                 <input
                   type="text"
-                  name="soDienThoai"
+                  name="srcMap"
                   className="w-full p-2 mb-4 rounded bg-[#111] border border-gray-600 text-white"
-                  value={formData.soDienThoai || ""}
+                  value={formData.srcMap || ""}
                   onChange={handleChange}
-                  required
                 />
               </div>
-
               <div className="flex justify-end gap-2">
                 <button
                   type="button"

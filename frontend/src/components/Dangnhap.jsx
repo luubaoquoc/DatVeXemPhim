@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { login, register } from '../redux/features/authSlice'
 import toast from "react-hot-toast";
@@ -17,7 +18,7 @@ const Dangnhap = ({ onClose }) => {
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [showNew, setShowNew] = useState(false)
 
-
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,6 +26,14 @@ const Dangnhap = ({ onClose }) => {
       if (isLogin) {
         const res = await dispatch(login({ email, matKhau })).unwrap();
         toast.success(res.message);
+        const vaitro = res.user.vaiTro;
+        console.log(vaitro);
+
+        if ([2, 3, 4].includes(vaitro)) {
+          navigate('/admin');
+        } else {
+          navigate('/');
+        }
         onClose();
       } else {
         const res = await dispatch(register({ hoTen, email, matKhau })).unwrap();

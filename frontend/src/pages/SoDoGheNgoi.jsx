@@ -164,8 +164,7 @@ const SoDoGheNgoi = () => {
         <div className='relative flex-1 flex flex-col items-center max-md:mt-16 mt-10'>
           <BlurCircle top='-100px' left='-100px' />
           <BlurCircle bottom='0' right='0' />
-          <h1 className='text-2xl font-semibold mb-4'>Chọn chỗ ngồi cho bạn</h1>
-          <img src={assets.screenImage} alt="" className='shadow-2xl rounded-lg shadow-red-200' />
+          <img src={assets.screenImage} alt="" className='shadow-2xl rounded-lg shadow-red-200 mt-6' />
           <p className='text-gray-300 text-sm mb-6'>Màn hình</p>
 
           <GheLayout
@@ -193,7 +192,7 @@ const SoDoGheNgoi = () => {
           giaVeCoBan={show.giaVeCoBan}
           onBack={() => { navigate(-1); scrollTo(0, 0) }}
           onAction={handleThanhToan}
-          actionLabel="Thanh toán"
+          actionLabel="Tiếp tục"
         />
       </div>
 

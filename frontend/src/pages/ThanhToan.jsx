@@ -181,7 +181,7 @@ const ThanhToan = () => {
           timeLeft={timeLeft}
           onBack={() => navigate(-1)}
           onAction={handleConfirm}
-          actionLabel="Xác nhận thanh toán"
+          actionLabel="Thanh toán"
         />
       </div>
     </div>

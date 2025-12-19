@@ -86,7 +86,7 @@ export const updateDienVien = async (req, res) => {
     const dienVien = await DienVien.findByPk(maDienVien)
     if (!dienVien) return res.status(404).json({ message: 'Không tìm thấy diễn viên' })
 
-    let anhDaiDien = null;
+    let anhDaiDien = dienVien.anhDaiDien;
     if (req.file) {
       const result = await new Promise((resolve, reject) => {
         const stream = cloudinary.uploader.upload_stream(

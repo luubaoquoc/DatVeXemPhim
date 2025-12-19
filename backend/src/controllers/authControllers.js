@@ -178,10 +178,20 @@ export const login = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 ngày
     });
 
+    const userData = {
+      maTaiKhoan: user.maTaiKhoan,
+      hoTen: user.hoTen,
+      email: user.email,
+      soDienThoai: user.soDienThoai,
+      ngayTao: user.ngayTao,
+      anhDaiDien: user.anhDaiDien,
+      maRap: user.maRap,
+      vaiTro: user.maVaiTro
+    };
     res.status(200).json({
       message: "Đăng nhập thành công",
       accessToken,
-      user: user.maTaiKhoan,
+      user: userData
     });
   } catch (error) {
     console.error(error.message);
@@ -210,7 +220,18 @@ export const refreshToken = (req, res) => {
 
       const payload = { maTaiKhoan: user.maTaiKhoan };
       const accessToken = createAccessToken(payload);
-      return res.status(200).json({ accessToken, user });
+
+      const userData = {
+        maTaiKhoan: user.maTaiKhoan,
+        hoTen: user.hoTen,
+        email: user.email,
+        soDienThoai: user.soDienThoai,
+        ngayTao: user.ngayTao,
+        anhDaiDien: user.anhDaiDien,
+        maRap: user.maRap,
+        vaiTro: user.maVaiTro
+      };
+      return res.status(200).json({ accessToken, user: userData });
     });
   } catch (error) {
     console.error("Refresh error:", error.message);

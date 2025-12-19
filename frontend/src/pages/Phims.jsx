@@ -44,25 +44,26 @@ const Phims = () => {
 
       <BlurCircle top='150px' left='0px' />
       <BlurCircle bottom='50px' right='50px' />
-      <div className='flex gap-4 mt-10 justify-center '>
+      <div className='flex gap-4 mt-10 justify-start'>
+        <h1 className='p-2 text-2xl font-semibold text-white border-l-2 border-primary'>PHIM</h1>
         <button
           onClick={() => setActiveTab('dangChieu')}
-          className={`py-2 text-2xl font-medium transition cursor-pointer ${activeTab === 'dangChieu'
+          className={`py-2 text-xl font-medium transition cursor-pointer ${activeTab === 'dangChieu'
             ? 'border-b-2 border-primary text-white'
             : 'text-gray-400 hover:text-white'
             }`}
         >
-          Phim đang chiếu
+          Đang chiếu
         </button>
         <span className='text-2xl pt-2'>|</span>
         <button
           onClick={() => setActiveTab('sapChieu')}
-          className={`py-2 text-2xl font-medium transition cursor-pointer ${activeTab === 'sapChieu'
+          className={`py-2 text-xl font-medium transition cursor-pointer ${activeTab === 'sapChieu'
             ? 'border-b-2 border-primary text-white'
             : 'text-gray-400 hover:text-white'
             }`}
         >
-          Phim sắp chiếu
+          Sắp chiếu
         </button>
       </div>
       <div className='relative'>

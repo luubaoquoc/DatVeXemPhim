@@ -40,10 +40,10 @@ const Footer = () => {
           <div>
             <h2 className="font-semibold mb-5 text-2xl">Về chúng tôi</h2>
             <ul className="text-sm space-y-2 text-gray-400 ">
-              <li><Link to="/" className='hover:text-white'>Trang chủ</Link></li>
-              <li><Link to="/gioi-thieu" className='hover:text-white'>Giới thiệu</Link></li>
-              <li><Link to="/lien-he" className='hover:text-white'>Liên hệ</Link></li>
-              <li><Link to="/chinh-sach-bao-mat" className='hover:text-white'>Chính sách bảo mật</Link></li>
+              <li><Link to="/" className='hover:text-primary'>Trang chủ</Link></li>
+              <li><Link to="/gioi-thieu" className='hover:text-primary'>Giới thiệu</Link></li>
+              <li><Link to="/lien-he" className='hover:text-primary'>Liên hệ</Link></li>
+              <li><Link to="/chinh-sach-bao-mat" className='hover:text-primary'>Chính sách bảo mật</Link></li>
             </ul>
           </div>
 

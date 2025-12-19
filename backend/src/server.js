@@ -6,13 +6,13 @@ import cookieParser from "cookie-parser";
 import connectDB from "./configs/db.js";
 import authRoutes from "./routes/authRoutes.js";
 
-import taiKhoanRoutes from './routes/TaiKhoanRoutes.js';
-import phimRoutes from './routes/PhimRoutes.js';
+import taiKhoanRoutes from './routes/taiKhoanRoutes.js';
+import phimRoutes from './routes/phimRoutes.js';
 import daoDienRoutes from './routes/daoDienRoutes.js';
 import theLoaiRoutes from './routes/theLoaiRoutes.js';
 import dienVienRoutes from './routes/dienVienRoutes.js';
-import suatChieuRoutes from './routes/SuatChieuRoutes.js';
-import datVeRoutes from './routes/DatVeRoutes.js';
+import suatChieuRoutes from './routes/suatChieuRoutes.js';
+import datVeRoutes from './routes/datVeRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
 import phongChieuRoutes from './routes/phongChieuRoutes.js';
 import rapRoutes from './routes/rapRoutes.js';

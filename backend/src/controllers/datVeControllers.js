@@ -50,16 +50,17 @@ export const getAllDatVe = async (req, res) => {
         {
           model: TaiKhoan,
           as: "khachHang",
-          attributes: ["maTaiKhoan", "hoTen", "email"]
+          attributes: ["maTaiKhoan", "hoTen"]
         },
         {
           model: TaiKhoan,
           as: "nhanVien",
-          attributes: ["maTaiKhoan", "hoTen", "email"]
+          attributes: ["maTaiKhoan", "hoTen", "maVaiTro"]
         },
         {
           model: SuatChieu,
           as: "suatChieu",
+          attributes: ["maSuatChieu", "gioBatDau", "gioKetThuc"],
           include: [
             {
               model: Phim,
@@ -70,7 +71,7 @@ export const getAllDatVe = async (req, res) => {
               model: PhongChieu,
               as: "phongChieu",
               attributes: ["maPhong", "tenPhong", "maRap"],
-              include: [{ model: Rap, as: 'rap', attributes: ['maRap', 'tenRap'] }]
+              include: [{ model: Rap, as: 'rap', attributes: ['maRap', 'tenRap', 'diaChi'] }]
             }
           ]
         },
@@ -248,15 +249,18 @@ export const listMyDatVes = async (req, res) => {
         {
           model: SuatChieu,
           as: 'suatChieu',
+          attributes: ['maSuatChieu', 'gioBatDau', 'gioKetThuc'],
           include: [
             {
               model: Phim,
               as: 'phim',
+              attributes: ['maPhim', 'tenPhim', 'poster']
             },
             {
               model: PhongChieu,
               as: 'phongChieu',
-              include: [{ model: Rap, as: 'rap' }]
+              attributes: ['maPhong', 'tenPhong', 'maRap'],
+              include: [{ model: Rap, as: 'rap', attributes: ['maRap', 'tenRap', 'diaChi'] }]
             }
           ]
         },
@@ -267,7 +271,6 @@ export const listMyDatVes = async (req, res) => {
         {
           model: ChiTietDatVe,
           as: 'chiTietDatVes',
-          attributes: ['maGhe'],
           include: [
             {
               model: Ghe,
@@ -595,9 +598,10 @@ export const BanVeTaiQuay = async (req, res) => {
         {
           model: SuatChieu,
           as: "suatChieu",
+          attributes: ["maSuatChieu", "gioBatDau", "gioKetThuc"],
           include: [
-            { model: Phim, as: "phim" },
-            { model: PhongChieu, as: "phongChieu", include: [{ model: Rap, as: "rap" }] }
+            { model: Phim, as: "phim", attributes: ['maPhim', 'tenPhim', 'poster'] },
+            { model: PhongChieu, as: "phongChieu", attributes: ['maPhong', 'tenPhong', 'maRap'], include: [{ model: Rap, as: "rap", attributes: ['maRap', 'tenRap', 'diaChi'] }] }
           ]
         },
         {

@@ -39,56 +39,100 @@ const AdminSidebar = () => {
   }
 
   const adminNavlinks = [
-    { name: 'Tổng quan', path: '/admin', icon: LayoutDashboardIcon },
+    {
+      name: 'Tổng quan',
+      path: '/admin',
+      icon: LayoutDashboardIcon,
+      roles: [2, 3, 4]
+    },
+
     {
       name: 'Vận hành Rạp',
       icon: TicketIcon,
+      roles: [2, 3, 4],
       children: [
-        // Đây là module chính để check-in và quét mã QR
-        { name: 'Check-in & Quét vé', path: '/admin/van-hanh/check-in', icon: ScanLineIcon },   // Dành cho: NVR (Bắt buộc)
-
-        // Module tạo và in vé mới tại quầy POS
-        { name: 'Bán vé tại quầy (POS)', path: '/admin/van-hanh/ban-ve-tai-quay', icon: ReceiptTextIcon }, // Dành cho: NVR (Bắt buộc)
-
-        // Xem lịch sử bán hàng cá nhân (dựa trên maNhanVienBan)
-        { name: 'Lịch sử giao dịch NV', path: '/admin/van-hanh/lich-su-ban-ve', icon: ListIcon } // Dành cho: NVR (Xem)
+        {
+          name: 'Check-in & Quét vé',
+          path: '/admin/van-hanh/check-in',
+          icon: ScanLineIcon,
+          roles: [2, 3, 4]
+        },
+        {
+          name: 'Bán vé tại quầy (POS)',
+          path: '/admin/van-hanh/ban-ve-tai-quay',
+          icon: ReceiptTextIcon,
+          roles: [2, 3, 4]
+        },
+        {
+          name: 'Lịch sử bán vé NV',
+          path: '/admin/van-hanh/lich-su-ban-ve',
+          icon: ListIcon,
+          roles: [2, 3, 4]
+        }
       ]
     },
+
     {
       name: 'Quản lý phim',
       icon: FilmIcon,
+      roles: [4],
       children: [
-        { name: 'Danh sách phim', path: '/admin/quan-ly-phim', icon: FilmIcon },
-        { name: 'Danh sách đạo diễn', path: '/admin/quan-ly-dao-dien', icon: BookUserIcon },
-        { name: 'Danh sách diễn viên', path: '/admin/quan-ly-dien-vien', icon: AwardIcon },
-        { name: 'Danh sách thể loại', path: '/admin/quan-ly-the-loai', icon: TagsIcon },
-        { name: 'Danh sách đánh giá', path: '/admin/quan-ly-danh-gia', icon: StarIcon },
-        { name: 'Danh sách banner', path: '/admin/banner', icon: ImagePlus }
+        { name: 'Danh sách phim', path: '/admin/quan-ly-phim', icon: FilmIcon, roles: [4] },
+        { name: 'Danh sách đạo diễn', path: '/admin/quan-ly-dao-dien', icon: BookUserIcon, roles: [4] },
+        { name: 'Danh sách diễn viên', path: '/admin/quan-ly-dien-vien', icon: AwardIcon, roles: [4] },
+        { name: 'Danh sách thể loại', path: '/admin/quan-ly-the-loai', icon: TagsIcon, roles: [4] },
+        { name: 'Danh sách đánh giá', path: '/admin/quan-ly-danh-gia', icon: StarIcon, roles: [4] },
+        { name: 'Danh sách banner', path: '/admin/banner', icon: ImagePlus, roles: [4] }
       ]
     },
-    { name: 'Quản lý suất chiếu', path: '/admin/quan-ly-suat-chieu', icon: ClockIcon },
 
-    { name: 'Quản lý đơn đặt vé', path: '/admin/quan-ly-don-dat-ve', icon: TicketIcon },
+    {
+      name: 'Quản lý suất chiếu',
+      path: '/admin/quan-ly-suat-chieu',
+      icon: ClockIcon,
+      roles: [3, 4]
+    },
+
+    {
+      name: 'Quản lý đơn đặt vé',
+      path: '/admin/quan-ly-don-dat-ve',
+      icon: TicketIcon,
+      roles: [2, 3, 4]
+    },
+
     {
       name: 'Quản lý rạp',
       icon: Building2Icon,
+      roles: [3, 4],
       children: [
-        { name: 'Danh sách rạp', path: '/admin/quan-ly-rap', icon: ListIcon },
-        { name: 'Danh sách phòng chiếu', path: '/admin/quan-ly-phong-chieu', icon: DoorOpenIcon },
-        { name: 'Danh sách ghế', path: '/admin/quan-ly-ghe', icon: Armchair }
+        { name: 'Danh sách rạp', path: '/admin/quan-ly-rap', icon: ListIcon, roles: [4] },
+        { name: 'Danh sách phòng chiếu', path: '/admin/quan-ly-phong-chieu', icon: DoorOpenIcon, roles: [3, 4] },
+        { name: 'Danh sách ghế', path: '/admin/quan-ly-ghe', icon: Armchair, roles: [3, 4] }
       ]
     },
-    {
-      name: 'Báo cáo',
-      path: '/admin/bao-cao',
-      icon: FileTextIcon
-    },
+
     {
       name: 'Quản lý tài khoản',
       path: '/admin/quan-ly-tai-khoan',
       icon: UserIcon,
+      roles: [3, 4]
     }
   ]
+
+  const role = user?.vaiTro
+
+  const filteredNavlinks = adminNavlinks
+    .filter(link => link.roles.includes(role))
+    .map(link => {
+      if (!link.children) return link
+
+      return {
+        ...link,
+        children: link.children.filter(child =>
+          child.roles.includes(role)
+        )
+      }
+    })
 
   return (
     <div className='h-[calc(100vh-64px)] md:flex flex-col items-center pt-8 max-w-13 md:max-w-60
@@ -100,13 +144,13 @@ const AdminSidebar = () => {
         <div onClick={() => dispatch(logout())}
           className='flex items-center mt-2 gap-2 border p-2 border-red-400 rounded cursor-pointer hover:text-red-400 transition'>
           <LogOutIcon className='size-4 text-red-400' />
-          <button className=' text-red-400 cursor-pointer'>Đăng xuất</button>
+          <button className=' text-red-400 cursor-pointer max-md:hidden'>Đăng xuất</button>
         </div>
       </div>
 
       {/* Danh sách menu */}
       <div className='w-full mt-2 space-y-2'>
-        {adminNavlinks.map((link, index) => (
+        {filteredNavlinks.map((link, index) => (
           <div key={index} className='mb-1'>
             {/* Mục không có children */}
             {!link.children ? (

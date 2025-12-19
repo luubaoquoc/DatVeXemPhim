@@ -105,13 +105,16 @@ const BanVeTaiQuay = () => {
       console.log(res.data);
 
 
-      toast.success("In vé thành công!");
-      setStep(1);
-      // Reset POS
-      setSelectedSeats([]);
-      setSelectedShow(null);
-      setSelectedMovie(null);
-      inVe(res.data);
+      await inVe(res.data);
+
+      setTimeout(() => {
+        toast.success("In vé thành công!");
+        setStep(1);
+        // Reset POS
+        setSelectedSeats([]);
+        setSelectedShow(null);
+        setSelectedMovie(null);
+      }, 2000);
     } catch (err) {
       console.error(err);
       toast.error("Thanh toán lỗi");

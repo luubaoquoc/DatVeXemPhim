@@ -80,13 +80,13 @@ const TrangCaNhan = () => {
               <div className="flex items-center gap-3 text-gray-300 border-b border-gray-700 pb-3">
                 <label className="flex items-center gap-1">
                   <User size={18} className="text-primary" />
-                  <span className="text-primary">Họ và tên:</span>
+                  <span className="text-primary w-18">Họ và tên:</span>
                 </label>
                 <input
                   type="text"
                   value={formData.hoTen}
                   onChange={(e) => setFormData({ ...formData, hoTen: e.target.value })}
-                  className="outline-none bg-transparent"
+                  className="outline-none bg-transparent w-full"
                 />
               </div>
 
@@ -99,7 +99,7 @@ const TrangCaNhan = () => {
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="outline-none bg-transparent"
+                  className="outline-none bg-transparent w-full"
                 />
               </div>
 
@@ -116,9 +116,9 @@ const TrangCaNhan = () => {
                 />
               </div>
 
-              <div className="flex items-center gap-1 text-gray-100 border-b border-gray-700 pb-3">
-                <Calendar size={18} className="text-primary/40" />
-                <span className="text-primary/40">Ngày tạo tài khoản: </span>{user.ngayTao}
+              <div className="flex items-center gap-1 text-gray-400 border-b border-gray-700 pb-3">
+                <Calendar size={18} className="text-primary/50" />
+                <span className="text-primary/50">Ngày tạo tài khoản: </span>{user.ngayTao}
               </div>
 
 

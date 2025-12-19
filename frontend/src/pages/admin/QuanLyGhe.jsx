@@ -113,7 +113,7 @@ const QuanLyGhe = () => {
       {/* Legend */}
       <div className="flex gap-4 items-center mb-4 text-sm">
         <div className="flex items-center gap-2"><div className="w-4 h-4 bg-primary/60 rounded" /> Khả dụng</div>
-        <div className="flex items-center gap-2"><div className="w-4 h-4 bg-gray-600 rounded" /> Khóa / Hỏng</div>
+        <div className="flex items-center gap-2"><div className="w-4 h-4 bg-red-400 rounded" /> Khóa / Hỏng</div>
       </div>
 
       {/* Seat layout */}

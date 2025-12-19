@@ -84,7 +84,7 @@ const ThongoTinDatVe = (
       <div className="mt-4 border-t border-gray-700 pt-3 flex justify-between items-center">
         <p className="text-sm text-gray-300">Tổng cộng:</p>
         <p className="font-semibold text-xl text-primary">
-          {(selectedSeats?.length || 0) * (giaVeCoBan || 0)} đ
+          {(selectedSeats?.length || 0) * (giaVeCoBan || 0)} VND
         </p>
       </div>
 

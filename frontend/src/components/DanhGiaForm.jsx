@@ -11,11 +11,11 @@ const DanhGiaModal = ({ maPhim, open, onClose }) => {
   const dispatch = useDispatch();
   const movie = useSelector((state) => state.phim.current);
 
-  const [rating, setRating] = useState(0);       // sao user chọn
-  const [hover, setHover] = useState(0);         // sao hover
+  const [rating, setRating] = useState(0);
+  const [hover, setHover] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  //  Khi mở modal, load đánh giá cũ (nếu có)
+
   useEffect(() => {
     if (!open) return;
 
@@ -61,7 +61,7 @@ const DanhGiaModal = ({ maPhim, open, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-900 rounded-xl p-6 w-full max-w-md relative border border-primary/30 shadow-2xl">
+      <div className="bg-black/80 rounded-xl p-6 w-full max-w-md relative border border-primary/30 shadow-2xl">
 
         {/* Close button */}
         <button

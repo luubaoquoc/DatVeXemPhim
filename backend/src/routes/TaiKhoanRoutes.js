@@ -12,6 +12,7 @@ import {
 
 import {
   authenticateToken,
+  hasRole,
   isAdmin,
   isSelfOrManagerOrAdmin
 } from '../middleware/authMiddleware.js';
@@ -21,13 +22,13 @@ import upload from '../configs/multer.js';
 const router = express.Router();
 
 // Admin mới được xem list tài khoản
-router.get('/', authenticateToken, isAdmin, listUsers);
+router.get('/', authenticateToken, hasRole(3, 4), listUsers);
 
 // Admin mới được xem danh sách vai trò
-router.get('/vaitro', authenticateToken, isAdmin, listVaiTro);
+router.get('/vaitro', authenticateToken, hasRole(3, 4), listVaiTro);
 
 // Admin mới được tạo tài khoản
-router.post('/', authenticateToken, isAdmin, createTaiKhoan);
+router.post('/', authenticateToken, hasRole(3, 4), createTaiKhoan);
 
 // Chính chủ hoặc Manager hoặc Admin
 router.get('/:maTaiKhoan', authenticateToken, isSelfOrManagerOrAdmin, getUser);
@@ -36,7 +37,7 @@ router.get('/:maTaiKhoan', authenticateToken, isSelfOrManagerOrAdmin, getUser);
 router.put('/:maTaiKhoan', authenticateToken, isSelfOrManagerOrAdmin, updateUser);
 
 // Chỉ Admin mới được xóa tài khoản
-router.delete('/:maTaiKhoan', authenticateToken, isAdmin, deleteUser);
+router.delete('/:maTaiKhoan', authenticateToken, hasRole(4), deleteUser);
 
 // Upload avatar: chính chủ + Manager + Admin
 router.put('/:maTaiKhoan/avatar',

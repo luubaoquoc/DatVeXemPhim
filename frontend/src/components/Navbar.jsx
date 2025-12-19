@@ -80,8 +80,8 @@ const Navbar = () => {
       <div className={`
       max-md:absolute max-md:top-0 max-md:left-0 max-md:font-medium 
       max-md:text-lg z-50 flex flex-col md:flex-row items-center max-md:justify-center
-      gap-7 min-md:px-8 py-3 max-md:h-screen min-md:rounded-full backdrop-blur bg-black/70
-      md:bg-white/10 md:border-b border-primary overflow-ellipsis transition-[width] duration-300
+      gap-7 min-md:px-8 py-3 max-md:h-screen min-md:rounded-full  bg-black/90 md:font-bold
+      md:bg-black/80 md:border-b border-primary overflow-ellipsis transition-[width] duration-300
       ${isOpen ? "max-md:w-full" : "max-md:hidden"}`}>
 
         <XIcon className='md:hidden absolute top-6 right-6 w-6 h-6 cursor-pointer'

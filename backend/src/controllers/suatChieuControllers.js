@@ -1,7 +1,7 @@
 import { SuatChieu, Phim, PhongChieu, Rap, Ghe } from '../models/index.js';
 import { Op } from 'sequelize';
 
-// GET /api/suatchieu?page=1&limit=20&maPhim=...
+
 export const listSuatChieus = async (req, res) => {
   try {
     const page = Math.max(1, Number(req.query.page) || 1);
@@ -57,7 +57,7 @@ export const listSuatChieus = async (req, res) => {
 
 
 
-// GET /api/suatchieu/raps?maPhim=1&date=2025-10-22
+
 export const getRapsForMovieDate = async (req, res) => {
   try {
     const maPhim = Number(req.query.maPhim);
@@ -67,8 +67,33 @@ export const getRapsForMovieDate = async (req, res) => {
     const start = new Date(date + 'T00:00:00');
     const end = new Date(date + 'T23:59:59');
 
-    const { Op } = await import('sequelize');
-    const rows = await SuatChieu.findAll({ where: { maPhim, gioBatDau: { [Op.between]: [start, end] } }, include: [{ model: PhongChieu, as: 'phongChieu', include: [{ model: Rap, as: 'rap' }] }] });
+    const { maVaiTro, maRap } = req.user || {};
+
+    let phongWhere = {};
+    if (maVaiTro === 2 || maVaiTro === 3) {
+      phongWhere.maRap = maRap;
+    }
+
+
+    const rows = await SuatChieu.findAll({
+      where: {
+        maPhim, gioBatDau: {
+          [Op.between]: [start, end]
+        }
+      },
+      include: [
+        {
+          model: PhongChieu,
+          as: 'phongChieu',
+          where: phongWhere,
+          include: [
+            {
+              model: Rap,
+              as: 'rap'
+            }]
+        }
+      ]
+    });
 
     // map to structured response: rap, phong, suatChieu list
     const map = {};
@@ -76,12 +101,34 @@ export const getRapsForMovieDate = async (req, res) => {
       const pc = r.phongChieu;
       const rap = pc?.rap;
       if (!rap) continue;
-      if (!map[rap.maRap]) map[rap.maRap] = { maRap: rap.maRap, tenRap: rap.tenRap, phongChieus: {} };
-      if (!map[rap.maRap].phongChieus[pc.maPhong]) map[rap.maRap].phongChieus[pc.maPhong] = { maPhong: pc.maPhong, tenPhong: pc.tenPhong, suatChieus: [] };
-      map[rap.maRap].phongChieus[pc.maPhong].suatChieus.push({ maSuatChieu: r.maSuatChieu, gioBatDau: r.gioBatDau, gioKetThuc: r.gioKetThuc, giaVeCoBan: r.giaVeCoBan });
+      if (!map[rap.maRap]) {
+        map[rap.maRap] = {
+          maRap: rap.maRap,
+          tenRap: rap.tenRap,
+          phongChieus: {}
+        };
+      }
+      if (!map[rap.maRap].phongChieus[pc.maPhong]) {
+        map[rap.maRap].phongChieus[pc.maPhong] = {
+          maPhong: pc.maPhong,
+          tenPhong: pc.tenPhong,
+          suatChieus: []
+        };
+      }
+      map[rap.maRap].phongChieus[pc.maPhong].suatChieus.push({
+        maSuatChieu: r.maSuatChieu,
+        gioBatDau: r.gioBatDau,
+        gioKetThuc: r.gioKetThuc,
+        giaVeCoBan: r.giaVeCoBan
+      });
     }
 
-    const result = Object.values(map).map(r => ({ ...r, phongChieus: Object.values(r.phongChieus) }));
+    const result = Object.values(map).map(r => (
+      {
+        ...r,
+        phongChieus: Object.values(r.phongChieus)
+      }
+    ));
     return res.json(result);
   } catch (error) {
     console.error('getRapsForMovieDate error:', error);
@@ -89,7 +136,7 @@ export const getRapsForMovieDate = async (req, res) => {
   }
 };
 
-// GET /api/suatchieu/lich-chieu-rap?maRap=1&date=2025-10-22
+
 export const getLichChieuByRapDate = async (req, res) => {
   try {
     const { maRap, date } = req.query;

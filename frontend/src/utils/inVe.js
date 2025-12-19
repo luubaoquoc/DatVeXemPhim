@@ -4,6 +4,12 @@ export const inVe = (booking) => {
   const rap = suat.phongChieu.rap;
   const phong = suat.phongChieu;
 
+  console.log(suat);
+  console.log(phim);
+  console.log(rap);
+  console.log(phong);
+
+
   let html = `
     <html>
     <head>
@@ -16,7 +22,7 @@ export const inVe = (booking) => {
         .rap-info p { margin: 4px 0 0 0; font-size: 20px; }
         .title { font-size: 28px; font-weight: bold; text-align: center; margin-bottom: 30px; }
         .ma-ve, .ngay-chieu { font-size: 20px; margin-bottom: 10px; }
-        .phim-info { display: flex; justify-content: space-between; font-size: 22px; margin-bottom: 10px; }
+        .phim-info { display: flex; justify-content: space-between; font-size: 22px; }
         .phim-info .phim { font-size: 22px; font-weight: bold; }
         .phong-ghe { display: flex; justify-content: space-between; font-size: 22px; margin-bottom: 20px; border-bottom: 1px dashed #333; padding-bottom: 10px; }
         .qr { text-align: center; margin: 20px 0; }
@@ -49,7 +55,7 @@ export const inVe = (booking) => {
 
         <div class="phim-info">
           <p class="phim">Phim: ${phim.tenPhim}</p>
-          <p><b>Giá vé:</b> ${item.giaVe.toLocaleString()} VND</p>
+          <p><b>Giá vé:</b> ${item?.giaVe?.toLocaleString()} VND</p>
         </div>
 
         <div class="phong-ghe">
