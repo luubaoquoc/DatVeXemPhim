@@ -216,7 +216,7 @@ const Navbar = () => {
           <button onClick={() => setShowLogin(true)}
             className='px-4 py-1 sm:px-7 sm:py-2 bg-primary hover:bg-primary-dull transition
          rounded-full font-medium cursor-pointer'>
-            Login
+            Đăng Nhập
           </button>) : (
           <div
             className="relative group"

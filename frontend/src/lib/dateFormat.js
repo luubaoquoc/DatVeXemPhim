@@ -2,17 +2,18 @@ export const dateFormat = (date) => {
   const d = new Date(date)
 
   const datePart = d.toLocaleDateString('vi-VN', {
-    weekday: 'short',
+    weekday: 'long',
+    year: 'numeric',
     month: 'long',
     day: 'numeric'
   })
 
-  const timePart = d.toLocaleTimeString('vi-VN', {
-    hour: '2-digit',
-    minute: '2-digit'
-  })
+  // const timePart = d.toLocaleTimeString('vi-VN', {
+  //   hour: '2-digit',
+  //   minute: '2-digit'
+  // })
 
-  return `${timePart} ${datePart}`
+  return ` ${datePart}`
 }
 
 export const formatDate = (date) => {

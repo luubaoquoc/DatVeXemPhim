@@ -61,21 +61,21 @@ const DanhGiaModal = ({ maPhim, open, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-black/80 rounded-xl p-6 w-full max-w-md relative border border-primary/30 shadow-2xl">
+      <div className="bg-black/80 rounded-xl p-6 w-full max-w-[400px] relative border border-primary/30 shadow-2xl">
 
         {/* Close button */}
         <button
-          className="absolute top-3 right-3 text-gray-300 hover:text-white cursor-pointer"
+          className="absolute top-3 right-3 text-gray-300 hover:text-red-400 cursor-pointer"
           onClick={onClose}
         >
           <X size={22} />
         </button>
 
         <div className="flex justify-center mb-4">
-          <img src={movie.poster} alt={movie.tenPhim} className="max-h-88 w-full rounded-lg" />
+          <img src={movie.poster} alt={movie.tenPhim} className="max-h-88 rounded-lg" />
         </div>
 
-        <h2 className="text-lg font-semibold mb-4 text-primary text-center">{movie.tenPhim}</h2>
+        <h2 className="text-2xl font-semibold mb-4 text-primary text-center">{movie.tenPhim}</h2>
 
         <div className="flex justify-center items-center gap-2 mb-4">
           <div className="flex flex-col border rounded-full p-4 items-center justify-center
@@ -107,19 +107,19 @@ const DanhGiaModal = ({ maPhim, open, onClose }) => {
         {/* Submit */}
         <div className="flex justify-center mt-3 gap-4">
           <button onClick={onClose}
-            className="bg-gray-300 hover:bg-gray-400 text-gray-800 py-3 px-6 rounded-lg font-medium transition cursor-pointer">
+            className="bg-gray-300 hover:bg-gray-400 text-gray-800 py-2 px-3 rounded-lg font-medium transition cursor-pointer">
             Đóng
           </button>
           <button
             onClick={handleSubmit}
             disabled={loading}
-            className={` p-3 rounded-lg font-medium transition flex justify-center items-center gap-2 cursor-pointer
-            ${loading ? "bg-primary/60 cursor-not-allowed" : "bg-primary hover:bg-primary-dull"}`}
+            className={` p-2 rounded-lg font-medium transition flex justify-center items-center gap-2 cursor-pointer
+            ${loading ? "bg-primary/60 cursor-not-allowed" : "bg-primary-dull hover:bg-primary"}`}
           >
             {loading && (
               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
             )}
-            {loading ? "Đang gửi..." : "Gửi đánh giá"}
+            {loading ? "Đang gửi..." : "Đánh giá"}
           </button>
 
         </div>

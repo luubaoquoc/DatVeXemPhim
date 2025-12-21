@@ -4,6 +4,9 @@ import { Op } from 'sequelize';
 
 export const listSuatChieus = async (req, res) => {
   try {
+
+    const { maVaiTro, maRap } = req.user || {};
+
     const page = Math.max(1, Number(req.query.page) || 1);
     const limit = Math.max(1, Number(req.query.limit) || 20);
     const search = req.query.search || "";
@@ -11,6 +14,8 @@ export const listSuatChieus = async (req, res) => {
     const offset = (page - 1) * limit;
     const filterPhong = req.query.maPhong || "";
     const filterDate = req.query.date || "";
+
+
     const where = {
       ...(search && { '$phim.tenPhim$': { [Op.like]: `%${search}%` } }),
       ...(filterPhong && { maPhong: filterPhong }),
@@ -22,6 +27,10 @@ export const listSuatChieus = async (req, res) => {
           ]
         }
       })
+    }
+    const phongWhere = {};
+    if (maVaiTro === 3 && maRap) {
+      phongWhere.maRap = maRap;
     }
 
     const { count, rows } = await SuatChieu.findAndCountAll(
@@ -36,6 +45,7 @@ export const listSuatChieus = async (req, res) => {
           {
             model: PhongChieu,
             as: 'phongChieu',
+            where: phongWhere,
             attributes: ['maPhong', 'tenPhong']
           }
         ],
@@ -85,6 +95,7 @@ export const getRapsForMovieDate = async (req, res) => {
         {
           model: PhongChieu,
           as: 'phongChieu',
+          required: true,
           where: phongWhere,
           include: [
             {
@@ -180,8 +191,10 @@ export const getLichChieuByRapDate = async (req, res) => {
 
       map[phim.maPhim].suatChieus.push({
         maSuatChieu: sc.maSuatChieu,
-        gioBatDau: sc.gioBatDau
-      });
+        gioBatDau: sc.gioBatDau,
+        maPhong: sc.phongChieu.maPhong,
+        tenPhong: sc.phongChieu.tenPhong
+      })
     }
 
     res.json(Object.values(map));
@@ -202,7 +215,7 @@ export const getSuatChieu = async (req, res) => {
         {
           model: Phim,
           as: 'phim',
-          attributes: ['maPhim', 'tenPhim', 'poster']
+          attributes: ['maPhim', 'tenPhim', 'poster', 'phanLoai']
         },
         {
           model: PhongChieu,

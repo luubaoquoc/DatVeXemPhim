@@ -5,9 +5,12 @@ import useApi from "../../hooks/useApi"
 import Pagination from "../../components/admin/Paginnation"
 import DeleteForm from "../../components/admin/DeleteForm"
 import SearchInput from "../../components/SearchInput"
+import { useSelector } from "react-redux"
 
 const QuanLyTaiKhoan = () => {
   const api = useApi(true)
+
+  const user = useSelector((state) => state.auth.user)
 
   const [taiKhoans, setTaiKhoans] = useState([])
   const [vaiTros, setVaiTros] = useState([])
@@ -158,6 +161,22 @@ const QuanLyTaiKhoan = () => {
     setShowModal(true)
   }
 
+  const filteredVaiTros = vaiTros.filter(vaiTro => {
+    // Admin: thấy tất cả
+    if (user?.vaiTro === 4) return true;
+
+    // Quản lý rạp: chỉ thấy NV rạp + QL rạp
+    if (user?.vaiTro === 3) {
+      return vaiTro.maVaiTro === 2 || vaiTro.maVaiTro === 3;
+    }
+
+    return false;
+  });
+
+  const filteredRaps = user?.vaiTro === 4
+    ? raps
+    : raps.filter(rap => rap.maRap === user.maRap);
+
   console.log(taiKhoans);
 
 
@@ -192,27 +211,30 @@ const QuanLyTaiKhoan = () => {
           }}
         >
           <option value="">Tất cả vai trò</option>
-          {vaiTros.map(vaiTro => (
+          {filteredVaiTros.map(vaiTro => (
             <option key={vaiTro.maVaiTro} value={vaiTro.maVaiTro}>
               {vaiTro.tenVaiTro}
             </option>
           ))}
         </select>
-        <select
-          className="border border-primary/70 px-3 py-2 bg-black h-[3rem] outline-none cursor-pointer"
-          value={filterRap}
-          onChange={(e) => {
-            setFilterRap(e.target.value);
-            setCurrentPage(1);
-          }}
-        >
-          <option value="">Tất cả rạp</option>
-          {raps.map(rap => (
-            <option key={rap.maRap} value={rap.maRap}>
-              {rap.tenRap}
-            </option>
-          ))}
-        </select>
+        {user.vaiTro == 4 && (
+
+          <select
+            className="border border-primary/70 px-3 py-2 bg-black h-[3rem] outline-none cursor-pointer"
+            value={filterRap}
+            onChange={(e) => {
+              setFilterRap(e.target.value);
+              setCurrentPage(1);
+            }}
+          >
+            <option value="">Tất cả rạp</option>
+            {raps.map(rap => (
+              <option key={rap.maRap} value={rap.maRap}>
+                {rap.tenRap}
+              </option>
+            ))}
+          </select>
+        )}
       </div>
 
       {/* Table */}
@@ -334,7 +356,7 @@ const QuanLyTaiKhoan = () => {
                   onChange={handleChange}
                 >
                   <option value="">-- Chọn vai trò --</option>
-                  {vaiTros.map((vaiTro) => (
+                  {filteredVaiTros.map((vaiTro) => (
                     <option key={vaiTro.maVaiTro} value={vaiTro.maVaiTro}>
                       {vaiTro.tenVaiTro}
                     </option>
@@ -353,7 +375,7 @@ const QuanLyTaiKhoan = () => {
                     required={isRapRequired}
                   >
                     <option value="">-- Chọn rạp --</option>
-                    {raps.map((rap) => (
+                    {filteredRaps.map((rap) => (
                       <option key={rap.maRap} value={rap.maRap}>
                         {rap.tenRap}
                       </option>

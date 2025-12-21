@@ -105,7 +105,7 @@ const BanVeTaiQuay = () => {
       console.log(res.data);
 
 
-      await inVe(res.data);
+      inVe(res.data);
 
       setTimeout(() => {
         toast.success("In vé thành công!");
@@ -114,7 +114,7 @@ const BanVeTaiQuay = () => {
         setSelectedSeats([]);
         setSelectedShow(null);
         setSelectedMovie(null);
-      }, 2000);
+      }, 5000);
     } catch (err) {
       console.error(err);
       toast.error("Thanh toán lỗi");

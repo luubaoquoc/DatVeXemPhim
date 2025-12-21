@@ -46,9 +46,9 @@ export const inVe = (booking) => {
 
         <div class="title">VÉ XEM PHIM</div>
 
-        <div class="qr">
-          <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${item.maChiTiet}" />
-        </div>
+         <div class="qr">
+           <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${item.maChiTiet}" />
+         </div>
 
         <p class="ma-ve"><b>Mã vé:</b> ${item.maChiTiet}</p>
         <p class="ngay-chieu"><b>Ngày chiếu:</b> ${suat.gioBatDau}</p>

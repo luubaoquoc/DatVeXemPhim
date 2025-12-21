@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import anhRap from "../assets/anhRap.jpg";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchPhims } from "../redux/features/phimSlice";
 import { useNavigate } from "react-router-dom";
@@ -71,6 +72,10 @@ const GioiThieu = () => {
           <p className="mt-10 text-2xl text-gray-200 font-semibold">
             <span className="text-primary">Go Cinema</span> – Nơi trải nghiệm điện ảnh thăng hoa!
           </p>
+
+          <div className="w-full mt-5">
+            <img src={anhRap} alt="anh rạp" className="w-full rounded-md" />
+          </div>
         </div>
 
 

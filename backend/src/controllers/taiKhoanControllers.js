@@ -9,8 +9,12 @@ import { Op } from 'sequelize';
 // GET /api/taikhoan?page=1&limit=20
 export const listUsers = async (req, res) => {
   try {
+
+    const { maVaiTro: roleUser, maRap: rapUser } = req.user;
+
     const maVaiTro = req.query.maVaiTro || "";
     const maRap = req.query.maRap || "";
+
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const search = req.query.search || "";
@@ -18,9 +22,25 @@ export const listUsers = async (req, res) => {
     const offset = (page - 1) * limit;
     const whereOp = {
       ...(search && { hoTen: { [Op.like]: `%${search}%` } }),
-      ...(maVaiTro && { maVaiTro: maVaiTro }),
-      ...(maRap && { maRap: maRap }),
+      ...(maVaiTro && { maVaiTro }),
     };
+
+    //  Admin: xem tất cả
+    if (roleUser === 4) {
+      if (maRap) {
+        whereOp.maRap = maRap;
+      }
+    }
+
+    //  Quản lý rạp: chỉ xem user thuộc rạp của mình
+    else if (roleUser === 3) {
+      whereOp.maRap = rapUser;
+    }
+
+    //  Role khác không được phép
+    else {
+      return res.status(403).json({ message: "Không có quyền truy cập" });
+    }
 
 
     // Lấy danh sách tài khoản với phân trang
@@ -63,7 +83,16 @@ export const listVaiTro = async (req, res) => {
 
 export const createTaiKhoan = async (req, res) => {
   try {
+
+    const { maVaiTro: roleUser, maRap: rapUser } = req.user;
     const { hoTen, email, matKhau, soDienThoai, maVaiTro, maRap } = req.body;
+
+    if (roleUser === 3 && ![2, 3].includes(Number(maVaiTro))) {
+      return res.status(403).json({ message: "Không có quyền gán vai trò này" });
+    }
+    if (roleUser === 3 && Number(maRap) !== Number(rapUser)) {
+      return res.status(403).json({ message: "Không thể tạo user cho rạp khác" });
+    }
     if (!hoTen || !email || !matKhau) {
       return res.status(400).json({ message: 'Vui lòng cung cấp đầy đủ thông tin' });
     }
@@ -112,14 +141,31 @@ export const getUser = async (req, res) => {
 // PUT /api/taikhoan/:maTaiKhoan
 export const updateUser = async (req, res) => {
   try {
+    const { maVaiTro: roleUser, maRap: rapUser } = req.user;
     const ma = Number(req.params.maTaiKhoan);
+
+
+
+
     if (!ma) return res.status(400).json({ message: 'maTaiKhoan không hợp lệ' });
 
     const user = await TaiKhoan.findByPk(ma);
     if (!user) return res.status(404).json({ message: 'Người dùng không tồn tại' });
 
+
+
     // chỉ cho sửa các trường sau
     const { hoTen, email, soDienThoai, maVaiTro, maRap } = req.body;
+
+    //  Quản lý rạp không được gán role khác 2,3
+    if (roleUser === 3 && maVaiTro && ![2, 3].includes(Number(maVaiTro))) {
+      return res.status(403).json({ message: "Không có quyền gán vai trò này" });
+    }
+
+    //  Quản lý rạp chỉ sửa user trong rạp của mình
+    if (roleUser === 3 && user.maRap !== rapUser) {
+      return res.status(403).json({ message: "Không có quyền sửa tài khoản rạp khác" });
+    }
 
     if (soDienThoai && (soDienThoai.length < 10 || soDienThoai.length > 10)) {
       return res.status(400).json({ message: 'Số điện thoại không hợp lệ' });

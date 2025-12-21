@@ -5,9 +5,12 @@ import useApi from "../../hooks/useApi"
 import Pagination from "../../components/admin/Paginnation"
 import DeleteForm from "../../components/admin/DeleteForm"
 import SearchInput from "../../components/SearchInput"
+import { useSelector } from "react-redux"
 
 const PhongChieu = () => {
   const api = useApi(true)
+
+  const user = useSelector((state) => state.auth.user)
 
   const [phongchieus, setPhongChieus] = useState([])
   const [raps, setRaps] = useState([])
@@ -140,21 +143,23 @@ const PhongChieu = () => {
         />
 
         {/*Lọc Rạp */}
-        <select
-          className="border border-primary/70 px-3 py-2 bg-black h-[3rem] outline-none cursor-pointer"
-          value={filterStatus}
-          onChange={(e) => {
-            setFilterStatus(e.target.value);
-            setCurrentPage(1);
-          }}
-        >
-          <option value="">Tất cả rạp</option>
-          {
-            raps.map(rap => (
-              <option key={rap.maRap} value={rap.maRap}>{rap.tenRap}</option>
-            ))
-          }
-        </select>
+        {user?.vaiTro === 4 && (
+          <select
+            className="border border-primary/70 px-3 py-2 bg-black h-[3rem] outline-none cursor-pointer"
+            value={filterStatus}
+            onChange={(e) => {
+              setFilterStatus(e.target.value);
+              setCurrentPage(1);
+            }}
+          >
+            <option value="">Tất cả rạp</option>
+            {
+              raps.map(rap => (
+                <option key={rap.maRap} value={rap.maRap}>{rap.tenRap}</option>
+              ))
+            }
+          </select>
+        )}
       </div>
       {/* Table */}
 

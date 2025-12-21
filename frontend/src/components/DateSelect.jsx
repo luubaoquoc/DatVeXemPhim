@@ -8,7 +8,7 @@ import { ChevronLeftIcon, ChevronRightIcon, Type } from 'lucide-react'
 // - maPhim: movie id (for booking button)
 // - selected: optional controlled selected date (YYYY-MM-DD)
 // - onSelect: optional callback(date) when user picks a date
-const DateSelect = ({ dateTime, selected: selectedProp, onSelect }) => {
+const DateSelect = ({ selected: selectedProp, onSelect }) => {
 
 
 
@@ -53,8 +53,8 @@ const DateSelect = ({ dateTime, selected: selectedProp, onSelect }) => {
             <ChevronLeftIcon width={28} />
             <span className='grid grid-cols-3 md:flex flex-wrap md:max-w-lg gap-4'>
               {dates.map((date) => {
-                const shows = dateTime?.[date] || []
-                const hasShows = Array.isArray(shows) && shows.length > 0
+                // const shows = dateTime?.[date] || []
+                // const hasShows = Array.isArray(shows) && shows.length > 0
                 // Dates are always selectable; if no shows, show muted style
                 return (
                   <button
@@ -64,7 +64,7 @@ const DateSelect = ({ dateTime, selected: selectedProp, onSelect }) => {
                       else setInternalSelected(date)
                     }}
                     className={`relative flex flex-col items-center justify-center h-14 w-14
-                aspect-square rounded cursor-pointer ${selected === date ? 'bg-primary text-white' : 'border border-primary/70'} ${!hasShows ? 'opacity-80' : ''}`}>
+                aspect-square rounded cursor-pointer ${selected === date ? 'bg-primary text-white' : 'border border-primary/70'} `}>
                     <span className='text-lg'>{new Date(date).getDate()}</span>
                     <span className='text-xs'>{new Date(date).toLocaleDateString('vi-VN', { month: 'short' })}</span>
                     {/* optional badge for counts

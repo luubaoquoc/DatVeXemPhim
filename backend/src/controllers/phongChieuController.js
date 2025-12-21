@@ -41,12 +41,17 @@ const generateSeats = (maPhong, tongSoGhe) => {
 export const listPhongChieu = async (req, res) => {
   try {
 
-    const maRap = req.query.maRap || "";
+    const { maVaiTro, maRap: maRapUser } = req.user || {};
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const search = req.query.search || "";
 
     const offset = (page - 1) * limit;
+
+    let maRap = req.query.maRap;
+    if (maVaiTro === 3) {
+      maRap = maRapUser;
+    }
     const whereOp = {
       ...(search && { tenPhong: { [Op.like]: `%${search}%` } }),
       ...(maRap && { maRap: maRap })

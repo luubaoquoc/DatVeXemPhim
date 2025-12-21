@@ -6,9 +6,14 @@ import SearchInput from "../../components/SearchInput";
 import Pagination from "../../components/admin/Paginnation";
 import DeleteForm from "../../components/admin/DeleteForm";
 import ChiTietDonDatVe from "../../components/admin/ChiTietDonDatVe";
+import { useSelector } from "react-redux";
 
 const QuanLyDonDatVe = () => {
   const api = useApi(true);
+
+  const user = useSelector((state) => state.auth.user)
+
+
 
   const [donDatVe, setDonDatVe] = useState([])
   const [loading, setLoading] = useState(true)
@@ -169,11 +174,13 @@ const QuanLyDonDatVe = () => {
                     <Eye size={20} />
                   </button>
 
-                  <DeleteForm
-                    title="Đơn Đặt Vé"
-                    itemName={order.maDatVe}
-                    onDelete={() => handleDelete(order.maDatVe)}
-                  />
+                  {user?.vaiTro !== 2 && (
+                    <DeleteForm
+                      title="Đơn Đặt Vé"
+                      itemName={order.maDatVe}
+                      onDelete={() => handleDelete(order.maDatVe)}
+                    />
+                  )}
                 </td>
               </tr>
             ))

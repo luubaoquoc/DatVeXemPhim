@@ -3,6 +3,9 @@ import sequelize from '../configs/sequelize.js';
 import ChiTietDatVe from '../models/ChiTietDatVe.js';
 import { DatVe, Ghe, Phim, PhongChieu, Rap, SuatChieu, TaiKhoan, ThanhToan } from '../models/index.js';
 import { sendVerificationEmail } from '../utils/sendEmail.js';
+
+
+const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:5173';
 /**
  *  MoMo IPN callback
  */
@@ -61,8 +64,11 @@ export const createVNPay = async (req, res) => {
 //  Xử lý callback từ VNPay
 export const vnpayReturn = async (req, res) => {
   const t = await sequelize.transaction();
+  const params = req.query
+  const orderId = params.vnp_TxnRef
+  const vnp_ResponseCode = params.vnp_ResponseCode
+  const success = params.vnp_ResponseCode === "00";
   try {
-    const params = req.query
     const isValid = verifyVNPayReturn(params)
 
     if (!isValid) {
@@ -70,8 +76,6 @@ export const vnpayReturn = async (req, res) => {
       return res.status(400).json({ message: 'Sai chữ ký trả về VNPay' })
     }
 
-    const orderId = params.vnp_TxnRef
-    const vnp_ResponseCode = params.vnp_ResponseCode
 
     const datVe = await DatVe.findOne({
       where: { maDatVe: orderId },
@@ -81,7 +85,7 @@ export const vnpayReturn = async (req, res) => {
 
     if (!datVe) {
       await t.rollback();
-      return res.status(404).json({ message: 'Không tìm thấy đơn đặt vé' });
+      return res.status(404).json({ message: 'Không tìm thấy đơn đặt vé hoặc đã hết hạn' });
     }
 
     const thanhToan = await ThanhToan.findOne({
@@ -89,7 +93,7 @@ export const vnpayReturn = async (req, res) => {
       transaction: t
     });
 
-    const success = params.vnp_ResponseCode === "00";
+
 
     await datVe.update({ trangThai: success ? "Thành công" : "Thất bại" }, { transaction: t });
     await thanhToan.update({ trangThai: success ? "Thành công" : "Thất bại" }, { transaction: t });
@@ -100,7 +104,14 @@ export const vnpayReturn = async (req, res) => {
 
     await t.commit();
 
-    // 2. Lấy thông tin vé để gửi mail – KHÔNG LOCK
+  } catch (error) {
+    await t.rollback();
+    console.error('vnpayReturn error:', error)
+    return res.status(500).json({ message: 'Lỗi xử lý callback VNPay' })
+  }
+
+  // 2. Lấy thông tin vé để gửi mail – KHÔNG LOCK
+  try {
     const fullOrder = await DatVe.findOne({
       where: { maDatVe: orderId },
       include: [
@@ -167,17 +178,16 @@ export const vnpayReturn = async (req, res) => {
           <p><b>Ghế:</b> ${soGhe}</p>
           <p><b>Tổng tiền:</b> ${(Number(params.vnp_Amount) / 100).toLocaleString('vi-VN')} VND</p>
           <p><b>Thời gian thanh toán:</b> ${(params.vnp_PayDate).toLocaleString('vi-VN')}</p>
-        `
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${orderId}" />
+          `
     })
 
 
     //  Redirect về frontend
-    return res.redirect(`http://localhost:5173/lich-su-dat-ve?status=${vnp_ResponseCode}`)
   } catch (error) {
-    await t.rollback();
-    console.error('vnpayReturn error:', error)
-    return res.status(500).json({ message: 'Lỗi xử lý callback VNPay' })
+    console.error('vnpayReturn email error:', error);
   }
+  return res.redirect(`${CLIENT_URL}/dat-ve-thanh-cong?status=${vnp_ResponseCode}&maDatVe=${orderId}`);
 }
 
 /**

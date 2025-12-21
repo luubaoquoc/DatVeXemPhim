@@ -40,6 +40,7 @@ import ChinhSachBaoMat from './pages/ChinhSachBaoMat'
 import LichChieu from './pages/LichChieu'
 import ChiTietLichChieu from './pages/ChiTietLichChieu'
 import Rap from './pages/Rap'
+import DatVeThanhCong from './pages/DatVeThanhCong'
 
 const App = () => {
 
@@ -71,6 +72,16 @@ const App = () => {
               <SoDoGheNgoi />
             </ProtectedRoute>
           } />
+
+
+        <Route
+          path="/dat-ve-thanh-cong"
+          element={
+            <ProtectedRoute>
+              <DatVeThanhCong />
+            </ProtectedRoute>
+          }
+        />
 
         <Route
           path='/trang-ca-nhan'

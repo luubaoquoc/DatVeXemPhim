@@ -13,7 +13,6 @@ import {
 import {
   authenticateToken,
   hasRole,
-  isAdmin,
   isSelfOrManagerOrAdmin
 } from '../middleware/authMiddleware.js';
 

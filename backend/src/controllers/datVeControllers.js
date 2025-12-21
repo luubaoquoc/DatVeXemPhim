@@ -12,6 +12,9 @@ import { Op } from 'sequelize';
 // GET /api/don-dat-ve
 export const getAllDatVe = async (req, res) => {
   try {
+
+    const { maVaiTro, maRap } = req.user || {};
+
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const search = req.query.search?.trim() || "";
@@ -19,6 +22,14 @@ export const getAllDatVe = async (req, res) => {
 
     const offset = (page - 1) * limit;
 
+    let phongWhere = undefined;
+
+    if (maVaiTro === 3 || maVaiTro === 2) {
+      if (!maRap) {
+        return res.status(403).json({ message: "Tài khoản chưa gán rạp" });
+      }
+      phongWhere = { maRap };
+    }
     // WHERE conditions
     let whereOp = {};
 
@@ -40,7 +51,25 @@ export const getAllDatVe = async (req, res) => {
       whereOp.trangThai = "Thất bại";
     }
 
-    const totalItems = await DatVe.count({ where: whereOp });
+    const totalItems = await DatVe.count({
+      where: whereOp,
+      include: [
+        {
+          model: SuatChieu,
+          as: "suatChieu",
+          required: true,
+          include: [
+            {
+              model: PhongChieu,
+              as: "phongChieu",
+              required: true,
+              ...(phongWhere && { where: phongWhere })
+            }
+          ]
+        }
+      ],
+      distinct: true
+    });
 
     const datVes = await DatVe.findAll({
       where: whereOp,
@@ -60,18 +89,27 @@ export const getAllDatVe = async (req, res) => {
         {
           model: SuatChieu,
           as: "suatChieu",
+          required: true,
           attributes: ["maSuatChieu", "gioBatDau", "gioKetThuc"],
           include: [
             {
               model: Phim,
               as: "phim",
+              required: true,
               attributes: ["maPhim", "tenPhim", "poster"]
             },
             {
               model: PhongChieu,
               as: "phongChieu",
+              required: true,
               attributes: ["maPhong", "tenPhong", "maRap"],
-              include: [{ model: Rap, as: 'rap', attributes: ['maRap', 'tenRap', 'diaChi'] }]
+              ...(phongWhere ? { where: phongWhere } : {}),
+              include: [
+                {
+                  model: Rap,
+                  as: 'rap',
+                  attributes: ['maRap', 'tenRap', 'diaChi']
+                }]
             }
           ]
         },
@@ -415,23 +453,59 @@ export const createCheckoutForDatVe = async (req, res) => {
 
 
 // GET /api/datve/:maDatVe - get booking detail (owner or admin)
-// export const getDatVe = async (req, res) => {
-//   try {
-//     const ma = Number(req.params.maDatVe);
-//     if (!ma) return res.status(400).json({ message: 'maDatVe không hợp lệ' });
-//     const datVe = await DatVe.findByPk(ma);
-//     if (!datVe) return res.status(404).json({ message: 'Đặt vé không tồn tại' });
-//     // check ownership
-//     if (req.user.maTaiKhoan !== datVe.maTaiKhoan && req.user.maVaiTro !== 4) return res.status(403).json({ message: 'Không có quyền truy cập' });
-//     const result = datVe.get({ plain: true });
-//     // expose parsed seat labels as array for convenience
-//     result.soGheList = result.soGhe ? String(result.soGhe).split(',').map(s => s.trim()).filter(Boolean) : [];
-//     return res.json(result);
-//   } catch (error) {
-//     console.error('getDatVe error:', error);
-//     return res.status(500).json({ message: 'Lỗi server' });
-//   }
-// };
+export const getDatVe = async (req, res) => {
+  try {
+    const maDatVe = Number(req.params.maDatVe)
+    if (!maDatVe) {
+      return res.status(400).json({ message: 'maDatVe không hợp lệ' })
+    }
+
+    const datVe = await DatVe.findOne({
+      where: { maDatVe },
+      include: [
+        {
+          model: SuatChieu,
+          as: 'suatChieu',
+          include: [
+            { model: Phim, as: 'phim' },
+            {
+              model: PhongChieu,
+              as: 'phongChieu',
+              include: [{ model: Rap, as: 'rap' }]
+            }
+          ]
+        },
+        {
+          model: ChiTietDatVe,
+          as: 'chiTietDatVes',
+          include: [{ model: Ghe, as: 'ghe' }]
+        },
+        {
+          model: ThanhToan,
+          as: 'thanhToan'
+        }
+      ]
+    })
+
+    if (!datVe) {
+      return res.status(404).json({ message: 'Đặt vé không tồn tại' })
+    }
+
+    // kiểm tra quyền
+    if (
+      datVe.maTaiKhoanDatVe !== req.user.maTaiKhoan &&
+      req.user.maVaiTro !== 4
+    ) {
+      return res.status(403).json({ message: 'Không có quyền truy cập' })
+    }
+
+    return res.json(datVe)
+  } catch (error) {
+    console.error('getDatVe error:', error)
+    return res.status(500).json({ message: 'Lỗi server' })
+  }
+}
+
 
 export const deleteDatVe = async (req, res) => {
   try {

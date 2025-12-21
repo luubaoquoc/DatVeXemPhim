@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import useApi from "../../hooks/useApi";
 import toast from "react-hot-toast";
 import { RefreshCw } from "lucide-react";
-import GheLayout from "../../components/gheLayout";
+import GheLayout from "../../components/GheLayout";
 
 const QuanLyGhe = () => {
   const api = useApi(true);

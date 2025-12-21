@@ -17,7 +17,7 @@ import Dangnhap from '../components/Dangnhap.jsx'
 
 const ChiTietPhim = () => {
   const { maPhim } = useParams()
-  const publicApi = useApi(false)
+  // const publicApi = useApi(false)
   const api = useApi(true)
   const navigate = useNavigate()
   const dispatch = useDispatch()
@@ -25,7 +25,7 @@ const ChiTietPhim = () => {
   const movie = useSelector((state) => state.phim.current)
   const allMovies = useSelector(state => state.phim.items || [])
   const currentStatus = useSelector((state) => state.phim.currentStatus)
-  const [dateTimeMap, setDateTimeMap] = useState({})
+  // const [dateTimeMap, setDateTimeMap] = useState({})
   const [selectedDate, setSelectedDate] = useState(null)
   const [showTrailer, setShowTrailer] = useState(false)
   const [liked, setLiked] = useState(false)
@@ -63,79 +63,87 @@ const ChiTietPhim = () => {
 
 
   // fetch available dates for this movie from suatchieu API
+  // useEffect(() => {
+  //   const formatLocalDate = (d) => {
+  //     const y = d.getFullYear()
+  //     const m = String(d.getMonth() + 1).padStart(2, '0')
+  //     const day = String(d.getDate()).padStart(2, '0')
+  //     return `${y}-${m}-${day}`
+  //   }
+  //   const getDates = async () => {
+  //     const resolvedMaPhim = (movie && (movie.maPhim || movie.maPhim === 0))
+  //       ? movie.maPhim
+  //       : (Number(maPhim) || null)
+  //     if (!resolvedMaPhim) return setDateTimeMap({})
+
+  //     try {
+  //       const res = await publicApi.get('/suatchieu', { params: { maPhim: resolvedMaPhim, page: 1, limit: 200 } })
+  //       const rows = res.data?.data || res.data || []
+  //       const map = {}
+  //       const toLocalDate = (iso) => {
+  //         if (!iso) return null
+  //         const d = new Date(iso)
+  //         const y = d.getFullYear()
+  //         const m = String(d.getMonth() + 1).padStart(2, '0')
+  //         const day = String(d.getDate()).padStart(2, '0')
+  //         return `${y}-${m}-${day}`
+  //       }
+
+  //       rows.forEach(r => {
+  //         const dt = r.gioBatDau ? toLocalDate(r.gioBatDau) : null
+  //         if (!dt) return
+  //         if (!map[dt]) map[dt] = []
+  //         map[dt].push({
+  //           maSuatChieu: r.maSuatChieu,
+  //           gioBatDau: r.gioBatDau,
+  //           giaVeCoBan: r.giaVeCoBan
+  //         })
+  //       })
+
+  //       // ✅ Lọc chỉ lấy ngày chiếu từ hôm nay trở đi (bỏ qua suất chiếu đã qua)
+  //       const today = new Date()
+  //       today.setHours(0, 0, 0, 0)
+
+  //       const filteredMap = {}
+  //       Object.keys(map)
+  //         .filter(k => {
+  //           const d = new Date(k)
+  //           d.setHours(0, 0, 0, 0)
+  //           return d >= today
+  //         })
+  //         .sort((a, b) => new Date(a) - new Date(b))
+  //         .forEach(k => {
+  //           filteredMap[k] = map[k]
+  //         })
+
+  //       setDateTimeMap(filteredMap)
+
+  //       // ✅ Nếu hôm nay có suất chiếu thì chọn hôm nay, nếu không thì chọn ngày gần nhất kế tiếp
+  //       if (filteredMap[formatLocalDate(today)]) {
+  //         setSelectedDate(formatLocalDate(today))
+  //       } else if (Object.keys(filteredMap).length > 0) {
+  //         setSelectedDate(Object.keys(filteredMap)[0])
+  //       } else {
+  //         setSelectedDate(null)
+  //       }
+  //     } catch (err) {
+  //       console.error('Lỗi khi lấy ngày chiếu', err)
+  //       setDateTimeMap({})
+  //       setSelectedDate(new Date().toLocaleDateString('sv-SE'))
+  //     }
+  //   }
+  //   getDates()
+  // }, [movie, maPhim])
+
   useEffect(() => {
-    const formatLocalDate = (d) => {
-      const y = d.getFullYear()
-      const m = String(d.getMonth() + 1).padStart(2, '0')
-      const day = String(d.getDate()).padStart(2, '0')
-      return `${y}-${m}-${day}`
+    if (!selectedDate) {
+      const today = new Date()
+      const yyyy = today.getFullYear()
+      const mm = String(today.getMonth() + 1).padStart(2, '0')
+      const dd = String(today.getDate()).padStart(2, '0')
+      setSelectedDate(`${yyyy}-${mm}-${dd}`)
     }
-    const getDates = async () => {
-      const resolvedMaPhim = (movie && (movie.maPhim || movie.maPhim === 0))
-        ? movie.maPhim
-        : (Number(maPhim) || null)
-      if (!resolvedMaPhim) return setDateTimeMap({})
-
-      try {
-        const res = await publicApi.get('/suatchieu', { params: { maPhim: resolvedMaPhim, page: 1, limit: 200 } })
-        const rows = res.data?.data || res.data || []
-        const map = {}
-        const toLocalDate = (iso) => {
-          if (!iso) return null
-          const d = new Date(iso)
-          const y = d.getFullYear()
-          const m = String(d.getMonth() + 1).padStart(2, '0')
-          const day = String(d.getDate()).padStart(2, '0')
-          return `${y}-${m}-${day}`
-        }
-
-        rows.forEach(r => {
-          const dt = r.gioBatDau ? toLocalDate(r.gioBatDau) : null
-          if (!dt) return
-          if (!map[dt]) map[dt] = []
-          map[dt].push({
-            maSuatChieu: r.maSuatChieu,
-            gioBatDau: r.gioBatDau,
-            giaVeCoBan: r.giaVeCoBan
-          })
-        })
-
-        // ✅ Lọc chỉ lấy ngày chiếu từ hôm nay trở đi (bỏ qua suất chiếu đã qua)
-        const today = new Date()
-        today.setHours(0, 0, 0, 0)
-
-        const filteredMap = {}
-        Object.keys(map)
-          .filter(k => {
-            const d = new Date(k)
-            d.setHours(0, 0, 0, 0)
-            return d >= today
-          })
-          .sort((a, b) => new Date(a) - new Date(b))
-          .forEach(k => {
-            filteredMap[k] = map[k]
-          })
-
-        setDateTimeMap(filteredMap)
-
-        // ✅ Nếu hôm nay có suất chiếu thì chọn hôm nay, nếu không thì chọn ngày gần nhất kế tiếp
-        if (filteredMap[formatLocalDate(today)]) {
-          setSelectedDate(formatLocalDate(today))
-        } else if (Object.keys(filteredMap).length > 0) {
-          setSelectedDate(Object.keys(filteredMap)[0])
-        } else {
-          setSelectedDate(null)
-        }
-      } catch (err) {
-        console.error('Lỗi khi lấy ngày chiếu', err)
-        setDateTimeMap({})
-        setSelectedDate(new Date().toLocaleDateString('sv-SE'))
-      }
-    }
-    getDates()
-  }, [movie, maPhim])
-
-
+  }, [])
 
 
   if (!movie || currentStatus === 'loading') return <Loading />
@@ -152,6 +160,14 @@ const ChiTietPhim = () => {
   const genres = movie.theLoais || []
   const runtime = movie.thoiLuong || movie.runtime || 0
   const releaseYear = formatDate(movie.ngayCongChieu)
+
+  const handleDanhGiaClick = () => {
+    if (!user) {
+      setShowLoginModal(true);  // mở modal đăng nhập
+      return;
+    }
+    setShowDanhGia(true);
+  }
 
   const toggleLike = async () => {
     if (!user) {
@@ -201,7 +217,7 @@ const ChiTietPhim = () => {
                 </span>
               </p>
 
-              <div onClick={() => setShowDanhGia(true)}
+              <div onClick={handleDanhGiaClick}
                 className="flex items-center gap-2 text-gray-400 cursor-pointer hover:text-primary transition">
                 <StarIcon className="size-5 text-primary fill-primary" />
                 {movie.rating}
@@ -260,11 +276,11 @@ const ChiTietPhim = () => {
                 <button
                   onClick={toggleLike}
                   className={`p-2.5 rounded-full transition active:scale-95 cursor-pointer
-    ${liked ? "bg-red-600" : "bg-gray-700"}`}
+                ${liked ? "bg-red-600" : "bg-gray-700"}`}
                 >
                   <Heart
                     className={`size-5 transition
-      ${liked ? "text-red-400 fill-red-400" : ""}`}
+                ${liked ? "text-red-400 fill-red-400" : ""}`}
                   />
                 </button>
 
@@ -283,7 +299,7 @@ const ChiTietPhim = () => {
           {/* Lịch chiếu */}
           <div id="dateSelect" className="mt-4">
             <DateSelect
-              dateTime={dateTimeMap}
+              // dateTime={dateTimeMap}
               maPhim={maPhim}
               selected={selectedDate}
               onSelect={setSelectedDate}

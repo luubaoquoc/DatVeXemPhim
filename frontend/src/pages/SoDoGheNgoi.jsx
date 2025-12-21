@@ -142,6 +142,7 @@ const SoDoGheNgoi = () => {
     }
   }
 
+  console.log('Show info:', show);
 
 
   // Giao diện chính
@@ -158,6 +159,13 @@ const SoDoGheNgoi = () => {
             <span className='text-sm text-gray-300'>-</span>
             <p className='text-sm text-gray-300'>Phòng: <span className='text-primary'>{show.phongChieu?.tenPhong || 'N/A'}</span></p>
           </div>
+        </div>
+        <div className="flex flex-wrap gap-4 items-center justify-center text-sm mt-5">
+          <div className="flex items-center gap-2"><div className="w-4 h-4 bg-primary-dull rounded" />Ghế đã bán</div>
+          <div className="flex items-center gap-2"><div className="w-4 h-4 bg-primary rounded" /> Ghế đang chọn</div>
+          <div className="flex items-center gap-2"><div className="w-4 h-4 bg-primary/20 rounded" /> Ghế trống</div>
+          <div className="flex items-center gap-2"><div className="w-4 h-4 bg-red-500 rounded" /> Khóa / Hỏng</div>
+
         </div>
 
         {/* Layout ghế */}
@@ -186,6 +194,7 @@ const SoDoGheNgoi = () => {
           rap={show.phongChieu?.rap}
           poster={show.phim?.poster}
           date={show.gioBatDau}
+          phanLoai={show.phim?.phanLoai}
           seats={seats}
           selectedSeats={selectedSeats}
           selectedTime={selectedTime}

@@ -141,7 +141,7 @@ const SuatChieu = ({ maPhim, date }) => {
                 {(rap.phongChieus || []).map((phong) => (
                   <div
                     key={phong.maPhong || phong.id || phong.tenPhong}
-                    className='mb-2'
+                    className='mb-2 flex flex-row items-center gap-6'
                   >
                     <div className='text-sm font-medium mb-2'>
                       {phong.tenPhong || phong.name || 'Phòng'}
@@ -157,7 +157,7 @@ const SuatChieu = ({ maPhim, date }) => {
                           className={`px-3 py-1 rounded text-sm border cursor-pointer
                             ${sc.isDisabled
                               ? 'bg-gray-700/50 text-gray-400 border-gray-600 cursor-not-allowed'
-                              : 'bg-white/5 hover:bg-primary/90 border-primary/30'
+                              : 'bg-white/5 hover:bg-primary/90 border-primary/30 cursor-pointer'
                             }`}
                         >
                           {sc.gioBatDau

@@ -5,7 +5,7 @@ import { authenticateToken, hasRole, optionalAuth } from '../middleware/authMidd
 const router = express.Router();
 
 
-router.get('/', listSuatChieus);
+router.get('/', authenticateToken, hasRole(3, 4), listSuatChieus);
 router.get('/raps', optionalAuth, getRapsForMovieDate);
 router.get('/lich-chieu-rap', getLichChieuByRapDate);
 router.get('/:maSuatChieu', getSuatChieu);

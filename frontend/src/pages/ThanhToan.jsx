@@ -5,6 +5,27 @@ import useApi from '../hooks/useApi'
 import momo from '../assets/vi-momo.jpg'
 import vnpay from '../assets/vnpay.png'
 import ThongoTinDatVe from '../components/ThongTinDatVe'
+import XacNhanTuoiModal from '../components/XacNhanTuoiModal'
+
+const AGE_RULES = {
+  P: {
+    age: 0,
+    message: null
+  },
+  T13: {
+    age: 13,
+    message: 'Tôi xác nhận mua vé phim này cho người có độ tuổi từ 13 tuổi trở lên và đồng ý cung cấp giấy tờ tuỳ thân để xác minh độ tuổi.'
+  },
+  T16: {
+    age: 16,
+    message: 'Tôi xác nhận mua vé phim này cho người có độ tuổi từ 16 tuổi trở lên và đồng ý cung cấp giấy tờ tuỳ thân để xác minh độ tuổi.'
+  },
+  C18: {
+    age: 18,
+    message: 'Tôi xác nhận mua vé phim này cho người có độ tuổi từ 18 tuổi trở lên và đồng ý cung cấp giấy tờ tuỳ thân để xác minh độ tuổi.'
+  }
+}
+
 
 const ThanhToan = () => {
   const { state } = useLocation()
@@ -26,7 +47,10 @@ const ThanhToan = () => {
   });
   const api = useApi(true)
 
-  const { maSuatChieu, date, selectedSeats = [], pricePerSeat = 0, movie = {} } = state
+  const { maSuatChieu, date, selectedSeats = [], pricePerSeat = 0, phim } = state
+  const [showAgeModal, setShowAgeModal] = useState(false)
+  const [ageMessage, setAgeMessage] = useState('')
+
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -42,7 +66,7 @@ const ThanhToan = () => {
     }, 1000)
 
     return () => clearInterval(timer)
-  }, [navigate, maSuatChieu, date, movie.maPhim])
+  }, [navigate, maSuatChieu, date, phim.maPhim])
 
 
   if (!state) {
@@ -87,8 +111,11 @@ const ThanhToan = () => {
       if (res.data.redirectUrl) {
         window.location.href = res.data.redirectUrl // 👉 chuyển sang trang thanh toán
       } else {
-        toast.success(res.data?.message || 'Đặt vé thành công')
-        navigate('/lich-su-dat-ve')
+        navigate('/dat-ve-thanh-cong', {
+          state: {
+            booking: res.data.data
+          }
+        })
       }
     } catch (err) {
       console.error(err)
@@ -96,6 +123,23 @@ const ThanhToan = () => {
       toast.error(msg)
     }
   }
+
+  const handleClickThanhToan = () => {
+    const phanLoai = phim?.phanLoai || state?.phim?.phanLoai || 'P'
+    const rule = AGE_RULES[phanLoai]
+
+    // Phim P → không cần xác nhận
+    if (!rule || rule.age === 0) {
+      handleConfirm()
+      return
+    }
+
+    // Phim có giới hạn tuổi
+    setAgeMessage(rule.message)
+    setShowAgeModal(true)
+  }
+
+  console.log('Phân loại phim:', phim?.phanLoai)
 
 
 
@@ -180,10 +224,12 @@ const ThanhToan = () => {
           giaVeCoBan={state.pricePerSeat}
           timeLeft={timeLeft}
           onBack={() => navigate(-1)}
-          onAction={handleConfirm}
+          onAction={handleClickThanhToan}
           actionLabel="Thanh toán"
         />
       </div>
+      {showAgeModal && <XacNhanTuoiModal doTuoi={phim.phanLoai} ageMessage={ageMessage} setShowAgeModal={setShowAgeModal} handleConfirm={handleConfirm} />}
+
     </div>
 
   )

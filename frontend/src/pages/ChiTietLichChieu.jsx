@@ -55,6 +55,33 @@ const ChiTietLichChieu = () => {
     fetchLichChieu()
   }, [maRap, dateSelected])
 
+  console.log(phims);
+
+  const isPastShowtime = (gioBatDau, dateSelected) => {
+    const now = new Date()
+
+    const showTime = new Date(gioBatDau)
+
+    // nếu không phải hôm nay → luôn hợp lệ
+    const todayStr = now.toISOString().slice(0, 10)
+    if (dateSelected !== todayStr) return false
+
+    return showTime <= now
+  }
+
+  const groupByPhong = (suatChieus) => {
+    const map = {}
+    suatChieus.forEach(sc => {
+      if (!map[sc.maPhong]) {
+        map[sc.maPhong] = {
+          tenPhong: sc.tenPhong,
+          suatChieus: []
+        }
+      }
+      map[sc.maPhong].suatChieus.push(sc)
+    })
+    return Object.values(map)
+  }
   return (
     <div className="px-6 md:px-16 lg:px-40 py-34">
       {rap && (
@@ -107,21 +134,42 @@ const ChiTietLichChieu = () => {
               </p>
               <p className='text-sm text-gray-400'>Nội dung: {phim.noiDung.slice(0, 150)}...</p>
               <div className="flex flex-wrap gap-3 mt-4">
-                {phim.suatChieus.map(sc => (
-                  <button
-                    key={sc.maSuatChieu}
-                    className="px-4 py-2 border border-primary rounded
-                           hover:bg-primary hover:text-white transition cursor-pointer"
-                    onClick={() =>
-                      navigate(`/chon-ghe/${sc.maSuatChieu}`)
-                    }
-                  >
-                    {new Date(sc.gioBatDau).toLocaleTimeString('vi-VN', {
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })}
-                  </button>
+                {groupByPhong(phim.suatChieus).map(phong => (
+                  <div key={phong.tenPhong} className="mt-4 border-l-4 border-primary/50 pl-4">
+                    <p className="text-sm font-medium text-gray-300 mb-2">
+                      {phong.tenPhong}
+                    </p>
+
+                    <div className="flex flex-wrap gap-3">
+                      {phong.suatChieus.map(sc => {
+                        const isPast = isPastShowtime(sc.gioBatDau, dateSelected)
+
+                        return (
+                          <button
+                            key={sc.maSuatChieu}
+                            disabled={isPast}
+                            className={` px-4 py-2 border rounded transition
+                            ${isPast
+                                ? 'bg-gray-700/50 text-gray-400 border-gray-600 cursor-not-allowed'
+                                : 'bg-white/5 hover:bg-primary/90 border-primary/30 cursor-pointer'
+                              }
+            `}
+                            onClick={() => {
+                              if (!isPast) navigate(`/chon-ghe/${sc.maSuatChieu}`)
+                            }}
+                          >
+                            {new Date(sc.gioBatDau).toLocaleTimeString('vi-VN', {
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
                 ))}
+
+
               </div>
             </div>
           </div>
