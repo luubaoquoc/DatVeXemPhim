@@ -119,11 +119,11 @@ const ChiTietLichChieu = () => {
           key={phim.maPhim}
           className="mt-10 border-b pb-6"
         >
-          <div className="flex gap-4 items-center">
+          <div className="flex gap-4 items-center max-md:items-start flex-col md:flex-row">
             <img
               src={phim.poster}
               alt={phim.tenPhim}
-              className="w-28 h-40 object-cover rounded"
+              className="w-28 h-40 object-contain rounded"
             />
             <div className='space-y-2'>
               <h2 className="text-xl font-semibold">
@@ -153,7 +153,7 @@ const ChiTietLichChieu = () => {
                                 ? 'bg-gray-700/50 text-gray-400 border-gray-600 cursor-not-allowed'
                                 : 'bg-white/5 hover:bg-primary/90 border-primary/30 cursor-pointer'
                               }
-            `}
+                          `}
                             onClick={() => {
                               if (!isPast) navigate(`/chon-ghe/${sc.maSuatChieu}`)
                             }}

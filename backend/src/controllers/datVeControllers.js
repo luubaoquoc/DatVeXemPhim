@@ -1,3 +1,4 @@
+import e from 'express';
 import sequelize from '../configs/sequelize.js';
 import createMoMoPayment from '../helpers/momo.js';
 import createStripePayment from '../helpers/stripe.js';
@@ -5,6 +6,7 @@ import { createVNPayPayment } from '../helpers/VNPay.js';
 import ChiTietDatVe from '../models/ChiTietDatVe.js';
 import { DatVe, Ghe, Phim, PhongChieu, Rap, SuatChieu, TaiKhoan, ThanhToan } from '../models/index.js';
 import { Op } from 'sequelize';
+import { xoaVeHetHan } from '../crons/xoaVeHetHan.js';
 
 
 
@@ -157,6 +159,8 @@ export const createDatVe = async (req, res) => {
     const maGheList = chiTiet.map(g => g.maGhe);
     console.log(maGheList);
 
+
+    await xoaVeHetHan(maSuatChieu);
 
     //  1. Check ghế đã có người giữ chưa
     const conflict = await ChiTietDatVe.findAll({
@@ -333,9 +337,25 @@ export const listMyDatVes = async (req, res) => {
   }
 };
 
+export const getGheDangDat = async (req, res) => {
+  const maDatVe = Number(req.params.maDatVe);
+
+  const rows = await ChiTietDatVe.findAll({
+    where: { maDatVe },
+    include: [{ model: Ghe, as: 'ghe' }]
+  });
+
+  const seats = rows.map(r => `${r.ghe.hang}${r.ghe.soGhe}`);
+
+  res.json(seats);
+};
+
 export const getGheDaDat = async (req, res) => {
   try {
     const maSuatChieu = Number(req.params.maSuatChieu);
+    const maDatVe = req.query.maDatVe ? Number(req.query.maDatVe) : null;
+
+    await xoaVeHetHan(maSuatChieu);
 
     const rows = await ChiTietDatVe.findAll({
       include: [
@@ -344,7 +364,12 @@ export const getGheDaDat = async (req, res) => {
           as: 'datVe', // alias đã define trong association
           where: {
             maSuatChieu,
-            trangThai: { [Op.in]: ['Đang chờ', 'Đang thanh toán', 'Thành công'] }
+            trangThai: { [Op.in]: ['Đang chờ', 'Đang thanh toán', 'Thành công'] },
+            [Op.or]: [
+              { trangThai: 'Thanh công' },
+              { thoiHanThanhToan: { [Op.gt]: new Date() } },
+            ],
+            ...(maDatVe ? { maDatVe: { [Op.ne]: maDatVe } } : {}) // exclude current booking if maDatVe provided
           },
           attributes: []
         },
@@ -372,6 +397,23 @@ export const getGheDaDat = async (req, res) => {
     console.error(">>> LỖI getGheDaDat:", e);
     return res.status(500).json({ message: 'Lỗi server', error: e.message });
   }
+};
+
+export const capNhatGheDangDat = async (req, res) => {
+  const { seats } = req.body;
+  const maDatVe = req.params.maDatVe;
+
+  await ChiTietDatVe.destroy({ where: { maDatVe } });
+
+  await ChiTietDatVe.bulkCreate(
+    seats.map(s => ({
+      maDatVe,
+      maGhe: s.maGhe,
+      giaVe: s.giaVe
+    }))
+  );
+
+  res.json({ message: 'Cập nhật ghế thành công' });
 };
 
 // POST /api/datve/:maDatVe/checkout  - create payment redirect for an existing pending booking

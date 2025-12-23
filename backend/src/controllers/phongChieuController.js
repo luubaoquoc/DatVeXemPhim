@@ -2,6 +2,7 @@ import PhongChieu from "../models/PhongChieu.js";
 import Ghe from "../models/Ghe.js";
 import { Op } from "sequelize";
 import Rap from "../models/Rap.js";
+import SuatChieu from "../models/SuatChieu.js";
 
 // Tính layout dựa theo tổng số ghế
 const getLayoutFromTotal = (total) => {
@@ -35,6 +36,24 @@ const generateSeats = (maPhong, tongSoGhe) => {
   return seats;
 };
 
+
+const hasFutureShowtime = async (maPhong) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const count = await SuatChieu.count({
+    where: {
+      maPhong,
+      gioBatDau: {
+        [Op.gte]: today
+      }
+    }
+  });
+
+  return count > 0;
+};
+
+
 /* =======================================
    1. LẤY DANH SÁCH PHÒNG CHIẾU
 ======================================= */
@@ -45,6 +64,7 @@ export const listPhongChieu = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const search = req.query.search || "";
+    const trangThai = req.query.trangThai || "";
 
     const offset = (page - 1) * limit;
 
@@ -54,7 +74,8 @@ export const listPhongChieu = async (req, res) => {
     }
     const whereOp = {
       ...(search && { tenPhong: { [Op.like]: `%${search}%` } }),
-      ...(maRap && { maRap: maRap })
+      ...(maRap && { maRap: maRap }),
+      ...(trangThai && { trangThai: trangThai })
     };
 
     const totalItems = await PhongChieu.count({ where: whereOp });
@@ -84,13 +105,13 @@ export const listPhongChieu = async (req, res) => {
    2. THÊM MỚI PHÒNG CHIẾU + GENERATE GHẾ
 ======================================= */
 export const themMoiPhongChieu = async (req, res) => {
-  const { maRap, tenPhong, tongSoGhe } = req.body;
+  const { maRap, tenPhong, tongSoGhe, trangThai } = req.body;
   if (!maRap || !tenPhong || !tongSoGhe)
     return res.status(400).json({ message: "Vui lòng điền đầy đủ tất cả các trường" });
 
   try {
     // 1. tạo phòng
-    const phong = await PhongChieu.create({ maRap, tenPhong, tongSoGhe });
+    const phong = await PhongChieu.create({ maRap, tenPhong, tongSoGhe, trangThai });
 
     // 2. tạo seat
     const seats = generateSeats(phong.maPhong, tongSoGhe);
@@ -112,11 +133,17 @@ export const themMoiPhongChieu = async (req, res) => {
 ======================================= */
 export const suaPhongChieu = async (req, res) => {
   const { maPhong } = req.params;
-  const { maRap, tenPhong, tongSoGhe } = req.body;
+  const { maRap, tenPhong, tongSoGhe, trangThai } = req.body;
 
   try {
     const phong = await PhongChieu.findByPk(maPhong);
     if (!phong) return res.status(404).json({ message: "Không tìm thấy phòng" });
+
+    // kiểm tra có suất chiếu tương lai ko
+    const hasShowtime = await hasFutureShowtime(maPhong);
+    if (hasShowtime) {
+      return res.status(400).json({ message: "Phòng có suất chiếu tương lai, không thể sửa" });
+    }
 
     const oldTotal = phong.tongSoGhe;
 
@@ -125,6 +152,7 @@ export const suaPhongChieu = async (req, res) => {
       maRap: maRap ?? phong.maRap,
       tenPhong: tenPhong ?? phong.tenPhong,
       tongSoGhe: tongSoGhe ?? phong.tongSoGhe,
+      trangThai: trangThai ?? phong.trangThai
     });
 
     // 2. nếu thay đổi tổng số ghế → update lại ghế
@@ -154,6 +182,12 @@ export const xoaPhongChieu = async (req, res) => {
   try {
     const phong = await PhongChieu.findByPk(maPhong);
     if (!phong) return res.status(404).json({ message: "Không tìm thấy phòng" });
+
+    // kiểm tra có suất chiếu tương lai ko
+    const hasShowtime = await hasFutureShowtime(maPhong);
+    if (hasShowtime) {
+      return res.status(400).json({ message: "Phòng có suất chiếu tương lai, không thể xóa" });
+    }
 
     await Ghe.destroy({ where: { maPhong } });
     await PhongChieu.destroy({ where: { maPhong } });

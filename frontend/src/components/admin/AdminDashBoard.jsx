@@ -77,6 +77,12 @@ const AdminDashboard = () => {
       return;
     }
 
+    if (filterType === "date" && (!from || !to)) {
+      return;
+    }
+
+    if (filterType === "month" && (!month || !year)) return;
+    if (filterType === "year" && !year) return;
     try {
       const res = await api.get("/admin/dashboard/filter", {
         params: { type: filterType, from, to, month, year, maRap },
@@ -102,6 +108,14 @@ const AdminDashboard = () => {
   useEffect(() => {
     fetchFilter();
   }, [filterType, from, to, month, year, maRap]);
+
+
+  useEffect(() => {
+    setFrom("");
+    setTo("");
+    setMonth("");
+    setYear("");
+  }, [filterType]);
 
 
 
@@ -170,7 +184,7 @@ const AdminDashboard = () => {
 
   return (
     <div className="p-6 text-white">
-      <h1 className="text-3xl font-semibold mb-6">Tổng quan • GoCinema</h1>
+      <h1 className="text-3xl font-semibold mb-6 max-md:text-2xl">Tổng quan • GoCinema</h1>
 
       <select
         value={maRap}
@@ -213,7 +227,7 @@ const AdminDashboard = () => {
       </div>
 
       {/* FILTER */}
-      <div className="flex gap-3 mb-6 items-center">
+      <div className="flex flex-wrap gap-3 mb-6 items-center">
         <select
           value={filterType}
           className="bg-black border border-primary px-3 py-2 rounded"
@@ -276,7 +290,7 @@ const AdminDashboard = () => {
 
 
       {/* BIỂU ĐỒ */}
-      <div className="flex flex-col md:flex-row gap-3">
+      <div className="flex flex-col lg:flex-row gap-3">
         <div className="bg-black border border-primary p-6 rounded-xl flex-2">
           <h2 className="text-xl mb-4 font-semibold">
             {filterType === "7days"

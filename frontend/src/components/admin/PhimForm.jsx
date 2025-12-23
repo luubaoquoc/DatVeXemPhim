@@ -151,7 +151,7 @@ const PhimForm = ({ onSubmit, onClose, editPhim }) => {
 
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-      <div className="bg-black/90 border border-primary p-6 rounded-xl w-[950px] text-white overflow-y-auto no-scrollbar max-h-[90vh]">
+      <div className="bg-black/90 border border-primary p-6 rounded-xl w-[950px] text-white overflow-y-auto no-scrollbar max-h-[90vh] max-md:m-4">
 
         <h2 className="text-2xl font-semibold mb-4 text-center text-primary">
           {editPhim ? 'Sửa phim' : 'Thêm phim mới'}
@@ -160,7 +160,7 @@ const PhimForm = ({ onSubmit, onClose, editPhim }) => {
         <form onSubmit={handleSubmit} className="space-y-4">
 
           {/* Tên phim */}
-          <div className='grid grid-cols-2 gap-4'>
+          <div className='grid md:grid-cols-2 gap-4'>
             <div className='flex flex-col gap-3'>
               <div>
                 <label className='block mb-1 font-medium text-primary'>Tên phim</label>
@@ -254,7 +254,7 @@ const PhimForm = ({ onSubmit, onClose, editPhim }) => {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid md:grid-cols-2 gap-4">
             <div>
               <label className="block mb-1 font-medium text-primary">Thời lượng (phút)</label>
               <input

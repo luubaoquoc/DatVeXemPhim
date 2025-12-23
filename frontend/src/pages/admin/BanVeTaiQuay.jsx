@@ -125,7 +125,7 @@ const BanVeTaiQuay = () => {
     <div className="p-6 text-white">
       <BlurCircle top='100px' left='100px' />
       <BlurCircle bottom='0px' right='100px' />
-      <h1 className="text-3xl font-bold mb-6">Bán vé tại quầy (POS)</h1>
+      <h1 className="text-3xl font-bold mb-6 max-md:text-2xl">Bán vé tại quầy (POS)</h1>
 
       {step === 1 && (
         <DanhSachPhim

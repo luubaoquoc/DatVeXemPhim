@@ -25,7 +25,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { NavLink } from 'react-router-dom'
 import { logout } from '../../redux/features/authSlice'
 
-const AdminSidebar = () => {
+const AdminSidebar = ({ onClose }) => {
   const user = useSelector((state) => state.auth.user)
   const dispatch = useDispatch()
 
@@ -157,8 +157,9 @@ const AdminSidebar = () => {
               <NavLink
                 to={link.path}
                 end
+                onClick={() => onClose?.()}
                 className={({ isActive }) =>
-                  `relative flex items-center justify-start max-md:justify-center gap-3 w-full py-2.5 px-6 text-gray-300 font-semibold transition-all
+                  `relative flex items-center justify-start max-md:justify-center gap-2 w-full py-2.5 px-6 text-gray-300 font-semibold transition-all
                    ${isActive
                     ? 'bg-primary/20 text-primary border-r-2'
                     : 'text-gray-300 hover:bg-primary/20 hover:text-white'}`
@@ -174,7 +175,7 @@ const AdminSidebar = () => {
                   onClick={() => toggleMenu(link.name)}
                   className='flex items-center justify-between w-full px-4 md:px-6 py-2.5 text-gray-300 font-semibold hover:bg-primary/20 transition-all cursor-pointer'
                 >
-                  <div className='flex items-center gap-3'>
+                  <div className='flex items-center gap-2'>
                     <link.icon className='size-5 shrink-0' />
                     <p className='max-md:hidden truncate'>{link.name}</p>
                   </div>
@@ -192,8 +193,9 @@ const AdminSidebar = () => {
                       <NavLink
                         key={i}
                         to={child.path}
+                        onClick={() => onClose?.()}
                         className={({ isActive }) =>
-                          `relative flex items-center gap-3 w-full py-2.5 pl-6 transition-all
+                          `relative flex items-center gap-2 w-full py-2.5 pl-6 transition-all
                            ${isActive
                             ? 'bg-primary/20 text-primary border-r-2'
                             : 'text-gray-400 hover:text-white hover:bg-primary/10'}`

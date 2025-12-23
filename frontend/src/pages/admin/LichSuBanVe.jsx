@@ -54,7 +54,7 @@ const LichSuBanVe = () => {
 
   return (
     <div className="p-6 text-white">
-      <h1 className="text-3xl font-bold mb-6">Lịch sử bán vé</h1>
+      <h1 className="text-3xl font-bold mb-6 max-md:text-2xl">Lịch sử bán vé</h1>
 
       {/* Bộ lọc */}
       <div className="flex flex-wrap gap-3 mb-4">
@@ -118,7 +118,17 @@ const LichSuBanVe = () => {
                   {order.tongTien.toLocaleString()} VND
                 </td>
 
-                <td className="p-2">{order.trangThai}</td>
+                <td className="p-2">
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-semibold
+                    ${order.trangThai === "Thành công"
+                        ? "bg-green-500/10 text-green-400 border border-green-500/40"
+                        : "bg-red-500/10 text-red-400 border border-red-500/40"}
+                    `}
+                  >
+                    {order.trangThai}
+                  </span>
+                </td>
 
                 <td className="p-2 flex items-center justify-center">
                   <button onClick={() => {

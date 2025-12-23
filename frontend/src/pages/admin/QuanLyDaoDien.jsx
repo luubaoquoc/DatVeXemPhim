@@ -141,13 +141,13 @@ const DaoDien = () => {
   return (
     <div className="p-6 text-white">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-semibold">Quản lý Đạo diễn</h1>
+        <h1 className="text-3xl font-semibold max-md:text-2xl">Quản lý Đạo diễn</h1>
 
         <button
           onClick={() => openModal()}
           className="bg-primary px-4 py-2 rounded flex items-center gap-2 hover:bg-primary/80 cursor-pointer"
         >
-          <PlusIcon size={18} /> Thêm đạo diễn
+          <PlusIcon size={18} /> <span className="max-md:hidden">Thêm đạo diễn</span>
         </button>
       </div>
 
@@ -218,7 +218,7 @@ const DaoDien = () => {
       {/* MODAL */}
       {showModal && (
         <div className="fixed inset-0 bg-black/80 flex justify-center items-center z-50">
-          <div className="bg-black/80 border border-primary p-6 rounded-lg w-96">
+          <div className="bg-black/80 border border-primary p-6 rounded-lg w-96 max-md:m-4">
             <h2 className="text-2xl font-semibold mb-4 text-primary text-center">
               {editItem ? "Sửa đạo diễn" : "Thêm đạo diễn"}
             </h2>

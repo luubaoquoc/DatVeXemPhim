@@ -1,7 +1,24 @@
 import { Op } from 'sequelize';
-import { Phim, DanhGia, TheLoai, DienVien, DaoDien, TaiKhoan, Phim_UaThich } from '../models/index.js';
+import { Phim, DanhGia, TheLoai, DienVien, DaoDien, TaiKhoan, Phim_UaThich, SuatChieu } from '../models/index.js';
 import cloudinary from '../configs/cloudinary.js';
 import streamifier from 'streamifier'
+
+
+
+const hasFutureShowtime = async (maPhim) => {
+  const now = new Date();
+
+  const count = await SuatChieu.count({
+    where: {
+      maPhim,
+      gioBatDau: {
+        [Op.gte]: now
+      }
+    }
+  });
+
+  return count > 0;
+};
 
 
 // GET /api/phim?page=1&limit=20&q=keyword
@@ -183,6 +200,11 @@ export const updatePhim = async (req, res) => {
     const phim = await Phim.findByPk(maPhim)
     if (!phim) return res.status(404).json({ message: 'Phim không tồn tại' })
 
+    const hasFuture = await hasFutureShowtime(maPhim);
+    if (hasFuture) {
+      return res.status(400).json({ message: 'Phim có suất chiếu tương lai, không thể sửa' });
+    }
+
     let {
       tenPhim,
       moTa,
@@ -264,6 +286,11 @@ export const deletePhim = async (req, res) => {
     const { maPhim } = req.params;
     const phim = await Phim.findByPk(maPhim);
     if (!phim) return res.status(404).json({ message: 'Phim không tồn tại' });
+
+    const hasFuture = await hasFutureShowtime(maPhim);
+    if (hasFuture) {
+      return res.status(400).json({ message: 'Phim có suất chiếu tương lai, không thể xóa' });
+    }
 
     await phim.destroy();
     res.json({ message: 'Xóa phim thành công' });

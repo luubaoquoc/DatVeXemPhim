@@ -4,7 +4,7 @@ import { fetchPhims } from "../redux/features/phimSlice";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import MoviesCard from "../components/MoviesCard";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Mail, Phone, PhoneCall } from "lucide-react";
 
 const ChinhSachBaoMat = () => {
 
@@ -122,9 +122,11 @@ const ChinhSachBaoMat = () => {
             Nếu bạn có bất kỳ câu hỏi nào liên quan đến chính sách bảo mật, vui lòng liên hệ:
           </p>
           <p className="mt-2 text-gray-400">
-            📧 Email: gocinema.support@gmail.com
+            <Mail className="inline-block mr-2  size-5" />
+            Email: gocinema.@gmail.com
             <br />
-            📞 Hotline: 0939 779 138
+            <PhoneCall className="inline-block mr-2 text-red-400 size-5" />
+            Hotline: 0939 779 138
           </p>
 
           <p className="mt-10 text-2xl text-gray-200 font-semibold">

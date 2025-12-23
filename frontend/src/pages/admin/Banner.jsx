@@ -96,12 +96,12 @@ const Banner = () => {
   return (
     <div className="p-6 text-white">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-semibold mb-6">Quản lý Banner</h1>
+        <h1 className="text-3xl font-semibold mb-6 max-md:text-2xl">Quản lý Banner</h1>
         <button
           onClick={() => openModal()}
           className="bg-primary text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-primary/80 transition cursor-pointer"
         >
-          <PlusIcon size={18} /> Thêm banner
+          <PlusIcon size={18} /> <span className="max-md:hidden">Thêm banner</span>
         </button>
       </div>
 
@@ -146,7 +146,7 @@ const Banner = () => {
       {/* Modal thêm/sửa */}
       {showModal && (
         <div className="fixed inset-0 bg-black/80 flex justify-center items-center z-50">
-          <div className="bg-black/80 border border-primary p-6 rounded-lg w-96">
+          <div className="bg-black/80 border border-primary p-6 rounded-lg w-96 max-md:m-4">
             <h2 className="text-3xl font-semibold mb-4 text-primary text-center">
               {editItem ? 'Sửa Ảnh Banner' : 'Thêm Ảnh Banner'}
             </h2>

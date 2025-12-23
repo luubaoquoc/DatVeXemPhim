@@ -27,6 +27,18 @@ const SuatChieuPOS = ({ maPhim, date, onSelectShow }) => {
     if (maPhim && date) fetchRaps();
   }, [maPhim, date]);
 
+  const isPastShowtime = (gioBatDau, date) => {
+    const now = new Date()
+
+    const showTime = new Date(gioBatDau)
+
+    // nếu không phải hôm nay → luôn hợp lệ
+    const todayStr = now.toISOString().slice(0, 10)
+    if (date !== todayStr) return false
+
+    return showTime <= now
+  }
+
   if (loading) return <div className="text-gray-300 p-4">Đang tải...</div>;
 
   if (raps.length === 0)
@@ -43,18 +55,29 @@ const SuatChieuPOS = ({ maPhim, date, onSelectShow }) => {
               <h3 className="text-lg font-medium">{phong.tenPhong}</h3>
 
               <div className="flex flex-wrap gap-3 mt-2">
-                {phong.suatChieus.map((sc) => (
-                  <button
-                    key={sc.maSuatChieu}
-                    onClick={() => onSelectShow(sc.maSuatChieu)}
-                    className="px-3 py-2 bg-gray-800 hover:bg-primary transition rounded text-sm"
-                  >
-                    {new Date(sc.gioBatDau).toLocaleTimeString("vi-VN", {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </button>
-                ))}
+                {phong.suatChieus.map((sc) => {
+
+                  const isPast = isPastShowtime(sc.gioBatDau, date);
+
+                  return (
+                    <button
+                      key={sc.maSuatChieu}
+                      disabled={isPast}
+                      onClick={() => onSelectShow(sc.maSuatChieu)}
+                      className={` px-4 py-2 border rounded transition
+                            ${isPast
+                          ? 'bg-gray-700/50 text-gray-400 border-gray-600 cursor-not-allowed'
+                          : 'bg-white/5 hover:bg-primary/90 border-primary/30 cursor-pointer'
+                        }
+                          `}
+                    >
+                      {new Date(sc.gioBatDau).toLocaleTimeString("vi-VN", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </button>
+                  )
+                })}
               </div>
             </div>
           ))}

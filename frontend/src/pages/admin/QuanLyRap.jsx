@@ -138,13 +138,13 @@ const Rap = () => {
   return (
     <div className="p-6 text-white">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-semibold">Quản lý rạp</h1>
+        <h1 className="text-3xl font-semibold max-md:text-2xl">Quản lý rạp</h1>
 
         <button
           onClick={() => { openModal() }}
           className="bg-primary text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-primary/80 transition cursor-pointer"
         >
-          <PlusIcon size={18} /> Thêm rạp
+          <PlusIcon size={18} /> <span className="max-md:hidden">Thêm rạp</span>
         </button>
       </div>
 
@@ -215,12 +215,12 @@ const Rap = () => {
 
       {showModal && (
         <div className="fixed inset-0 bg-black/80 flex justify-center items-center z-50">
-          <div className="bg-black/80 border border-primary p-6 rounded-lg w-200 overflow-y-auto max-h-[90vh]">
+          <div className="bg-black/80 border border-primary p-6 rounded-lg w-200 overflow-y-auto max-h-[90vh] max-md:m-4">
             <h2 className="text-2xl font-semibold mb-6 text-primary text-center">
               {editRap ? 'Sửa Rạp' : 'Thêm Rạp'}
             </h2>
             <form onSubmit={handleSubmit}>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <div>
                     <label className='block mb-1 font-medium text-primary'>Tên rạp</label>

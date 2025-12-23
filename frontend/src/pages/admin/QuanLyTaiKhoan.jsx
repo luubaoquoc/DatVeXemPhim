@@ -183,17 +183,17 @@ const QuanLyTaiKhoan = () => {
   return (
     <div className="p-6 text-white">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-semibold">Quản lý tài khoản</h1>
+        <h1 className="text-3xl font-semibold max-md:text-2xl">Quản lý tài khoản</h1>
 
         <button
           onClick={() => { openModal() }}
           className="bg-primary text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-primary/80 transition cursor-pointer"
         >
-          <PlusIcon size={18} /> Thêm tài khoản
+          <PlusIcon size={18} /> <span className="max-md:hidden">Thêm tài khoản</span>
         </button>
       </div>
 
-      <div className='flex flex-wrap gap-3'>
+      <div className='flex flex-wrap gap-3 mb-4'>
         <SearchInput
           search={search}
           setSearch={setSearch}
@@ -261,7 +261,7 @@ const QuanLyTaiKhoan = () => {
               <td className="p-2 text-left">{taiKhoan.vaiTro?.tenVaiTro}</td>
               <td className="p-2 text-left">{taiKhoan.rapLamViec ? taiKhoan.rapLamViec.tenRap : "-"}</td>
 
-              <td className="p-2 flex justify-center">
+              <td className="p-2">
                 <button
                   onClick={() => {
                     openModal(taiKhoan)
@@ -291,7 +291,7 @@ const QuanLyTaiKhoan = () => {
 
       {showModal && (
         <div className="fixed inset-0 bg-black/80 flex justify-center items-center z-50">
-          <div className="bg-black/80 border border-primary p-6 rounded-lg w-96">
+          <div className="bg-black/80 border border-primary p-6 rounded-lg w-96 max-md:m-4">
             <h2 className="text-2xl font-semibold mb-4 text-primary text-center">
               {editTaiKhoan ? 'Sửa tài khoản' : 'Thêm tài khoản'}
             </h2>

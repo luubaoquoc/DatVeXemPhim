@@ -52,7 +52,7 @@ const CheckInVe = () => {
 
   return (
     <div className="p-6 max-w-xl">
-      <h1 className="text-3xl font-bold mb-6 ">Quét & Check-in Vé</h1>
+      <h1 className="text-3xl font-bold mb-6 max-md:text-2xl">Quét & Check-in Vé</h1>
 
       {/* INPUT + BUTTON */}
       <div className="flex gap-2 mb-5">
@@ -60,28 +60,28 @@ const CheckInVe = () => {
           type="text"
           value={maChiTiet}
           onChange={(e) => setMaChiTiet(e.target.value)}
-          placeholder="Nhập mã đặt vé..."
+          placeholder="Nhập mã vé..."
           className="border p-3 w-3/4 rounded focus:ring focus:ring-blue-300 outline-none"
         />
 
         <button
           onClick={handleSearch}
           disabled={loading}
-          className="bg-primary hover:bg-primary-dull text-white w-1/4 font-semibold px-5 py-3 rounded flex items-center gap-2 transition cursor-pointer"
+          className="bg-primary hover:bg-primary-dull text-white w-1/4 font-semibold px-5 py-3 rounded flex items-center justify-center gap-2 transition cursor-pointer"
         >
           {loading ? (
             <span className="animate-spin border-2 border-white border-t-transparent rounded-full w-5 h-5"></span>
           ) : (
             <Search size={18} />
           )}
-          <span>Kiểm tra</span>
+          <span className="max-md:hidden">Kiểm tra</span>
         </button>
       </div>
 
       {/* ======================= MODAL THÔNG TIN VÉ ======================= */}
       {openModal && ve && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-          <div className="bg-black/80 rounded-2xl shadow-2xl w-120 p-6 border border-primary relative">
+          <div className="bg-black/80 rounded-2xl shadow-2xl w-120 p-6 max-md:m-6 border border-primary relative">
 
             {/* NÚT ĐÓNG */}
             <button
@@ -93,33 +93,33 @@ const CheckInVe = () => {
 
             <h2 className="font-bold text-2xl mb-4 flex items-center gap-2 justify-center">
               <TicketCheck className="text-blue-600" />
-              Thông tin vé
+              <span className="text-primary">Thông tin vé</span>
             </h2>
 
             <div className="space-y-3 text-gray-700">
               <p className="flex items-center gap-2 text-white">
                 <TicketCheck size={18} className="text-blue-600" />
-                <b>Mã vé:</b> {ve.maChiTiet}
+                <b className="text-primary">Mã vé:</b> {ve.maChiTiet}
               </p>
 
               <p className="flex items-center gap-2 text-white">
                 <Film size={18} className="text-red-600" />
-                <b>Tên phim:</b> {ve.datVe?.suatChieu?.phim?.tenPhim}
+                <b className="text-primary">Tên phim:</b> {ve.datVe?.suatChieu?.phim?.tenPhim}
               </p>
 
               <p className="flex items-center gap-2 text-white">
                 <Clock size={18} className="text-orange-600" />
-                <b>Suất chiếu:</b> {ve.datVe?.suatChieu?.gioBatDau}
+                <b className="text-primary">Suất chiếu:</b> {ve.datVe?.suatChieu?.gioBatDau}
               </p>
 
               <p className="flex items-center gap-2 text-white">
                 <Armchair size={18} className="text-green-600" />
-                <b>Ghế:</b>{ghe}
+                <b className="text-primary">Ghế:</b>{ghe}
 
               </p>
 
               <p>
-                <b>Trạng thái:</b>{" "}
+                <b className="text-primary">Trạng thái:</b>{" "}
                 <span
                   className={
                     ve.trangThai === "Đã check-in"

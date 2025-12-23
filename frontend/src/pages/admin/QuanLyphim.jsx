@@ -34,15 +34,15 @@ const QuanLyPhim = () => {
   const handleSubmit = async (formData) => {
     try {
       if (editPhim) {
-        await api.put(`/phim/${editPhim.maPhim}`, formData, {
+        const res = await api.put(`/phim/${editPhim.maPhim}`, formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         })
-        toast.success('Cập nhật phim thành công!')
+        toast.success(res.data.message || 'Cập nhật phim thành công!')
       } else {
-        await api.post('/phim', formData, {
+        const res = await api.post('/phim', formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         })
-        toast.success('Thêm phim thành công!')
+        toast.success(res.data.message || 'Thêm phim thành công!')
       }
       setShowModal(false)
       setEditPhim(null)
@@ -54,12 +54,12 @@ const QuanLyPhim = () => {
 
   const handleDelete = async (maPhim) => {
     try {
-      await api.delete(`/phim/${maPhim}`)
-      toast.success("Xoá phim thành công!")
+      const res = await api.delete(`/phim/${maPhim}`)
+      toast.success(res.data.message || "Xoá phim thành công!")
       dispatch(fetchPhims({ page: currentPage, limit, search }))
     } catch (err) {
       console.log(err);
-      toast.error("Xoá thất bại!")
+      toast.error(err.response?.data?.message || "Xoá thất bại!")
     }
   }
 
@@ -76,7 +76,7 @@ const QuanLyPhim = () => {
   return (
     <div className="p-6 text-white">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-semibold">Quản lý phim</h1>
+        <h1 className="text-3xl font-semibold max-md:text-2xl">Quản lý phim</h1>
         <button
           onClick={() => {
             setShowModal(true)
@@ -84,11 +84,11 @@ const QuanLyPhim = () => {
           }}
           className="bg-primary text-white px-4 py-2 rounded flex items-center gap-2 cursor-pointer hover:bg-primary/80 transition"
         >
-          <PlusIcon size={18} /> Thêm phim
+          <PlusIcon size={18} /> <span className='max-md:hidden'>Thêm phim</span>
         </button>
       </div>
 
-      <div className='flex flex-wrap gap-3'>
+      <div className='flex flex-wrap gap-3 mb-4'>
         <SearchInput
           search={search}
           setSearch={setSearch}

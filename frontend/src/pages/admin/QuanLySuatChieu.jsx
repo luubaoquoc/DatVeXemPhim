@@ -93,12 +93,12 @@ const QuanLySuatChieu = () => {
   return (
     <div className="p-6 text-white">
       <div className="flex justify-between mb-6">
-        <h1 className="text-3xl font-semibold">Quản lý suất chiếu</h1>
+        <h1 className="text-3xl font-semibold max-md:text-2xl">Quản lý suất chiếu</h1>
         <button
           className="bg-primary px-4 py-2 rounded flex items-center gap-2 cursor-pointer hover:bg-primary/80 text-white"
           onClick={() => { setShowModal(true); setEditItem(null); }}
         >
-          <PlusIcon size={18} /> Thêm suất chiếu
+          <PlusIcon size={18} /> <span className="max-md:hidden">Thêm suất chiếu</span>
         </button>
       </div>
 

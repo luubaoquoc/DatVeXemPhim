@@ -20,6 +20,7 @@ const PhongChieu = () => {
     tenPhong: "",
     tongSoGhe: "",
     maRap: "",
+    trangThai: "Hoạt động"
   })
   const [search, setSearch] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
@@ -27,13 +28,14 @@ const PhongChieu = () => {
   const limit = 10
   const [loading, setLoading] = useState(false)
   const [filterStatus, setFilterStatus] = useState("")
+  const [filterTrangThai, setFilterTrangThai] = useState("")
 
 
   // Fetch API
   const fetchData = async () => {
     try {
       const res = await api.get("/phongchieu", {
-        params: { page: currentPage, limit, search, maRap: filterStatus }
+        params: { page: currentPage, limit, search, maRap: filterStatus, trangThai: filterTrangThai }
       })
       setPhongChieus(res.data.data)
       setTotalPages(res.data.totalPages)
@@ -53,7 +55,7 @@ const PhongChieu = () => {
   useEffect(() => {
     fetchData()
     fetchRaps()
-  }, [currentPage, search, filterStatus])
+  }, [currentPage, search, filterStatus, filterTrangThai])
 
   // Xử lý thay đổi input
   const handleChange = (e) => {
@@ -67,11 +69,11 @@ const PhongChieu = () => {
     setLoading(true);
     try {
       if (editPhong) {
-        await api.put(`/phongchieu/${editPhong.maPhong}`, formData)
-        toast.success("Cập nhật phòng chiếu thành công!")
+        const res = await api.put(`/phongchieu/${editPhong.maPhong}`, formData)
+        toast.success(res.data.message || "Cập nhật phòng chiếu thành công!")
       } else {
-        await api.post("/phongchieu", formData)
-        toast.success("Thêm phòng chiếu thành công!")
+        const res = await api.post("/phongchieu", formData)
+        toast.success(res.data.message || "Thêm phòng chiếu thành công!")
       }
 
       setShowModal(false)
@@ -92,12 +94,12 @@ const PhongChieu = () => {
   // Xóa phòng
   const handleDelete = async (maPhong) => {
     try {
-      await api.delete(`/phongchieu/${maPhong}`)
-      toast.success("Xoá thành công!")
+      const res = await api.delete(`/phongchieu/${maPhong}`)
+      toast.success(res.data.message || "Xoá thành công!")
       fetchData()
     } catch (err) {
       console.log(err);
-      toast.error("Xóa thất bại!")
+      toast.error(err.response?.data?.message || "Xóa thất bại!")
     }
   }
 
@@ -109,11 +111,12 @@ const PhongChieu = () => {
       setFormData({
         tenPhong: item.tenPhong || "",
         tongSoGhe: item.tongSoGhe || "",
-        maRap: item.maRap || ""
+        maRap: item.maRap || "",
+        trangThai: item.trangThai || "Hoạt động"
       })
     } else {
       setEditPhong(null)
-      setFormData({ tenPhong: "", tongSoGhe: "", maRap: "" })
+      setFormData({ tenPhong: "", tongSoGhe: "", maRap: "", trangThai: "Hoạt động" })
     }
     setShowModal(true)
   }
@@ -124,17 +127,17 @@ const PhongChieu = () => {
   return (
     <div className="p-6 text-white">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-semibold">Quản lý phòng chiếu</h1>
+        <h1 className="text-3xl font-semibold max-md:text-2xl">Quản lý phòng chiếu</h1>
 
         <button
           onClick={() => { openModal() }}
           className="bg-primary text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-primary/80 transition cursor-pointer"
         >
-          <PlusIcon size={18} /> Thêm phòng
+          <PlusIcon size={18} /> <span className="max-md:hidden">Thêm phòng</span>
         </button>
       </div>
 
-      <div className='flex flex-wrap gap-3'>
+      <div className='flex flex-wrap gap-3 mb-4'>
         <SearchInput
           search={search}
           setSearch={setSearch}
@@ -160,6 +163,19 @@ const PhongChieu = () => {
             }
           </select>
         )}
+
+        <select
+          className="border border-primary/70 px-3 py-2 bg-black h-[3rem] outline-none cursor-pointer"
+          value={filterTrangThai}
+          onChange={(e) => {
+            setFilterTrangThai(e.target.value);
+            setCurrentPage(1);
+          }}
+        >
+          <option value="">Tất cả trạng thái</option>
+          <option value="Hoạt động">Hoạt động</option>
+          <option value="Bảo trì">Bảo trì</option>
+        </select>
       </div>
       {/* Table */}
 
@@ -170,6 +186,7 @@ const PhongChieu = () => {
             <th className="p-2 text-left">Tên phòng</th>
             <th className="p-2 text-left">Tổng ghế</th>
             <th className="p-2 text-left">Tên rạp</th>
+            <th className="p-2 text-left">Trạng thái</th>
             <th className="p-2">Hành động</th>
           </tr>
         </thead>
@@ -181,7 +198,17 @@ const PhongChieu = () => {
               <td className="p-2 font-medium text-left">{phong.tenPhong}</td>
               <td className="p-2 text-left">{phong.tongSoGhe}</td>
               <td className="p-2 text-left">{phong.rap?.tenRap}</td>
-
+              <td className="p-2 text-left">
+                <span
+                  className={`px-3 py-1 rounded-full text-xs font-semibold
+                  ${phong.trangThai === "Hoạt động"
+                      ? "bg-green-500/20 text-green-400 border border-green-500/40"
+                      : "bg-red-500/20 text-red-400 border border-red-500/40"}
+                  `}
+                >
+                  {phong.trangThai}
+                </span>
+              </td>
               <td className="p-2 flex justify-center">
                 <button
                   onClick={() => {
@@ -211,7 +238,7 @@ const PhongChieu = () => {
 
       {showModal && (
         <div className="fixed inset-0 bg-black/80 flex justify-center items-center z-50">
-          <div className="bg-black/80 border border-primary p-6 rounded-lg w-96">
+          <div className="bg-black/80 border border-primary p-6 rounded-lg w-96 max-md:m-4">
             <h2 className="text-2xl font-semibold mb-4 text-primary text-center">
               {editPhong ? 'Sửa phòng chiếu' : 'Thêm phòng chiếu'}
             </h2>
@@ -255,6 +282,20 @@ const PhongChieu = () => {
                       {rap.tenRap}
                     </option>
                   ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block mb-1 font-medium text-primary">Trạng thái</label>
+                <select
+                  name="trangThai"
+                  className="w-full p-2 mb-4 rounded bg-[#111] border border-gray-600 text-white cursor-pointer"
+                  value={formData.trangThai}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="Hoạt động">Hoạt động</option>
+                  <option value="Bảo trì">Bảo trì</option>
                 </select>
               </div>
 

@@ -87,7 +87,7 @@ const QuanLyGhe = () => {
       </div>
 
       {/* Controls */}
-      <div className="flex gap-4 items-center mb-4">
+      <div className="flex flex-wrap gap-4 items-center mb-4">
         <select
           value={maPhong}
           onChange={(e) => setMaPhong(e.target.value)}

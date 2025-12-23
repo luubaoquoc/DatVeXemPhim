@@ -76,7 +76,7 @@ const QuanLyDanhGia = () => {
 
   return (
     <div className="p-6 text-white">
-      <h1 className="text-3xl font-semibold mb-6">Quản lý đánh giá</h1>
+      <h1 className="text-3xl font-semibold mb-6 max-md:text-2xl">Quản lý đánh giá</h1>
 
       <SearchInput
         search={search}
@@ -115,7 +115,7 @@ const QuanLyDanhGia = () => {
               <td className="p-2">{d.diem}</td>
               <td className="p-2">{new Date(d.ngayDanhGia).toLocaleDateString()}</td>
 
-              <td className="p-2 text-center flex justify-center">
+              <td className="p-2">
                 <button
                   onClick={() => openEdit(d)}
                   className="p-2 text-gray-400 hover:bg-primary/20 rounded cursor-pointer transition"

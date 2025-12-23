@@ -7,7 +7,7 @@ const PhimDetail = ({ phim, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-      <div className="bg-black/90 border border-primary p-6 rounded-xl w-[750px] text-white max-h-[90vh] overflow-y-auto no-scrollbar relative">
+      <div className="bg-black/90 border border-primary p-6 rounded-xl w-[750px] text-white max-h-[90vh] overflow-y-auto no-scrollbar relative max-md:m-4">
 
         <div>
           <X onClick={onClose} className="absolute top-4 right-4 hover:text-red-400 cursor-pointer" />
@@ -16,14 +16,14 @@ const PhimDetail = ({ phim, onClose }) => {
           Chi tiết phim
         </h2>
 
-        <div className="flex gap-6">
+        <div className="flex max-md:flex-col gap-6">
           <img
             src={phim.poster}
             alt={phim.tenPhim}
             className="w-50 h-66 object-contain rounded"
           />
 
-          <div className="flex-1 space-y-2">
+          <div className=" space-y-1">
             <p><span className="text-primary">Tên phim:</span> {phim.tenPhim}</p>
             <p><span className="text-primary">Thời lượng:</span> {phim.thoiLuong} phút</p>
             <p><span className="text-primary">Ngày công chiếu:</span> {formatDate(phim.ngayCongChieu)}</p>

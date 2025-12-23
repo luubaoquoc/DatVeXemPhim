@@ -129,12 +129,12 @@ const DienVien = () => {
   return (
     <div className="p-6 text-white">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-semibold">Quản lý Diễn viên</h1>
+        <h1 className="text-3xl font-semibold max-md:text-2xl">Quản lý Diễn viên</h1>
         <button
           onClick={() => openModal()}
           className="bg-primary text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-primary/80 transition cursor-pointer"
         >
-          <PlusIcon size={18} /> Thêm diễn viên
+          <PlusIcon size={18} /> <span className="max-md:hidden">Thêm diễn viên</span>
         </button>
       </div>
 
@@ -169,7 +169,7 @@ const DienVien = () => {
               </td>
               <td className="p-2 text-left">{item.tenDienVien}</td>
               <td className="p-2 text-left">{formatDate(item.ngaySinh) || "Chưa cập nhật"}</td>
-              <td className="p-2 text-left max-w-[250px] truncate">{item.tieuSu || "Chưa cập nhật"}</td>
+              <td className="p-2 text-left max-w-[250px] max-md:max-w-[50px] truncate">{item.tieuSu || "Chưa cập nhật"}</td>
               <td className="p-2">
                 <button
                   onClick={() => openModal(item)}
@@ -199,7 +199,7 @@ const DienVien = () => {
       {/* Modal thêm/sửa */}
       {showModal && (
         <div className="fixed inset-0 bg-black/80 flex justify-center items-center z-50">
-          <div className="bg-black/80 border border-primary p-6 rounded-lg w-96">
+          <div className="bg-black/80 border border-primary p-6 rounded-lg w-96 max-md:m-4">
             <h2 className="text-2xl font-semibold mb-4 text-primary text-center">
               {editItem ? 'Sửa diễn viên' : 'Thêm diễn viên'}
             </h2>

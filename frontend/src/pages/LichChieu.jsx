@@ -37,7 +37,7 @@ const ChonRap = () => {
                 <p className="text-sm text-gray-400"><MapPin className='inline-block mr-1 text-blue-500 size-4' />{rap.diaChi}</p>
                 <p className="text-sm text-gray-400"><PhoneCall className='inline-block mr-1 text-red-500 size-4' />{rap.soDienThoai}</p>
               </div>
-              <button className='border border-primary py-2 px-4 rounded-lg bg-primary hover:bg-primary-dull transition cursor-pointer'>Xem chi tiết</button>
+              <button className='border border-primary py-2 px-4 rounded-lg bg-primary-dull hover:bg-primary transition cursor-pointer'>Xem chi tiết</button>
             </div>
           </div>
         ))}

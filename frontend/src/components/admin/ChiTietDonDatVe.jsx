@@ -34,22 +34,22 @@ const ChiTietDonDatVe = ({ bookings, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-      <div className="bg-black/90 border border-primary p-6 rounded-xl w-[750px] text-white max-h-[90vh] overflow-y-auto no-scrollbar">
+      <div className="bg-black/90 border border-primary p-6 rounded-xl w-[750px] text-white max-h-[90vh] overflow-y-auto no-scrollbar max-md:m-4">
 
-        <h2 className="text-2xl font-semibold mb-4 text-center bg-gradient-to-r from-primary to-yellow-200 bg-clip-text text-transparent">
+        <h2 className="text-2xl font-semibold mb-4 text-center text-primary">
           Chi tiết vé
         </h2>
 
         {/* Nội dung */}
-        <div className="flex gap-6">
+        <div className="flex max-md:flex-col items-center gap-6">
           <img
             src={phim?.poster}
             alt={phim?.tenPhim}
             className="w-50 h-66 object-contain rounded"
           />
 
-          <div className="flex space-x-3">
-            <div className="border-x p-2 space-y-1 w-1/2">
+          <div className="flex max-md:flex-col space-x-3 w-full">
+            <div className="md:border-x p-2 space-y-1 md:w-1/2 ">
               <h4 className="text-center mb-2 text-primary font-medium text-xl">
                 Thông tin vé
               </h4>
@@ -62,7 +62,7 @@ const ChiTietDonDatVe = ({ bookings, onClose }) => {
               <p><span className="text-primary">Ghế đã đặt:</span> {gheDaDat}</p>
             </div>
 
-            <div className="p-2 w-1/2">
+            <div className="p-2 md:w-1/2">
               <h4 className="text-center mb-2 text-primary font-medium text-xl">
                 Thông tin thanh toán
               </h4>

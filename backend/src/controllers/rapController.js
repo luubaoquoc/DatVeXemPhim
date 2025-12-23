@@ -74,6 +74,9 @@ export const createRap = async (req, res) => {
           {
             folder: 'hinhAnh',
             resource_type: 'image',
+            width: 1240,
+            height: 400,
+            crop: "fill",
           },
           (error, result) => {
             if (error) {
@@ -117,6 +120,9 @@ export const updateRap = async (req, res) => {
           {
             folder: 'hinhAnh',
             resource_type: 'image',
+            width: 1240,
+            height: 400,
+            crop: "fill",
           },
           (error, result) => {
             if (error) {

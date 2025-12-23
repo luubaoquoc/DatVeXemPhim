@@ -30,15 +30,16 @@ const Rap = () => {
       <BlurCircle top='100px' left='100px' />
       <BlurCircle bottom='100px' right='100px' />
       <BlurCircle bottom='-300px' left='100px' />
-      <div className="flex flex-col lg:flex-row justify-between gap-10 max-w-7xl mx-auto">
-        <div className='space-y-3 flex-1'>
-          <h2 className="text-4xl font-bold bg-gradient-to-r from-[#20B2AA] to-yellow-300/50 bg-clip-text text-transparent">{rap?.tenRap}</h2>
-          <p className="mb-2"><strong>Địa chỉ:</strong> {rap?.diaChi}</p>
-          <p className="mb-2"><strong>Số điện thoại:</strong> {rap?.soDienThoai}</p>
-        </div>
-
-        <img src={rap?.hinhAnh} alt={rap?.tenRap} className='flex-1 w-full' />
+      <div className='w-full h-[400px] rounded-lg'>
+        <img src={rap?.hinhAnh} alt={rap?.tenRap} className=' w-full h-full object-cover rounded-lg' />
       </div>
+
+      <div className='space-y-3 mt-6'>
+        <h2 className="text-4xl font-bold bg-gradient-to-r from-[#20B2AA] to-yellow-300/50 bg-clip-text text-transparent">{rap?.tenRap}</h2>
+        <p className="mb-2"><span className='text-gray-500'>Địa chỉ:</span> {rap?.diaChi}</p>
+        <p className="mb-2"><span className='text-gray-500'>Số điện thoại:</span> {rap?.soDienThoai}</p>
+      </div>
+
       <div className="flex flex-col lg:flex-row gap-8 max-w-7xl mx-auto mt-10 mb-40">
         <div className="flex-1">
           <h3 className="text-2xl font-medium mt-10 mb-4 border-l-3 border-primary pl-4">

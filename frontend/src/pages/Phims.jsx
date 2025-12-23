@@ -32,7 +32,7 @@ const Phims = () => {
 
 
   const renderMovies = (list) => (
-    <div className='flex flex-wrap justify-start max-lg:justify-center gap-8 mt-8'>
+    <div className='flex flex-wrap max-md:justify-center gap-8 mt-8'>
       {list.map((movie) => (
         <MoviesCard key={movie.maPhim} movie={movie} />
       ))}
@@ -44,7 +44,7 @@ const Phims = () => {
 
       <BlurCircle top='150px' left='0px' />
       <BlurCircle bottom='50px' right='50px' />
-      <div className='flex gap-4 mt-10 justify-start'>
+      <div className='flex gap-4 mt-10 justify-start max-md:ml-6'>
         <h1 className='p-2 text-2xl font-semibold text-white border-l-2 border-primary'>PHIM</h1>
         <button
           onClick={() => setActiveTab('dangChieu')}

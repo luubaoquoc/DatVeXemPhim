@@ -93,10 +93,24 @@ const SuatChieuForm = ({ onSubmit, onClose, editItem }) => {
     label: `${p.maPhim} - ${p.tenPhim}`,
   }));
 
-  const phongOptions = phongs.map((pc) => ({
-    value: pc.maPhong,
-    label: pc.tenPhong,
-  }));
+  const phongOptions = phongs
+    .filter(pc => pc.trangThai === "Hoạt động")
+    .map(pc => ({
+      value: pc.maPhong,
+      label: pc.tenPhong,
+    }));
+  const editPhongOption =
+    editItem &&
+      phongs.find(p => p.maPhong === editItem.maPhong && p.trangThai === "Bảo trì")
+      ? {
+        value: editItem.maPhong,
+        label: `${editItem.phongChieu?.tenPhong || "Phòng"} (Bảo trì)`
+      }
+      : null;
+
+  const phongOptionsFinal = editPhongOption
+    ? [...phongOptions, editPhongOption]
+    : phongOptions;
 
 
   /* ==============================
@@ -185,7 +199,7 @@ const SuatChieuForm = ({ onSubmit, onClose, editItem }) => {
   =============================== */
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 ">
-      <div className="bg-black/90 border border-primary p-6 rounded-xl w-[650px] text-white overflow-y-auto max-h-[90vh] no-scrollbar">
+      <div className="bg-black/90 border border-primary p-6 rounded-xl w-[650px] text-white overflow-y-auto max-h-[90vh] no-scrollbar max-md:m-4">
 
         <h2 className="text-2xl font-semibold mb-4 text-center text-primary">
           {editItem ? "Sửa suất chiếu" : "Thêm suất chiếu mới"}
@@ -213,11 +227,17 @@ const SuatChieuForm = ({ onSubmit, onClose, editItem }) => {
             <Select
               className="react-select-container"
               classNamePrefix="react-select"
-              options={phongOptions}
-              value={phongOptions.find((pc) => pc.value === formData.maPhong) || null}
+              options={phongOptionsFinal}
+              value={phongOptionsFinal.find((pc) => pc.value === formData.maPhong) || null}
               onChange={handleSelectPhong}
               placeholder="Chọn phòng..."
+              isDisabled={!!editPhongOption}
             />
+            {editPhongOption && (
+              <p className="text-sm text-red-400 mt-1">
+                Phòng này đang bảo trì, không thể đổi phòng cho suất chiếu
+              </p>
+            )}
           </div>
 
           {/* KHUNG GIỜ */}
@@ -234,7 +254,12 @@ const SuatChieuForm = ({ onSubmit, onClose, editItem }) => {
                     type="datetime-local"
                     value={slot.gioBatDau}
                     onChange={(e) => updateTimeSlot(index, "gioBatDau", e.target.value)}
-                    className="w-full p-2 bg-[#111] border border-gray-700 rounded"
+                    className={`w-full p-2 rounded
+                  ${editPhongOption
+                        ? "bg-gray-800 border-gray-700 text-gray-500 cursor-not-allowed"
+                        : "bg-[#111] border-gray-700"}
+                  `}
+
                     required
                   />
                 </div>
@@ -246,12 +271,16 @@ const SuatChieuForm = ({ onSubmit, onClose, editItem }) => {
                     type="datetime-local"
                     value={slot.gioKetThuc}
                     onChange={(e) => updateTimeSlot(index, "gioKetThuc", e.target.value)}
-                    className="w-full p-2 bg-[#111] border border-gray-700 rounded"
+                    className={`w-full p-2 rounded
+              ${editPhongOption
+                        ? "bg-gray-800 border-gray-700 text-gray-500 cursor-not-allowed"
+                        : "bg-[#111] border-gray-700"}
+              `}
                     required
                   />
                 </div>
 
-                {index > 0 && (
+                {index > 0 && !editPhongOption && (
                   <button
                     type="button"
                     onClick={() => removeTimeSlot(index)}

@@ -36,7 +36,7 @@ const FeatureSection = () => {
 
   const renderMovies = (list) => (
     <>
-      <div className='flex flex-wrap max-sm:justify-center gap-8 mt-6'>
+      <div className='flex flex-wrap max-md:justify-center gap-8 mt-6'>
         {list.slice(0, 4).map((movie) => (
           <MoviesCard key={movie.maPhim} movie={movie} />
         ))}
@@ -48,7 +48,7 @@ const FeatureSection = () => {
               navigate('/phims');
               scrollTo(0, 0);
             }}
-            className='px-10 py-3 bg-primary hover:bg-primary-dull transition rounded-md font-medium cursor-pointer'
+            className='px-10 py-3 bg-primary-dull hover:bg-primary transition rounded-md font-medium cursor-pointer'
           >
             Xem thêm
           </button>

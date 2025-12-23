@@ -32,41 +32,57 @@ const ThanhToan = () => {
   const navigate = useNavigate()
   const [promo, setPromo] = useState('')
   const [selectedMethod, setSelectedMethod] = useState('momo')
-  const [timeLeft, setTimeLeft] = useState(() => {
-    // nếu được truyền thoiHanThanhToan từ server -> tính khoảng thời gian còn lại
-    try {
-      if (state?.thoiHanThanhToan) {
-        const diff = Math.floor((new Date(state.thoiHanThanhToan).getTime() - Date.now()) / 1000)
-        return Math.max(0, diff)
-      }
-    } catch {
-      console.log('lỗi');
+  const [timeLeft, setTimeLeft] = useState(null);
 
-    }
-    return 5 * 60 * 1000
-  });
   const api = useApi(true)
 
-  const { maSuatChieu, date, selectedSeats = [], pricePerSeat = 0, phim } = state
+  const { maSuatChieu, selectedSeats = [], pricePerSeat = 0, phim } = state
   const [showAgeModal, setShowAgeModal] = useState(false)
   const [ageMessage, setAgeMessage] = useState('')
 
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev <= 1) {
-          clearInterval(timer)
-          toast.error('Đã hết thời gian giữ ghế! Vui lòng chọn lại.')
-          navigate(`/chon-ghe/${maSuatChieu}`)
-          return 0
-        }
-        return prev - 1
-      })
-    }, 1000)
+    if (!state?.maDatVe) return;
 
-    return () => clearInterval(timer)
-  }, [navigate, maSuatChieu, date, phim.maPhim])
+    const fetchBooking = async () => {
+      try {
+        const res = await api.get(`/datve/${state.maDatVe}`);
+
+        const expireTime = new Date(res.data.thoiHanThanhToan).getTime();
+        const now = Date.now();
+
+        const diff = Math.floor((expireTime - now) / 1000);
+        setTimeLeft(Math.max(0, diff));
+      } catch (err) {
+        console.error('Fetch booking failed:', err);
+        toast.error("Không thể lấy thông tin giữ ghế");
+        navigate(`/chon-ghe/${state.maSuatChieu}`);
+      }
+    };
+
+    fetchBooking();
+  }, [state?.maDatVe]);
+
+  useEffect(() => {
+    if (timeLeft === null) return;
+
+    if (timeLeft <= 0) {
+      toast.error("Đã hết thời gian giữ ghế!");
+      navigate(`/chon-ghe/${state.maSuatChieu}`, {
+        state: { maDatVe: state.maDatVe }
+      });
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setTimeLeft(prev => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [timeLeft]);
+
+
+
 
 
   if (!state) {
@@ -157,7 +173,7 @@ const ThanhToan = () => {
           />
           <button
             onClick={handleApplyPromo}
-            className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/80 transition"
+            className="bg-primary-dull text-white px-4 w-28 py-2 rounded-lg hover:bg-primary transition cursor-pointer"
           >
             Áp dụng
           </button>
@@ -223,7 +239,9 @@ const ThanhToan = () => {
           date={state.gioBatDau}
           giaVeCoBan={state.pricePerSeat}
           timeLeft={timeLeft}
-          onBack={() => navigate(-1)}
+          onBack={() => navigate(`/chon-ghe/${state.maSuatChieu}`, {
+            state: { maDatVe: state.maDatVe }
+          })}
           onAction={handleClickThanhToan}
           actionLabel="Thanh toán"
         />

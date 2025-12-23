@@ -24,7 +24,7 @@ const MoviesCard = ({ movie }) => {
 
       <div className='flex items-center justify-between mt-4 pb-3'>
         <button onClick={() => { navigate(`/phims/${movie.maPhim}`); scrollTo(0, 0) }}
-          className='px-4 py-2 text-sm bg-primary hover:bg-primary-dull transition
+          className='px-4 py-2 text-sm bg-primary-dull hover:bg-primary transition
         rounded-full font-medium cursor-pointer'>
           Mua vé
         </button>
