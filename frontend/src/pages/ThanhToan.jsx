@@ -30,16 +30,35 @@ const AGE_RULES = {
 const ThanhToan = () => {
   const { state } = useLocation()
   const navigate = useNavigate()
-  const [promo, setPromo] = useState('')
-  const [selectedMethod, setSelectedMethod] = useState('momo')
-  const [timeLeft, setTimeLeft] = useState(null);
-
+  const { maSuatChieu, selectedSeats = [], pricePerSeat = 0, phim } = state
   const api = useApi(true)
 
-  const { maSuatChieu, selectedSeats = [], pricePerSeat = 0, phim } = state
+  console.log('maSuatChieu', maSuatChieu);
+  console.log('selectedSeats', selectedSeats);
+  console.log('pricePerSeat', pricePerSeat);
+  console.log('phim', phim);
+
+
+
+  const total = (selectedSeats.length || 0) * (pricePerSeat || 0)
+
+  const [promo, setPromo] = useState('')
+  const [discount, setDiscount] = useState(0)
+  const [finalTotal, setFinalTotal] = useState(total)
+  const [khuyenMaiId, setKhuyenMaiId] = useState(null)
+  const [selectedMethod, setSelectedMethod] = useState('vnpay')
+  const [timeLeft, setTimeLeft] = useState(null);
+
+
   const [showAgeModal, setShowAgeModal] = useState(false)
   const [ageMessage, setAgeMessage] = useState('')
 
+
+  useEffect(() => {
+    setDiscount(0);
+    setFinalTotal(total);
+    setKhuyenMaiId(null);
+  }, [total]);
 
   useEffect(() => {
     if (!state?.maDatVe) return;
@@ -85,21 +104,32 @@ const ThanhToan = () => {
 
 
 
-  if (!state) {
-    return (
-      <div className="p-8">
-        <h2 className="text-xl font-semibold mb-4">Trang thanh toán</h2>
-        <p>Không có dữ liệu thanh toán. Vui lòng chọn ghế trước khi tới trang này.</p>
-      </div>
-    )
-  }
 
-  const total = (selectedSeats.length || 0) * (pricePerSeat || 0)
 
-  const handleApplyPromo = () => {
+
+
+  const handleApplyPromo = async () => {
     if (!promo) return toast.error('Vui lòng nhập mã khuyến mãi')
-    toast.success(`Áp dụng mã ${promo} thành công (demo)`)
+
+    try {
+      const { data } = await api.post('/khuyenmai/kiem-tra', {
+        maKhuyenMai: promo,
+        tongTien: total
+      })
+
+      setDiscount(data.soTienGiam)
+      setFinalTotal(data.tongTienSauGiam)
+      setKhuyenMaiId(data.khuyenMaiId)
+
+      toast.success('Áp dụng mã khuyến mãi thành công!')
+    } catch (err) {
+      setDiscount(0)
+      setFinalTotal(total)
+      setKhuyenMaiId(null)
+      toast.error(err.response?.data?.message || 'Mã không hợp lệ')
+    }
   }
+
 
   const handleConfirm = async () => {
     try {
@@ -107,7 +137,7 @@ const ThanhToan = () => {
 
       // Nếu đã có maDatVe (được tạo khi giữ chỗ) -> gọi checkout endpoint để tạo redirectUrl cho booking hiện tại
       if (state?.maDatVe) {
-        const res = await api.post(`/datve/${state.maDatVe}/checkout`, { phuongThuc, tongTien: total })
+        const res = await api.post(`/datve/${state.maDatVe}/checkout`, { phuongThuc, tongTien: finalTotal, khuyenMaiId })
         if (res.data?.redirectUrl) {
           window.location.href = res.data.redirectUrl
           return
@@ -120,8 +150,9 @@ const ThanhToan = () => {
       const payload = {
         maSuatChieu,
         chiTiet: selectedSeats,
-        tongTien: total,
-        phuongThuc
+        tongTien: finalTotal,
+        phuongThuc,
+        khuyenMaiId
       }
       const res = await api.post('/datve', payload)
       if (res.data.redirectUrl) {
@@ -156,6 +187,14 @@ const ThanhToan = () => {
   }
 
   console.log('Phân loại phim:', phim?.phanLoai)
+  if (!state) {
+    return (
+      <div className="p-8">
+        <h2 className="text-xl font-semibold mb-4">Trang thanh toán</h2>
+        <p>Không có dữ liệu thanh toán. Vui lòng chọn ghế trước khi tới trang này.</p>
+      </div>
+    )
+  }
 
 
 
@@ -184,17 +223,18 @@ const ThanhToan = () => {
         <div className="space-y-4">
           {[
             {
-              id: 'momo',
-              name: 'MoMo',
-              desc: 'Thanh toán qua ví điện tử MoMo nhanh chóng.',
-              logo: { src: momo, alt: 'MoMo' }
-            },
-            {
               id: 'vnpay',
               name: 'VNPay',
               desc: 'Thanh toán bằng QR ngân hàng nội địa.',
               logo: { src: vnpay, alt: 'VNPay' }
             },
+            {
+              id: 'momo',
+              name: 'MoMo',
+              desc: 'Thanh toán qua ví điện tử MoMo nhanh chóng.',
+              logo: { src: momo, alt: 'MoMo' }
+            },
+
             {
               id: 'stripe',
               name: 'Stripe',
@@ -238,6 +278,8 @@ const ThanhToan = () => {
           selectedTime={state.gioBatDau}
           date={state.gioBatDau}
           giaVeCoBan={state.pricePerSeat}
+          discount={discount}
+          finalTotal={finalTotal}
           timeLeft={timeLeft}
           onBack={() => navigate(`/chon-ghe/${state.maSuatChieu}`, {
             state: { maDatVe: state.maDatVe }

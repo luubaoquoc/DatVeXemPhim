@@ -8,12 +8,14 @@ import { useDispatch, useSelector } from 'react-redux'
 import { logout } from '../redux/features/authSlice'
 import ProfileSidebar from '../components/ProfileSidebar'
 import ChiTietLichSuDatVe from '../components/ChiTietLichSuDatVe'
+import { useNavigate } from 'react-router-dom'
 
 
 const LichSuDatVe = () => {
 
   const api = useApi(true)
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const user = useSelector((state) => state.auth.user)
   const currency = import.meta.env.VITE_CURRENCY || '₫'
   const [bookings, setBookings] = useState([])
@@ -65,13 +67,10 @@ const LichSuDatVe = () => {
                 const phong = suat.phongChieu || {}
                 const thanhToan = item.thanhToan || {}
                 const isSuccess = item.trangThai === 'Thành công' || thanhToan.trangThai === 'Thành công'
+                const isFailed = item.trangThai === 'Thất bại' || thanhToan.trangThai === 'Thất bại'
 
                 return (
                   <div key={index}
-                    onClick={() => {
-                      setSelectedBooking(item);
-                      setShowDetail(true);
-                    }}
                     className='flex flex-col md:flex-row justify-between bg-primary/8 
               border border-primary/20 rounded-lg mt-4 p-2 max-w-3xl'>
                     <div className='flex flex-col md:flex-row'>
@@ -81,7 +80,7 @@ const LichSuDatVe = () => {
                         className='md:max-w-25 aspect-video h-auto object-contain rounded'
                       />
                       <div className='flex flex-col p-2 md:pl-4'>
-                        <p className='text-lg font-semibold'>{phim.tenPhim}</p>
+                        <p className='text-2xl font-semibold'>{phim.tenPhim}</p>
                         <p className='text-gray-400 text-sm mt-3'>
                           <span className='text-primary'>Phòng: </span>{phong.tenPhong || 'N/A'}
                         </p>
@@ -99,27 +98,47 @@ const LichSuDatVe = () => {
                         <p className='text-2xl font-semibold mb-3'>
                           {Number(item.tongTien).toLocaleString('vi-VN')} {currency}
                         </p>
-                        {/* {!isSuccess && (
-                    <button
-                      className='bg-primary px-4 py-1.5 mb-3 text-sm rounded-full font-medium cursor-pointer'
-                      onClick={() => toast('Chức năng thanh toán lại đang phát triển')}
-                    >
-                      Thanh toán lại
-                    </button>
-                  )} */}
+                        {!isSuccess && !isFailed && (
+                          <button
+                            className='bg-primary px-4 py-1.5 mb-3 text-sm rounded-full font-medium cursor-pointer'
+                            onClick={() => navigate(`/thanh-toan?maDatVe=${item.maDatVe}`, {
+                              state: {
+                                maDatVe: item.maDatVe,
+                                maSuatChieu: item.maSuatChieu,
+                                maPhim: phim.maPhim,
+                                selectedSeats: item.chiTietDatVes.map(ct => `${ct.ghe.hang}${ct.ghe.soGhe}`),
+                                pricePerSeat: suat.giaVeCoBan,
+                                phim: phim,
+                                phong: phong,
+                                gioBatDau: suat.gioBatDau,
+                              }
+                            })}
+                          >
+                            Thanh toán lại
+                          </button>
+                        )}
                       </div>
-                      <div className='text-sm'>
+                      <div className='text-sm space-y-1'>
                         <p><span className='text-primary'>Ghế: </span>{item.chiTietDatVes.map(ct => `${ct.ghe.hang}${ct.ghe.soGhe}`).join(', ')}</p>
+                        <p>
+                          <span className='text-primary'>Phương thức: </span>{thanhToan.phuongThuc?.toUpperCase() || 'N/A'}
+                        </p>
                         <p>
                           <span className='text-primary'>Trạng thái: </span>
                           <b className={isSuccess ? 'text-green-500' : 'text-red-400'}>
                             {thanhToan.trangThai || item.trangThai}
                           </b>
                         </p>
-                        <p>
-                          <span className='text-primary'>Phương thức: </span>{thanhToan.phuongThuc?.toUpperCase() || 'N/A'}
-                        </p>
+
                       </div>
+                      <button className='text-blue-400 mt-4 underline text-sm cursor-pointer hover:text-blue-600'
+                        onClick={() => {
+                          setSelectedBooking(item);
+                          setShowDetail(true);
+                        }}
+                      >
+                        Xem chi tiết
+                      </button>
                     </div>
                   </div>
                 )

@@ -1,8 +1,9 @@
 import { verifyVNPayReturn } from '../helpers/VNPay.js';
 import sequelize from '../configs/sequelize.js';
 import ChiTietDatVe from '../models/ChiTietDatVe.js';
-import { DatVe, Ghe, Phim, PhongChieu, Rap, SuatChieu, TaiKhoan, ThanhToan } from '../models/index.js';
+import { DatVe, Ghe, KhuyenMai, LichSuDungMa, Phim, PhongChieu, Rap, SuatChieu, TaiKhoan, ThanhToan } from '../models/index.js';
 import { sendVerificationEmail } from '../utils/sendEmail.js';
+import { Op } from 'sequelize';
 
 
 const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:5173';
@@ -101,6 +102,32 @@ export const vnpayReturn = async (req, res) => {
       { trangThai: success ? "Đã thanh toán" : "Thất bại" },
       { where: { maDatVe: orderId }, transaction: t }
     );
+
+    if (success && datVe.maKhuyenMaiId) {
+      // 1. Giảm số lượt sử dụng mã
+      await KhuyenMai.update(
+        {
+          soLuotSuDung: sequelize.literal('soLuotSuDung - 1')
+        },
+        {
+          where: {
+            id: datVe.maKhuyenMaiId,
+            soLuotSuDung: { [Op.gt]: 0 }
+          },
+          transaction: t
+        }
+      );
+
+      // 2. Ghi lịch sử sử dụng mã
+      await LichSuDungMa.create(
+        {
+          maTaiKhoan: datVe.maTaiKhoanDatVe,
+          maKhuyenMaiId: datVe.maKhuyenMaiId,
+          ngaySuDung: new Date()
+        },
+        { transaction: t }
+      );
+    }
 
     await t.commit();
 

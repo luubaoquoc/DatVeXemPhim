@@ -174,7 +174,7 @@ const DaoDien = () => {
         <tbody>
           {daoDiens.map((item, index) => (
             <tr key={item.maDaoDien} className="border-b border-primary/30">
-              <td className="p-2 text-center">{index + 1}</td>
+              <td className="p-2 text-center">{(currentPage - 1) * limit + index + 1}</td>
 
               <td className="p-2 text-left">
                 {item.anhDaiDien ? (

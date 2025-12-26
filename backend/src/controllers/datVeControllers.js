@@ -291,7 +291,7 @@ export const listMyDatVes = async (req, res) => {
         {
           model: SuatChieu,
           as: 'suatChieu',
-          attributes: ['maSuatChieu', 'gioBatDau', 'gioKetThuc'],
+          attributes: ['maSuatChieu', 'gioBatDau', 'gioKetThuc', 'giaVeCoBan'],
           include: [
             {
               model: Phim,
@@ -424,7 +424,7 @@ export const createCheckoutForDatVe = async (req, res) => {
     if (!maTaiKhoan) return res.status(401).json({ message: 'Chưa xác thực' });
 
     const maDatVe = Number(req.params.maDatVe);
-    const { phuongThuc, tongTien } = req.body;
+    const { phuongThuc, tongTien, khuyenMaiId } = req.body;
     if (!maDatVe || !phuongThuc) return res.status(400).json({ message: 'Dữ liệu không hợp lệ' });
 
     // load booking with lock
@@ -453,13 +453,20 @@ export const createCheckoutForDatVe = async (req, res) => {
     await datVe.update(
       {
         trangThai: 'Đang thanh toán',
+        tongTien,
+        maKhuyenMaiId: khuyenMaiId || null,
+        ngayDat: new Date(),
         thoiHanThanhToan: new Date(Date.now() + 5 * 60 * 1000)
       },
       { transaction: t }
     );
 
     // update or create payment record
-    const thanhToan = await ThanhToan.findOne({ where: { maDatVe }, transaction: t, lock: t.LOCK.UPDATE });
+    const thanhToan = await ThanhToan.findOne({
+      where: { maDatVe },
+      transaction: t,
+      lock: t.LOCK.UPDATE
+    });
     if (!thanhToan) {
       await t.rollback();
       return res.status(500).json({ message: 'Không tìm thấy bản ghi thanh toán' });
@@ -467,7 +474,8 @@ export const createCheckoutForDatVe = async (req, res) => {
 
     await thanhToan.update(
       {
-        phuongThuc, soTien: tongTien || thanhToan.soTien,
+        phuongThuc,
+        soTien: tongTien,
         ngayThanhToan: new Date(),
         trangThai: 'Đang thanh toán'
       },

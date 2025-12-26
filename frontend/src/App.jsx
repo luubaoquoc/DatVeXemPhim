@@ -41,6 +41,7 @@ import LichChieu from './pages/LichChieu'
 import ChiTietLichChieu from './pages/ChiTietLichChieu'
 import Rap from './pages/Rap'
 import DatVeThanhCong from './pages/DatVeThanhCong'
+import QuanLyKhuyenMai from './pages/admin/QuanLyKhuyenMai'
 
 const App = () => {
 
@@ -138,6 +139,7 @@ const App = () => {
           <Route path='quan-ly-ghe' element={<QuanLyGhe />} />
           <Route path='quan-ly-suat-chieu' element={<QuanLySuatChieu />} />
           <Route path='quan-ly-don-dat-ve' element={<QuanLyDonDatVe />} />
+          <Route path='quan-ly-khuyen-mai' element={<QuanLyKhuyenMai />} />
           <Route path='quan-ly-tai-khoan' element={<QuanLyTaiKhoan />} />
         </Route>
 

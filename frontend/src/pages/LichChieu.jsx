@@ -3,24 +3,32 @@ import useApi from '../hooks/useApi'
 import { useNavigate } from 'react-router-dom'
 import { MapPin, PhoneCall } from 'lucide-react'
 import BlurCircle from '../components/BlurCircle'
+import Loading from '../components/Loading'
 
 const ChonRap = () => {
   const api = useApi()
-  const [raps, setRaps] = useState([])
   const navigate = useNavigate();
+  const [raps, setRaps] = useState([])
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     const fetchRaps = async () => {
       try {
+        setLoading(true);
         const res = await api.get('/rap')
         setRaps(res.data.data)
+        setLoading(false)
       } catch (error) {
+        setLoading(false)
         console.log(error);
         setRaps([])
       }
     }
     fetchRaps()
   }, [])
+
+  if (loading) return <Loading />
+
 
   return (
     <div className='px-6 md:px-16 lg:px-40 py-30 md:pt-40 min-h-screen'>

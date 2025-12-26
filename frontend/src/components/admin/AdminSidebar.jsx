@@ -112,6 +112,13 @@ const AdminSidebar = ({ onClose }) => {
     },
 
     {
+      name: 'Quản lý khuyến mãi',
+      path: '/admin/quan-ly-khuyen-mai',
+      icon: TagsIcon,
+      roles: [3, 4]
+    },
+
+    {
       name: 'Quản lý tài khoản',
       path: '/admin/quan-ly-tai-khoan',
       icon: UserIcon,

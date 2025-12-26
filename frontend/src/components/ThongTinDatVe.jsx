@@ -13,6 +13,8 @@ const ThongoTinDatVe = (
     selectedTime,
     date,
     giaVeCoBan,
+    discount = 0,
+    finalTotal,
     timeLeft,
     onBack,
     onAction,
@@ -20,9 +22,10 @@ const ThongoTinDatVe = (
 ) => {
 
   const currency = import.meta.env.VITE_CURRENCY || "đ";
-  console.log(phim);
+  const total = ((selectedSeats?.length || 0) * (giaVeCoBan || 0));
 
 
+  const tongThanhToan = typeof finalTotal === 'number' ? finalTotal : total;
 
 
   return (
@@ -87,10 +90,27 @@ const ThongoTinDatVe = (
 
       </div>
 
+      <div>
+        <div className="mt-4 border-t border-gray-700 pt-3 flex justify-between items-center">
+          <p className="text-sm text-gray-300">Tạm tính:</p>
+          <p className="font-semibold text-xl text-primary">
+            {total.toLocaleString('vi-VN')} {currency}
+          </p>
+        </div>
+        {discount > 0 && (
+          <div className="mt-2 border-t border-gray-700 pt-3 flex justify-between items-center">
+            <p className="text-sm text-gray-300">Giảm giá:</p>
+            <p className="font-semibold text-xl text-primary">
+              -{discount.toLocaleString('vi-VN')} {currency}
+            </p>
+          </div>
+        )}
+      </div>
+
       <div className="mt-4 border-t border-gray-700 pt-3 flex justify-between items-center">
         <p className="text-sm text-gray-300">Tổng cộng:</p>
         <p className="font-semibold text-xl text-primary">
-          {((selectedSeats?.length || 0) * (giaVeCoBan || 0)).toLocaleString('vi-VN')} {currency}
+          {tongThanhToan.toLocaleString('vi-VN')} {currency}
         </p>
       </div>
 

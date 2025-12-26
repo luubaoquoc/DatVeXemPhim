@@ -20,6 +20,7 @@ import gheRoutes from './routes/gheRoutes.js';
 import anhBannerRoutes from './routes/anhBannerRoutes.js';
 import dashboard from './routes/dashboardRoutes.js';
 import danhGiaRoutes from './routes/danhGiaRoutes.js';
+import khuyenMaiRoutes from './routes/khuyenMaiRoutes.js';
 import './crons/index.js';
 // import { runAllCronsNow } from './crons/index.js';
 
@@ -63,6 +64,7 @@ app.use("/api/ghe", gheRoutes);
 app.use('/api/anhbanner', anhBannerRoutes);
 app.use('/api/admin', dashboard);
 app.use('/api/danhgia', danhGiaRoutes);
+app.use('/api/khuyenmai', khuyenMaiRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server listening at http://localhost:${PORT}`);

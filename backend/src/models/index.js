@@ -16,6 +16,8 @@ import PhongChieu from './PhongChieu.js';
 import Ghe from './Ghe.js';
 import Phim_UaThich from './Phim_UaThich.js';
 import ChiTietDatVe from './ChiTietDatVe.js';
+import LichSuDungMa from './LichSuDungMa.js';
+import KhuyenMai from './KhuyenMai.js';
 
 
 // --- THIẾT LẬP MỐI QUAN HỆ ---
@@ -86,6 +88,15 @@ ChiTietDatVe.belongsTo(Ghe, { foreignKey: 'maGhe', as: 'ghe' });
 // Previously DatVe had ChiTietDatVe entries linking to Ghe; now seat labels are stored
 // directly on DatVe.soGhe (comma-separated list). No ChiTietDatVe or Ghe associations.
 
+LichSuDungMa.belongsTo(TaiKhoan, { foreignKey: 'maTaiKhoan', as: 'taiKhoan' });
+TaiKhoan.hasMany(LichSuDungMa, { foreignKey: 'maTaiKhoan', as: 'lichSuDungMas' });
+
+LichSuDungMa.belongsTo(KhuyenMai, { foreignKey: 'maKhuyenMaiId', as: 'khuyenMai' });
+KhuyenMai.hasMany(LichSuDungMa, { foreignKey: 'maKhuyenMaiId', as: 'lichSuDungMas' });
+
+DatVe.belongsTo(KhuyenMai, { foreignKey: 'maKhuyenMaiId', as: 'khuyenMai' });
+KhuyenMai.hasMany(DatVe, { foreignKey: 'maKhuyenMaiId', as: 'datVes' });
+
 DatVe.hasOne(ThanhToan, { foreignKey: 'maDatVe', as: 'thanhToan', onDelete: 'CASCADE' });
 ThanhToan.belongsTo(DatVe, { foreignKey: 'maDatVe', as: 'datVe' });
 
@@ -107,4 +118,7 @@ export {
   PhongChieu,
   Ghe,
   Phim_UaThich,
+  ChiTietDatVe,
+  LichSuDungMa,
+  KhuyenMai
 };

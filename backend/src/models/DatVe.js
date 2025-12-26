@@ -1,6 +1,7 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../configs/sequelize.js';
 import TaiKhoan from './TaiKhoan.js';
+import KhuyenMai from './KhuyenMai.js';
 
 const DatVe = sequelize.define('DatVe', {
   maDatVe: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
@@ -35,6 +36,14 @@ const DatVe = sequelize.define('DatVe', {
     references: {
       model: TaiKhoan,
       key: 'maTaiKhoan'
+    }
+  },
+  maKhuyenMaiId: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    references: {
+      model: KhuyenMai,
+      key: 'id'
     }
   }
 }, {
