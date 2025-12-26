@@ -48,6 +48,10 @@ app.use(cors({
 //   }
 // });
 
+app.get("/", (req, res) => {
+  res.send("GoCinema Backend is running...");
+});
+
 
 app.use("/api/auth", authRoutes);
 app.use('/api/taikhoan', taiKhoanRoutes);

@@ -5,6 +5,9 @@ import store from "../redux/store"; // import store trực tiếp
 import { refreshAuth } from "../redux/features/authSlice";
 
 const useApi = (isProtected = false) => {
+
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000"
+
   const accessToken = useSelector((state) => state.auth.accessToken)
 
   // console.log(accessToken);
@@ -12,7 +15,7 @@ const useApi = (isProtected = false) => {
 
   const axiosInstance = useMemo(() => {
     const inst = axios.create({
-      baseURL: "http://localhost:5000/api",
+      baseURL: `${backendUrl}/api`,
       withCredentials: true,
     });
 
