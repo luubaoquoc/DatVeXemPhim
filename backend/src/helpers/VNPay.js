@@ -1,5 +1,6 @@
 
 import { dateFormat, VNPay } from 'vnpay'
+import moment from 'moment-timezone'
 
 const vnpay = new VNPay({
   tmnCode: '9QG49KG9',
@@ -9,23 +10,27 @@ const vnpay = new VNPay({
 })
 
 export const createVNPayPayment = async (datVe, tongTien, req) => {
-  const ipAddr = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1'
+  const ipAddr =
+    req.headers['x-forwarded-for']?.split(',')[0] ||
+    req.socket.remoteAddress ||
+    '127.0.0.1'
 
+  const createDate = moment()
+    .tz('Asia/Ho_Chi_Minh')
+    .format('YYYYMMDDHHmmss')
 
-  const createDate = dateFormat(new Date())
-  const expireDate = dateFormat(new Date(Date.now() + 5 * 60 * 1000)) // +30 phút
-
+  const expireDate = moment()
+    .tz('Asia/Ho_Chi_Minh')
+    .add(15, 'minutes')
+    .format('YYYYMMDDHHmmss')
 
   const paymentUrl = vnpay.buildPaymentUrl({
-    vnp_Amount: tongTien,
+    vnp_Amount: tongTien * 100, //  BẮT BUỘC
     vnp_IpAddr: ipAddr,
     vnp_TxnRef: datVe.maDatVe.toString(),
-    vnp_OrderInfo: `
-      Thanh toán vé xe khách - Mã đặt vé: ${datVe.maDatVe}
-    `,
-    vnp_ReturnUrl: process.env.VNPAY_RETURN_URL || 'http://localhost:5000/api/payment/vnpay-return',
+    vnp_OrderInfo: `Thanh toán vé xem phim - Mã ${datVe.maDatVe}`,
+    vnp_ReturnUrl: process.env.VNPAY_RETURN_URL,
     vnp_Locale: 'vn',
-
     vnp_CreateDate: createDate,
     vnp_ExpireDate: expireDate,
   })
