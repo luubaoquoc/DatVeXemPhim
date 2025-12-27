@@ -23,7 +23,7 @@ export const createVNPayPayment = async (datVe, tongTien, req) => {
     vnp_OrderInfo: `
       Thanh toán vé xe khách - Mã đặt vé: ${datVe.maDatVe}
     `,
-    vnp_ReturnUrl: 'http://localhost:5000/api/payment/vnpay-return',
+    vnp_ReturnUrl: process.env.VNPAY_RETURN_URL || 'http://localhost:5000/api/payment/vnpay-return',
     vnp_Locale: 'vn',
 
     vnp_CreateDate: createDate,

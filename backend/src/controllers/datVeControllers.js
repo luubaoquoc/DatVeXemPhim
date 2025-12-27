@@ -220,7 +220,7 @@ export const createDatVe = async (req, res) => {
     await t.commit();
 
     return res.json({
-      message: 'Giư giữ ghế thành công',
+      message: 'Giữ ghế thành công',
       maDatVe: datVe.maDatVe,
       thoiHanThanhToan: datVe.thoiHanThanhToan,
     });
