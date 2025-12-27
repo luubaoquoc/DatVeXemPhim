@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 dotenv.config();
 import cors from "cors";
+import path from "path";
 import cookieParser from "cookie-parser";
 import connectDB from "./configs/db.js";
 import authRoutes from "./routes/authRoutes.js";
@@ -28,6 +29,8 @@ import './crons/index.js';
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+const __dirname = path.resolve();
+
 await connectDB();
 
 app.use(express.json());
@@ -48,9 +51,7 @@ app.use(cors({
 //   }
 // });
 
-app.get("/", (req, res) => {
-  res.send("GoCinema Backend is running...");
-});
+
 
 
 app.use("/api/auth", authRoutes);
@@ -69,6 +70,15 @@ app.use('/api/anhbanner', anhBannerRoutes);
 app.use('/api/admin', dashboard);
 app.use('/api/danhgia', danhGiaRoutes);
 app.use('/api/khuyenmai', khuyenMaiRoutes);
+
+
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../frontend/dist")));
+  app.use((req, res) => {
+    res.sendFile(path.resolve(__dirname, "../frontend", "dist", "index.html"));
+  }
+  );
+}
 
 app.listen(PORT, () => {
   console.log(`Server listening at http://localhost:${PORT}`);

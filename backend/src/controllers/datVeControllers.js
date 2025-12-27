@@ -217,34 +217,101 @@ export const createDatVe = async (req, res) => {
       trangThai: 'Chờ xử lý',
     }, { transaction: t });
 
-    //  Nếu chưa chọn phương thức thanh toán -> chỉ giữ ghế
-    if (!phuongThuc) {
-      await t.commit();
-      return res.json({
-        message: 'Đã giữ ghế. Hãy thanh toán trong thời hạn.',
-        maDatVe: datVe.maDatVe,
-        thoiHanThanhToan
-      });
-    }
-
-    //  Chọn cổng thanh toán
-    let redirectUrl;
-    if (phuongThuc === 'momo')
-      redirectUrl = await createMoMoPayment(datVe, tongTien);
-    else if (phuongThuc === 'vnpay')
-      redirectUrl = await createVNPayPayment(datVe, tongTien, req);
-    else if (phuongThuc === 'stripe')
-      redirectUrl = await createStripePayment(datVe, tongTien);
-
     await t.commit();
 
     return res.json({
-      message: 'Tạo đơn đặt vé thành công',
-      redirectUrl
+      message: 'Giư giữ ghế thành công',
+      maDatVe: datVe.maDatVe,
+      thoiHanThanhToan: datVe.thoiHanThanhToan,
     });
 
   } catch (err) {
     console.error(err);
+    await t.rollback();
+    return res.status(500).json({ message: 'Lỗi server' });
+  }
+};
+
+// POST /api/datve/:maDatVe/checkout  - create payment redirect for an existing pending booking
+export const createCheckoutForDatVe = async (req, res) => {
+  const t = await sequelize.transaction();
+  try {
+    const maTaiKhoan = req.user?.maTaiKhoan;
+    if (!maTaiKhoan) return res.status(401).json({ message: 'Chưa xác thực' });
+
+    const maDatVe = Number(req.params.maDatVe);
+    const { phuongThuc, tongTien, khuyenMaiId } = req.body;
+    if (!maDatVe || !phuongThuc) return res.status(400).json({ message: 'Dữ liệu không hợp lệ' });
+
+    // load booking with lock
+    const datVe = await DatVe.findByPk(maDatVe, { transaction: t, lock: t.LOCK.UPDATE });
+    if (!datVe) {
+      await t.rollback();
+      return res.status(404).json({ message: 'Đặt vé không tồn tại' });
+    }
+    // ownership check
+    if (datVe.maTaiKhoanDatVe !== maTaiKhoan) {
+      await t.rollback();
+      return res.status(403).json({ message: 'Không có quyền truy cập' });
+    }
+
+    // must be pending and not expired
+    if (datVe.trangThai !== 'Đang chờ') {
+      await t.rollback();
+      return res.status(400).json({ message: 'Đặt vé không ở trạng thái đang chờ' });
+    }
+    if (new Date(datVe.thoiHanThanhToan) < new Date()) {
+      await datVe.update({ trangThai: 'Đã hủy' }, { transaction: t });
+      await t.commit();
+      return res.status(400).json({ message: 'Thời gian giữ ghế đã hết' });
+    }
+
+    await datVe.update(
+      {
+        trangThai: 'Đang thanh toán',
+        tongTien,
+        maKhuyenMaiId: khuyenMaiId || null,
+        ngayDat: new Date(),
+        thoiHanThanhToan: new Date(Date.now() + 5 * 60 * 1000)
+      },
+      { transaction: t }
+    );
+
+    // update or create payment record
+    const thanhToan = await ThanhToan.findOne({
+      where: { maDatVe },
+      transaction: t,
+      lock: t.LOCK.UPDATE
+    });
+    if (!thanhToan) {
+      await t.rollback();
+      return res.status(500).json({ message: 'Không tìm thấy bản ghi thanh toán' });
+    }
+
+    await thanhToan.update(
+      {
+        phuongThuc,
+        soTien: tongTien,
+        ngayThanhToan: new Date(),
+        trangThai: 'Đang thanh toán'
+      },
+      { transaction: t });
+
+    // call payment provider
+    let redirectUrl;
+    if (phuongThuc === 'momo') redirectUrl = await createMoMoPayment(datVe, thanhToan.soTien);
+    else if (phuongThuc === 'vnpay') redirectUrl = await createVNPayPayment(datVe, thanhToan.soTien, req);
+    else if (phuongThuc === 'stripe') redirectUrl = await createStripePayment(datVe, thanhToan.soTien);
+
+    if (!redirectUrl) {
+      await t.rollback();
+      return res.status(500).json({ message: 'Không tạo được URL thanh toán' });
+    }
+
+    await t.commit();
+    return res.json({ message: 'Tạo URL thanh toán thành công', redirectUrl });
+  } catch (error) {
+    console.error('createCheckoutForDatVe error:', error);
     await t.rollback();
     return res.status(500).json({ message: 'Lỗi server' });
   }
@@ -416,90 +483,7 @@ export const capNhatGheDangDat = async (req, res) => {
   res.json({ message: 'Cập nhật ghế thành công' });
 };
 
-// POST /api/datve/:maDatVe/checkout  - create payment redirect for an existing pending booking
-export const createCheckoutForDatVe = async (req, res) => {
-  const t = await sequelize.transaction();
-  try {
-    const maTaiKhoan = req.user?.maTaiKhoan;
-    if (!maTaiKhoan) return res.status(401).json({ message: 'Chưa xác thực' });
 
-    const maDatVe = Number(req.params.maDatVe);
-    const { phuongThuc, tongTien, khuyenMaiId } = req.body;
-    if (!maDatVe || !phuongThuc) return res.status(400).json({ message: 'Dữ liệu không hợp lệ' });
-
-    // load booking with lock
-    const datVe = await DatVe.findByPk(maDatVe, { transaction: t, lock: t.LOCK.UPDATE });
-    if (!datVe) {
-      await t.rollback();
-      return res.status(404).json({ message: 'Đặt vé không tồn tại' });
-    }
-    // ownership check
-    if (datVe.maTaiKhoanDatVe !== maTaiKhoan) {
-      await t.rollback();
-      return res.status(403).json({ message: 'Không có quyền truy cập' });
-    }
-
-    // must be pending and not expired
-    if (datVe.trangThai !== 'Đang chờ') {
-      await t.rollback();
-      return res.status(400).json({ message: 'Đặt vé không ở trạng thái đang chờ' });
-    }
-    if (new Date(datVe.thoiHanThanhToan) < new Date()) {
-      await datVe.update({ trangThai: 'Đã hủy' }, { transaction: t });
-      await t.commit();
-      return res.status(400).json({ message: 'Thời gian giữ ghế đã hết' });
-    }
-
-    await datVe.update(
-      {
-        trangThai: 'Đang thanh toán',
-        tongTien,
-        maKhuyenMaiId: khuyenMaiId || null,
-        ngayDat: new Date(),
-        thoiHanThanhToan: new Date(Date.now() + 5 * 60 * 1000)
-      },
-      { transaction: t }
-    );
-
-    // update or create payment record
-    const thanhToan = await ThanhToan.findOne({
-      where: { maDatVe },
-      transaction: t,
-      lock: t.LOCK.UPDATE
-    });
-    if (!thanhToan) {
-      await t.rollback();
-      return res.status(500).json({ message: 'Không tìm thấy bản ghi thanh toán' });
-    }
-
-    await thanhToan.update(
-      {
-        phuongThuc,
-        soTien: tongTien,
-        ngayThanhToan: new Date(),
-        trangThai: 'Đang thanh toán'
-      },
-      { transaction: t });
-
-    // call payment provider
-    let redirectUrl;
-    if (phuongThuc === 'momo') redirectUrl = await createMoMoPayment(datVe, thanhToan.soTien);
-    else if (phuongThuc === 'vnpay') redirectUrl = await createVNPayPayment(datVe, thanhToan.soTien, req);
-    else if (phuongThuc === 'stripe') redirectUrl = await createStripePayment(datVe, thanhToan.soTien);
-
-    if (!redirectUrl) {
-      await t.rollback();
-      return res.status(500).json({ message: 'Không tạo được URL thanh toán' });
-    }
-
-    await t.commit();
-    return res.json({ message: 'Tạo URL thanh toán thành công', redirectUrl });
-  } catch (error) {
-    console.error('createCheckoutForDatVe error:', error);
-    await t.rollback();
-    return res.status(500).json({ message: 'Lỗi server' });
-  }
-};
 
 
 // GET /api/datve/:maDatVe - get booking detail (owner or admin)

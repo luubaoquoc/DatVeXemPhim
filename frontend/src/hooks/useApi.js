@@ -6,7 +6,7 @@ import { refreshAuth } from "../redux/features/authSlice";
 
 const useApi = (isProtected = false) => {
 
-  const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000"
+  const BACKEND_URL = import.meta.env.MODE === "development" ? 'http://localhost:5000/api' : '/api';
 
   const accessToken = useSelector((state) => state.auth.accessToken)
 
@@ -15,7 +15,7 @@ const useApi = (isProtected = false) => {
 
   const axiosInstance = useMemo(() => {
     const inst = axios.create({
-      baseURL: `${backendUrl}/api`,
+      baseURL: BACKEND_URL,
       withCredentials: true,
     });
 

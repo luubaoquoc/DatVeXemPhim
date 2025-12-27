@@ -1,9 +1,10 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "src/server.js",
   "scripts": {
-    "start": "nodemon src/server.js"
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js"
   },
   "keywords": [],
   "author": "",
@@ -23,6 +24,7 @@
     "mysql2": "^3.3.0",
     "node-cron": "^4.2.1",
     "nodemailer": "^7.0.6",
+    "phimplus": "file:..",
     "qs": "^6.14.0",
     "sequelize": "^6.32.1",
     "streamifier": "^0.1.1",
