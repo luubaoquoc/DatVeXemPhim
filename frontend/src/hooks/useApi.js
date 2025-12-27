@@ -15,7 +15,7 @@ const useApi = (isProtected = false) => {
 
   const axiosInstance = useMemo(() => {
     const inst = axios.create({
-      baseURL: BACKEND_URL,
+      baseURL: `${BACKEND_URL}/api`,
       withCredentials: true,
     });
 
