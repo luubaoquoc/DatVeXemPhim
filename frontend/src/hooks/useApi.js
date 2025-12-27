@@ -6,7 +6,8 @@ import { refreshAuth } from "../redux/features/authSlice";
 
 const useApi = (isProtected = false) => {
 
-  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+  // const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+  const BACKEND_URL = "http://localhost:5000";
 
   const accessToken = useSelector((state) => state.auth.accessToken)
 
