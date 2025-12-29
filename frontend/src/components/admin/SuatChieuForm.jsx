@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Select from "react-select";
 import toast from "react-hot-toast";
 import useApi from "../../hooks/useApi";
+import { formatDatetimeLocal } from "../../lib/formatDatetimeLocal";
 
 const SuatChieuForm = ({ onSubmit, onClose, editItem }) => {
   const api = useApi(true)
@@ -47,11 +48,6 @@ const SuatChieuForm = ({ onSubmit, onClose, editItem }) => {
   useEffect(() => {
     if (editItem) {
 
-      const toLocalInput = (dateString) => {
-        const d = new Date(dateString);
-        d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
-        return d.toISOString().slice(0, 16);
-      };
 
       setFormData({
         maPhim: editItem.maPhim,
@@ -61,8 +57,8 @@ const SuatChieuForm = ({ onSubmit, onClose, editItem }) => {
       });
 
       setTimeSlots([{
-        gioBatDau: toLocalInput(editItem.gioBatDau),
-        gioKetThuc: toLocalInput(editItem.gioKetThuc),
+        gioBatDau: formatDatetimeLocal(editItem.gioBatDau),
+        gioKetThuc: formatDatetimeLocal(editItem.gioKetThuc),
       }]);
     }
   }, [editItem]);
@@ -121,8 +117,7 @@ const SuatChieuForm = ({ onSubmit, onClose, editItem }) => {
     const d = new Date(start);
     if (isNaN(d)) return "";
     d.setMinutes(d.getMinutes() + duration);
-    d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
-    return d.toISOString().slice(0, 16);
+    return formatDatetimeLocal(d);
   };
 
   /* ==============================
@@ -132,8 +127,8 @@ const SuatChieuForm = ({ onSubmit, onClose, editItem }) => {
     const updated = [...timeSlots];
     updated[index][field] = value;
 
-    if (field === "gioBatDau" && formData.thoiLuong > 0) {
-      updated[index].gioKetThuc = calcEndTime(value, formData.thoiLuong);
+    if (field === "gioBatDau" && Number(formData.thoiLuong) > 0) {
+      updated[index].gioKetThuc = calcEndTime(value, Number(formData.thoiLuong));
     }
 
     setTimeSlots(updated);
@@ -171,13 +166,20 @@ const SuatChieuForm = ({ onSubmit, onClose, editItem }) => {
     }
 
     try {
-      const payloadArray = timeSlots.map((slot) => ({
-        maPhim: formData.maPhim,
-        maPhong: formData.maPhong,
-        gioBatDau: slot.gioBatDau,
-        gioKetThuc: slot.gioKetThuc,
-        giaVeCoBan: formData.giaVeCoBan,
-      }));
+      const payloadArray = timeSlots.map((slot) => {
+        const gioKetThuc = calcEndTime(
+          slot.gioBatDau,
+          Number(formData.thoiLuong)
+        );
+
+        return {
+          maPhim: formData.maPhim,
+          maPhong: formData.maPhong,
+          gioBatDau: slot.gioBatDau,
+          gioKetThuc, // ÉP TÍNH LẠI
+          giaVeCoBan: formData.giaVeCoBan,
+        };
+      });
 
       if (editItem) {
         await onSubmit(payloadArray[0]);
@@ -270,13 +272,9 @@ const SuatChieuForm = ({ onSubmit, onClose, editItem }) => {
                   <input
                     type="datetime-local"
                     value={slot.gioKetThuc}
+                    disabled
                     onChange={(e) => updateTimeSlot(index, "gioKetThuc", e.target.value)}
-                    className={`w-full p-2 rounded
-              ${editPhongOption
-                        ? "bg-gray-800 border-gray-700 text-gray-500 cursor-not-allowed"
-                        : "bg-[#111] border-gray-700"}
-              `}
-                    required
+
                   />
                 </div>
 

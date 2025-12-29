@@ -221,26 +221,55 @@ export const vnpayReturn = async (req, res) => {
  *  Stripe webhook
  */
 export const stripeWebhook = async (req, res) => {
+  console.log('🔥 Stripe webhook received');
+
+  const sig = req.headers['stripe-signature'];
+  let event;
   try {
-    const event = req.body;
-    const orderId = event.data?.object?.metadata?.orderId;
 
-    if (!orderId) return res.status(400).json({ message: 'Thiếu mã đơn hàng' });
+    event = stripe.webhooks.constructEvent(
+      req.body,
+      sig,
+      process.env.STRIPE_WEBHOOK_SECRET
+    );
 
-    const datVe = await DatVe.findOne({ where: { maDatVe: orderId } });
-    const thanhToan = await ThanhToan.findOne({ where: { maDatVe: orderId } });
-
-    if (event.type === 'checkout.session.completed') {
-      await datVe.update({ trangThai: 'Thành công' });
-      await thanhToan.update({ trangThai: 'Thành công' });
-    } else if (event.type === 'checkout.session.expired') {
-      await datVe.update({ trangThai: 'Thất bại' });
-      await thanhToan.update({ trangThai: 'Thất bại' });
-    }
-
-    res.json({ received: true });
   } catch (error) {
-    console.error('stripeWebhook error:', error);
-    return res.status(500).json({ message: 'Lỗi server' });
+    console.error(' Stripe signature verification failed:', error.message);
+    return res.status(400).send('Webhook Error');
   }
+
+  const session = event.data.object;
+
+  const orderId = session.metadata?.orderId;
+
+  if (!orderId) {
+    return res.status(400).json({ message: 'Không tìm thấy orderId trong metadata' });
+  }
+
+  const datVe = await DatVe.findOne({ where: { maDatVe: orderId } });
+  if (!datVe) {
+    return res.status(404).json({ message: 'Không tìm thấy đơn đặt vé' });
+  }
+  const thanhToan = await ThanhToan.findOne({ where: { maDatVe: orderId } });
+  if (!thanhToan) {
+    return res.status(404).json({ message: 'Không tìm thấy thông tin thanh toán' });
+  }
+  if (event.type === 'checkout.session.completed') {
+    // Payment is successful
+    await datVe.update({ trangThai: 'Thành công' });
+    await thanhToan.update({ trangThai: 'Thành công' });
+    await ChiTietDatVe.update(
+      { trangThai: 'Đã thanh toán' },
+      { where: { maDatVe: orderId } }
+    );
+  } else if (event.type === 'checkout.session.expired') {
+    // Payment failed or expired
+    await datVe.update({ trangThai: 'Thất bại' });
+    await thanhToan.update({ trangThai: 'Thất bại' });
+    await ChiTietDatVe.update(
+      { trangThai: 'Thất bại' },
+      { where: { maDatVe: orderId } }
+    );
+  }
+  res.status(200).json({ received: true });
 };

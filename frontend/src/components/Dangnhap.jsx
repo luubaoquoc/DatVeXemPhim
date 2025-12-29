@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { login, register } from '../redux/features/authSlice'
 import toast from "react-hot-toast";
 import OtpModal from "./OtpModal";
@@ -17,6 +17,9 @@ const Dangnhap = ({ onClose }) => {
   const [otp, setOtp] = useState("");
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [showNew, setShowNew] = useState(false)
+
+  const { status } = useSelector((state) => state.auth);
+  const loading = status === 'loading';
 
   const navigate = useNavigate();
 
@@ -115,9 +118,14 @@ const Dangnhap = ({ onClose }) => {
 
               <button
                 type="submit"
-                className="bg-primary hover:bg-primary-dull text-white py-2 rounded cursor-pointer"
+                disabled={loading}
+                className={`bg-primary hover:bg-primary-dull text-white py-2 rounded cursor-pointer 
+                  ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
               >
-                {isLogin ? "Đăng nhập" : "Đăng ký"}
+                {isLogin ?
+                  (loading
+                    ? "Đang đăng nhập..." : "Đăng nhập")
+                  : (loading ? "Đang đăng ký..." : "Đăng ký")}
               </button>
             </form>
 

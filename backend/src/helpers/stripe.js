@@ -1,24 +1,28 @@
 import Stripe from 'stripe';
-const stripe = new Stripe('sk_test_51Nxxxxxxx'); // test key
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY); // test key
 
 const createStripePayment = async (datVe, tongTien) => {
   const session = await stripe.checkout.sessions.create({
+    mode: 'payment',
     payment_method_types: ['card'],
+
+
+    metadata: { orderId: datVe.maDatVe.toString() },
     line_items: [
       {
         price_data: {
-          currency: 'vnd',
+          currency: 'VND',
           product_data: {
-            name: 'Vé xem phim',
+            name: `Vé xem phim - Đơn #${datVe.maDatVe}`,
           },
-          unit_amount: tongTien,
+          unit_amount: Math.round(tongTien),
         },
         quantity: 1,
       },
     ],
     mode: 'payment',
-    success_url: 'http://localhost:5173/payment-success',
-    cancel_url: 'http://localhost:5173/payment-failed',
+    success_url: `${process.env.CLIENT_URL}/dat-ve-thanh-cong?status=00&maDatVe=${datVe.maDatVe}`,
+    cancel_url: `${process.env.CLIENT_URL}/lich-su-dat-ve`,
   });
 
   return session.url;

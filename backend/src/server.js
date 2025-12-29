@@ -33,7 +33,7 @@ const __dirname = path.resolve();
 
 await connectDB();
 
-app.use(express.json());
+
 app.use(cookieParser());
 app.use(cors({
   origin: process.env.CLIENT_URL,
@@ -52,8 +52,8 @@ app.use(cors({
 // });
 
 
-
-
+app.use('/api/payment', paymentRoutes);
+app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use('/api/taikhoan', taiKhoanRoutes);
 app.use('/api/phim', phimRoutes);
@@ -62,7 +62,7 @@ app.use('/api/theloai', theLoaiRoutes);
 app.use('/api/dienvien', dienVienRoutes);
 app.use('/api/suatchieu', suatChieuRoutes);
 app.use('/api/datve', datVeRoutes);
-app.use('/api/payment', paymentRoutes);
+
 app.use('/api/phongchieu', phongChieuRoutes);
 app.use('/api/rap', rapRoutes);
 app.use("/api/ghe", gheRoutes);

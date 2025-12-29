@@ -25,7 +25,7 @@ export const createVNPayPayment = async (datVe, tongTien, req) => {
     .format('YYYYMMDDHHmmss')
 
   const paymentUrl = vnpay.buildPaymentUrl({
-    vnp_Amount: tongTien * 100, //  BẮT BUỘC
+    vnp_Amount: tongTien,
     vnp_IpAddr: ipAddr,
     vnp_TxnRef: datVe.maDatVe.toString(),
     vnp_OrderInfo: `Thanh toán vé xem phim - Mã ${datVe.maDatVe}`,

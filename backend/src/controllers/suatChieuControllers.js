@@ -248,8 +248,8 @@ export const createSuatChieu = async (req, res) => {
 
       // Format datetime
       for (const sc of body) {
-        sc.gioBatDau = new Date(sc.gioBatDau);
-        sc.gioKetThuc = new Date(sc.gioKetThuc);
+        sc.gioBatDau = new Date(sc.gioBatDau + ":00");
+        sc.gioKetThuc = new Date(sc.gioKetThuc + ":00");
       }
 
       // --- Check trùng giữa các suất trong payload ---
@@ -330,13 +330,55 @@ export const createSuatChieu = async (req, res) => {
 export const updateSuatChieu = async (req, res) => {
   try {
     const ma = Number(req.params.maSuatChieu);
-    if (!ma) return res.status(400).json({ message: 'maSuatChieu không hợp lệ' });
-    const sc = await SuatChieu.findByPk(ma);
-    if (!sc) return res.status(404).json({ message: 'Suất chiếu không tồn tại' });
-    console.log(req.body);
+    if (!ma) {
+      return res.status(400).json({ message: 'maSuatChieu không hợp lệ' });
+    }
 
-    await sc.update(req.body);
-    return res.json({ message: 'Cập nhật suất chiếu thành công', suatChieu: sc });
+    const sc = await SuatChieu.findByPk(ma, {
+      include: [{
+        model: Phim,
+        as: 'phim',
+        attributes: ['thoiLuong']
+      }]
+    });
+
+    if (!sc) {
+      return res.status(404).json({ message: 'Suất chiếu không tồn tại' });
+    }
+
+    const body = { ...req.body };
+
+    // 🔒 ÉP TÍNH LẠI GIỜ KẾT THÚC
+    if (body.gioBatDau) {
+      const start = new Date(body.gioBatDau + ":00");
+      if (isNaN(start)) {
+        return res.status(400).json({ message: "gioBatDau không hợp lệ" });
+      }
+
+      const duration = sc.phim?.thoiLuong;
+      if (!duration) {
+        return res.status(400).json({ message: "Không lấy được thời lượng phim" });
+      }
+
+      const end = new Date(start);
+      end.setMinutes(end.getMinutes() + duration);
+
+      body.gioBatDau = start;
+      body.gioKetThuc = end;
+    }
+
+    // ❌ XÓA gioKetThuc nếu FE gửi rác
+    if (!body.gioKetThuc) {
+      delete body.gioKetThuc;
+    }
+
+    await sc.update(body);
+
+    return res.json({
+      message: 'Cập nhật suất chiếu thành công',
+      suatChieu: sc
+    });
+
   } catch (error) {
     console.error('updateSuatChieu error:', error);
     return res.status(500).json({ message: 'Lỗi server' });
