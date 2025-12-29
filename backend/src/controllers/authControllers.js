@@ -1,7 +1,7 @@
 import TaiKhoan from "../models/TaiKhoan.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { sendVerificationEmail, sendVerificationEmailResend } from "../utils/sendEmail.js";
+import { sendVerificationEmail } from "../utils/sendEmail.js";
 
 const createAccessToken = (user) => {
   return jwt.sign(user, process.env.JWT_ACCESS_SECRET, { expiresIn: "1h" });
@@ -25,7 +25,7 @@ export const register = async (req, res) => {
         const otpHetHan = Date.now() + 5 * 60 * 1000;
 
         await existing.update({ otpMa: newOtp, otpHetHan });
-        await sendVerificationEmailResend({
+        await sendVerificationEmail({
           to: email,
           subject: "Mã xác thực tài khoản Go Cinema",
           html: `
@@ -57,7 +57,7 @@ export const register = async (req, res) => {
       otpHetHan: Date.now() + 5 * 60 * 1000
     });
 
-    await sendVerificationEmailResend({
+    await sendVerificationEmail({
       to: email,
       subject: "Mã xác thực tài khoản Go Cinema",
       html: `
@@ -131,7 +131,7 @@ export const resendOtp = async (req, res) => {
       otpHetHan: newExpiry,
     });
 
-    await sendVerificationEmailResend({
+    await sendVerificationEmail({
       to: email,
       subject: "Gửi lại mã xác thực tài khoản Go Cinema",
       html: `
