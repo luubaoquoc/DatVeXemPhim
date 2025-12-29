@@ -1,6 +1,7 @@
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 dotenv.config();
+import { Resend } from "resend";
 
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST,
@@ -19,6 +20,18 @@ const transporter = nodemailer.createTransport({
 export const sendVerificationEmail = async ({ to, subject, html }) => {
   await transporter.sendMail({
     from: process.env.EMAIL_FROM,
+    to,
+    subject,
+    html,
+  });
+};
+
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+export const sendVerificationEmailResend = async ({ to, subject, html }) => {
+  await resend.emails.send({
+    from: "Go Cinema <onboarding@resend.dev>",
     to,
     subject,
     html,

@@ -243,13 +243,16 @@ export const createSuatChieu = async (req, res) => {
   try {
     const body = req.body;
 
+
     // Nếu payload là array → xử lý batch create
     if (Array.isArray(body)) {
 
       // Format datetime
       for (const sc of body) {
-        sc.gioBatDau = new Date(sc.gioBatDau + ":00");
-        sc.gioKetThuc = new Date(sc.gioKetThuc + ":00");
+        console.log(sc.gioBatDau);
+        console.log(sc.gioKetThuc);
+        sc.gioBatDau = new Date(sc.gioBatDau);
+        sc.gioKetThuc = new Date(sc.gioKetThuc);
       }
 
       // --- Check trùng giữa các suất trong payload ---

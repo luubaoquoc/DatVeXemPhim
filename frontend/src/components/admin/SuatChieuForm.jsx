@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Select from "react-select";
 import toast from "react-hot-toast";
 import useApi from "../../hooks/useApi";
-import { formatDatetimeLocal } from "../../lib/formatDatetimeLocal";
+import { localToUTC, utcToLocalInput } from "../../lib/formatDatetimeLocal";
 
 const SuatChieuForm = ({ onSubmit, onClose, editItem }) => {
   const api = useApi(true)
@@ -53,12 +53,12 @@ const SuatChieuForm = ({ onSubmit, onClose, editItem }) => {
         maPhim: editItem.maPhim,
         maPhong: editItem.maPhong,
         giaVeCoBan: editItem.giaVeCoBan,
-        thoiLuong: editItem?.phim?.thoiLuong || 0, // lấy từ include
+        thoiLuong: editItem?.phim?.thoiLuong || 0,
       });
 
       setTimeSlots([{
-        gioBatDau: formatDatetimeLocal(editItem.gioBatDau),
-        gioKetThuc: formatDatetimeLocal(editItem.gioKetThuc),
+        gioBatDau: utcToLocalInput(editItem.gioBatDau),
+        gioKetThuc: utcToLocalInput(editItem.gioKetThuc),
       }]);
     }
   }, [editItem]);
@@ -117,7 +117,7 @@ const SuatChieuForm = ({ onSubmit, onClose, editItem }) => {
     const d = new Date(start);
     if (isNaN(d)) return "";
     d.setMinutes(d.getMinutes() + duration);
-    return formatDatetimeLocal(d);
+    return utcToLocalInput(d.toISOString());
   };
 
   /* ==============================
@@ -175,8 +175,8 @@ const SuatChieuForm = ({ onSubmit, onClose, editItem }) => {
         return {
           maPhim: formData.maPhim,
           maPhong: formData.maPhong,
-          gioBatDau: slot.gioBatDau,
-          gioKetThuc, // ÉP TÍNH LẠI
+          gioBatDau: localToUTC(slot.gioBatDau),
+          gioKetThuc: localToUTC(gioKetThuc),
           giaVeCoBan: formData.giaVeCoBan,
         };
       });
