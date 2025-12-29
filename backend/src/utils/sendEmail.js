@@ -31,7 +31,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const sendVerificationEmailResend = async ({ to, subject, html }) => {
   await resend.emails.send({
-    from: "Go Cinema <onboarding@resend.dev>",
+    from: "Go Cinema <quoclep2003@gmail.com>",
     to,
     subject,
     html,

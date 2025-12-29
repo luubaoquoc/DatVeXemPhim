@@ -131,7 +131,7 @@ export const resendOtp = async (req, res) => {
       otpHetHan: newExpiry,
     });
 
-    await sendVerificationEmail({
+    await sendVerificationEmailResend({
       to: email,
       subject: "Gửi lại mã xác thực tài khoản Go Cinema",
       html: `
