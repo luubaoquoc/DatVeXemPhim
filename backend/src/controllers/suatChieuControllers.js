@@ -353,7 +353,7 @@ export const updateSuatChieu = async (req, res) => {
 
     // 🔒 ÉP TÍNH LẠI GIỜ KẾT THÚC
     if (body.gioBatDau) {
-      const start = new Date(body.gioBatDau + ":00");
+      const start = new Date(body.gioBatDau);
       if (isNaN(start)) {
         return res.status(400).json({ message: "gioBatDau không hợp lệ" });
       }

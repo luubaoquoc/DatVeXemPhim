@@ -672,7 +672,7 @@ export const BanVeTaiQuay = async (req, res) => {
         message: `Ghế ${gheLoi.join(', ')} đã có người đặt`
       });
     }
-    const tongTien = seats.reduce((sum, g) => sum + (g.giaVe || 0), 0);
+    const tongTien = seats.reduce((sum, g) => sum + Number(g.giaVe || 0), 0);
 
     //  2. Tạo DatVe
     const datVe = await DatVe.create({
@@ -687,7 +687,7 @@ export const BanVeTaiQuay = async (req, res) => {
     const ct = seats.map(g => ({
       maDatVe: datVe.maDatVe,
       maGhe: g.maGhe,
-      giaVe: g.giaVe,
+      giaVe: Number(g.giaVe),
       trangThai: 'Đã thanh toán'
     }));
     await ChiTietDatVe.bulkCreate(ct, { transaction: t });
