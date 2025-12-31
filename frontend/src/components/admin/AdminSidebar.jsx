@@ -115,7 +115,7 @@ const AdminSidebar = ({ onClose }) => {
       name: 'Quản lý khuyến mãi',
       path: '/admin/quan-ly-khuyen-mai',
       icon: TagsIcon,
-      roles: [3, 4]
+      roles: [4]
     },
 
     {
@@ -146,7 +146,7 @@ const AdminSidebar = ({ onClose }) => {
     border-r border-gray-300/30 w-full text-sm overflow-y-auto bg-gray-950 no-scrollbar sticky top-[64px]'>
       {/* Avatar + tên admin */}
       <div className='flex flex-col items-center border-b border-gray-700 pb-3'>
-        <img src={user.anhDaiDien} alt="" className='h-9 md:h-18 w-9 md:w-18 rounded-full mx-auto' />
+        <img src={user.anhDaiDien || "https://cdn2.fptshop.com.vn/small/avatar_trang_1_cd729c335b.jpg"} alt="" className='h-9 md:h-18 w-9 md:w-18 rounded-full mx-auto' />
         <p className='mt-2 text-xl max-md:hidden font-medium text-gray-200'>{user.hoTen}</p>
         <div onClick={() => dispatch(logout())}
           className='flex items-center mt-2 gap-2 border p-2 border-red-400 rounded cursor-pointer hover:text-red-400 transition'>

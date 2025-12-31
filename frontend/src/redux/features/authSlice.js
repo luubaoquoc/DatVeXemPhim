@@ -58,6 +58,8 @@ const authSlice = createSlice({
     loading: true,
     error: null,
     otpStatus: 'idle',
+
+    authIntent: null,
   },
   reducers: {
     setCredentials(state, action) {
@@ -67,6 +69,12 @@ const authSlice = createSlice({
     clearCredentials(state) {
       state.user = null
       state.accessToken = null
+    },
+    setAuthIntent(state, action) {
+      state.authIntent = action.payload
+    },
+    clearAuthIntent(state) {
+      state.authIntent = null
     },
     updateProfile: (state, action) => {
       state.user = { ...state.user, ...action.payload };
@@ -100,6 +108,6 @@ const authSlice = createSlice({
   }
 })
 
-export const { setCredentials, clearCredentials, updateProfile, updateAvatar } = authSlice.actions
+export const { setCredentials, clearCredentials, setAuthIntent, clearAuthIntent, updateProfile, updateAvatar } = authSlice.actions
 
 export default authSlice.reducer

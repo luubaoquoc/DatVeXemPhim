@@ -23,13 +23,14 @@ const SoDoGheNgoi = () => {
 
   const maDatVe = state?.maDatVe;
 
-
   const [show, setShow] = useState(null);
   const [seats, setSeats] = useState([]);
   const [bookedSeats, setBookedSeats] = useState([]);
   const [selectedSeats, setSelectedSeats] = useState([]);
   const [selectedTime, setSelectedTime] = useState(null);
   const [timeLeft, setTimeLeft] = useState(null);
+  const [roomShows, setRoomShows] = useState([]);
+
 
   /* ====================== LOAD DATA ====================== */
 
@@ -44,6 +45,23 @@ const SoDoGheNgoi = () => {
       toast.error("Không thể tải suất chiếu");
     }
   }, [maSuatChieu, publicApi]);
+
+  const loadRoomShows = useCallback(async () => {
+    const maPhong = show?.phongChieu?.maPhong;
+    if (!maPhong) return;
+
+    try {
+      const date = show.gioBatDau.slice(0, 10);
+      const { data } = await publicApi.get('/suatchieu/phong', {
+        params: { maPhong, date }
+      });
+      setRoomShows(data);
+    } catch (err) {
+      console.error("Load room shows failed", err);
+      toast.error("Không thể tải lịch chiếu phòng");
+    }
+  }, [show, publicApi]);
+
 
   const loadSeats = useCallback(async () => {
     const maPhong = show?.phongChieu?.maPhong;
@@ -95,6 +113,7 @@ const SoDoGheNgoi = () => {
   /* ====================== EFFECTS ====================== */
 
   useEffect(() => { loadShow(); }, [loadShow]);
+  useEffect(() => { loadRoomShows(); }, [loadRoomShows]);
   useEffect(() => { loadSeats(); }, [loadSeats]);
   useEffect(() => { loadBookedSeats(); }, [loadBookedSeats]);
   useEffect(() => { restoreSelectedSeats(); }, [restoreSelectedSeats]);
@@ -147,6 +166,18 @@ const SoDoGheNgoi = () => {
     return () => clearInterval(interval);
   }, [loadBookedSeats]);
 
+
+  const handleChangeShow = (newMaSuatChieu) => {
+    if (newMaSuatChieu === Number(maSuatChieu)) return;
+
+    setSelectedSeats([]);
+    setBookedSeats([]);
+    setTimeLeft(null);
+
+    navigate(`/chon-ghe/${newMaSuatChieu}`, {
+      replace: true
+    });
+  };
 
 
   /* ====================== HANDLERS ====================== */
@@ -227,6 +258,25 @@ const SoDoGheNgoi = () => {
     }
   };
 
+  const handleBackFromSeatMap = async () => {
+    try {
+      if (maDatVe) {
+        await api.delete(`/datve/${maDatVe}/cancel`);
+      }
+    } catch (err) {
+      console.error("Hủy đặt vé thất bại:", err);
+    } finally {
+      const phimId = show?.phim?.maPhim;
+      if (phimId) {
+        navigate(`/phims/${phimId}`, { replace: true });
+      } else {
+        navigate("/", { replace: true });
+      }
+    }
+  };
+
+
+
   /* ====================== RENDER ====================== */
 
   if (!show) return <Loading />;
@@ -236,16 +286,34 @@ const SoDoGheNgoi = () => {
       <div className="flex flex-col flex-2">
         <div className="flex items-center bg-primary/10 border border-primary/20 rounded-lg py-2">
           <p className="text-lg font-semibold px-6">Suất chiếu</p>
-          <div className="flex items-center gap-4 px-6">
-            <ClockIcon className="w-4 h-4" />
-            <p className="text-sm">
-              {show.gioBatDau ? isoTimeFormat(show.gioBatDau) : "Chưa có giờ"}
-            </p>
-            <span className="text-gray-300">-</span>
-            <p className="text-sm text-gray-300">
-              Phòng: <span className="text-primary">{show.phongChieu?.tenPhong}</span>
-            </p>
+          <div className="flex flex-wrap gap-3 px-6 mt-2">
+            {roomShows.map(sc => {
+              const isActive = sc.maSuatChieu === Number(maSuatChieu);
+              const isPast = new Date(sc.gioBatDau).getTime() < Date.now();
+
+              return (
+                <button
+                  key={sc.maSuatChieu}
+                  disabled={isPast}
+                  onClick={() => !isPast && handleChangeShow(sc.maSuatChieu)}
+                  className={` px-4 py-1.5 rounded border text-sm
+                    ${isActive
+                      ? 'bg-primary text-white border-primary'
+                      : 'border-primary/40 hover:bg-primary/20'
+                    }
+                    ${isPast
+                      ? 'bg-gray-700/50 text-gray-400 border-gray-600 cursor-not-allowed'
+                      : 'cursor-pointer'
+                    }
+                `}
+                >
+                  {isoTimeFormat(sc.gioBatDau)}
+                </button>
+              );
+            })}
+
           </div>
+
         </div>
         <div className="flex flex-wrap gap-4 items-center justify-center text-sm mt-5">
           <div className="flex items-center gap-2">
@@ -289,7 +357,7 @@ const SoDoGheNgoi = () => {
           selectedTime={selectedTime}
           giaVeCoBan={show.giaVeCoBan}
           timeLeft={timeLeft}
-          onBack={() => navigate(-1)}
+          onBack={handleBackFromSeatMap}
           onAction={handleThanhToan}
           actionLabel="Tiếp tục"
         />

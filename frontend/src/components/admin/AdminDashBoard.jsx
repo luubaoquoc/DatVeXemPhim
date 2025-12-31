@@ -203,7 +203,7 @@ const AdminDashboard = () => {
         <Card
           icon={<CircleDollarSignIcon />}
           label="Doanh thu hôm nay"
-          value={dashboard.cards.doanhThu.toLocaleString() + " " + currency}
+          value={Number(dashboard.cards.doanhThu).toLocaleString("vi-VN") + " " + currency}
           color="text-green-500"
         />
         <Card

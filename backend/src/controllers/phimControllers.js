@@ -356,14 +356,29 @@ export const getLikedPhims = async (req, res) => {
               model: TheLoai,
               as: 'theLoais',
               through: { attributes: [] }
+            },
+            {
+              model: DanhGia,
+              as: 'danhGias',
+              attributes: ['diem'],
             }
           ]
         }]
     });
     if (!user) return res.status(404).json({ message: 'Người dùng không tồn tại' });
 
+    const data = user.likedPhims.map(phim => {
+      const plainPhim = phim.get({ plain: true });
+      const danhGias = plainPhim.danhGias || [];
+
+      plainPhim.rating = danhGias.length
+        ? (danhGias.reduce((sum, dg) => sum + parseFloat(dg.diem || 0), 0) / danhGias.length).toFixed(1)
+        : null;
+      return plainPhim;
+    });
+
     // trả về danh sách phim
-    return res.json({ data: user.likedPhims || [] });
+    return res.json({ data });
   } catch (err) {
     console.error('getLikedPhims error:', err);
     return res.status(500).json({ message: 'Lỗi server' });

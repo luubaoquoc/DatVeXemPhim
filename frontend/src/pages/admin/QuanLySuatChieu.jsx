@@ -19,7 +19,7 @@ const QuanLySuatChieu = () => {
 
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
-  const limit = 10
+  let limit = 10
 
   const [search, setSearch] = useState("")
   const [filterPhong, setFilterPhong] = useState("")
@@ -48,7 +48,11 @@ const QuanLySuatChieu = () => {
   };
 
   const fetchPhongs = async () => {
-    const res = await api.get("/phongChieu")
+    const res = await api.get("/phongChieu", {
+      params: {
+        limit: 1000,
+      },
+    })
     setPhong(res.data.data)
   };
 

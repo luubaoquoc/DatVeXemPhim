@@ -729,3 +729,53 @@ export const BanVeTaiQuay = async (req, res) => {
     return res.status(500).json({ message: 'Lỗi server' });
   }
 };
+
+
+export const cancelDatVe = async (req, res) => {
+  const t = await sequelize.transaction();
+  try {
+    const { maDatVe } = req.params;
+    const maTaiKhoan = req.user?.maTaiKhoan;
+
+    const datVe = await DatVe.findOne({
+      where: {
+        maDatVe,
+        maTaiKhoanDatVe: maTaiKhoan,
+        trangThai: 'Đang chờ'
+      },
+      transaction: t
+    });
+
+    if (!datVe) {
+      await t.rollback();
+      return res.status(404).json({ message: 'Đặt vé không tồn tại hoặc không thể hủy' });
+    }
+
+    // Xóa chi tiết ghế
+    await ChiTietDatVe.destroy({
+      where: { maDatVe },
+      transaction: t
+    });
+
+    // Xóa thanh toán
+    await ThanhToan.destroy({
+      where: { maDatVe },
+      transaction: t
+    });
+
+    // Xóa DatVe
+    await DatVe.destroy({
+      where: { maDatVe },
+      transaction: t
+    });
+
+    await t.commit();
+
+    return res.json({ message: 'Đã hủy giữ ghế' });
+  } catch (err) {
+    await t.rollback();
+    console.error(err);
+    return res.status(500).json({ message: 'Lỗi server' });
+  }
+};
+

@@ -1,5 +1,5 @@
 import Stripe from 'stripe';
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY); // test key
+export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY); // test key
 
 const createStripePayment = async (datVe, tongTien) => {
   const session = await stripe.checkout.sessions.create({
@@ -20,7 +20,6 @@ const createStripePayment = async (datVe, tongTien) => {
         quantity: 1,
       },
     ],
-    mode: 'payment',
     success_url: `${process.env.CLIENT_URL}/dat-ve-thanh-cong?status=00&maDatVe=${datVe.maDatVe}`,
     cancel_url: `${process.env.CLIENT_URL}/lich-su-dat-ve`,
   });

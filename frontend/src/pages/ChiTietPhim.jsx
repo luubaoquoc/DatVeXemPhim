@@ -14,10 +14,10 @@ import useApi from '../hooks/useApi.js'
 import toast from 'react-hot-toast'
 import DanhGiaModal from '../components/DanhGiaForm.jsx'
 import Dangnhap from '../components/Dangnhap.jsx'
+import { clearAuthIntent, setAuthIntent } from '../redux/features/authSlice.js'
 
 const ChiTietPhim = () => {
   const { maPhim } = useParams()
-  // const publicApi = useApi(false)
   const api = useApi(true)
   const navigate = useNavigate()
   const dispatch = useDispatch()
@@ -25,12 +25,14 @@ const ChiTietPhim = () => {
   const movie = useSelector((state) => state.phim.current)
   const allMovies = useSelector(state => state.phim.items || [])
   const currentStatus = useSelector((state) => state.phim.currentStatus)
-  // const [dateTimeMap, setDateTimeMap] = useState({})
+  const authIntent = useSelector(state => state.auth.authIntent)
   const [selectedDate, setSelectedDate] = useState(null)
   const [showTrailer, setShowTrailer] = useState(false)
   const [liked, setLiked] = useState(false)
-  const [showDanhGia, setShowDanhGia] = useState(false);
+  const [showDanhGia, setShowDanhGia] = useState(false)
   const [showLoginModal, setShowLoginModal] = useState(false)
+  const [selectedRap, setSelectedRap] = useState('all')
+
 
 
   useEffect(() => {
@@ -62,78 +64,6 @@ const ChiTietPhim = () => {
   }, [maPhim])
 
 
-  // fetch available dates for this movie from suatchieu API
-  // useEffect(() => {
-  //   const formatLocalDate = (d) => {
-  //     const y = d.getFullYear()
-  //     const m = String(d.getMonth() + 1).padStart(2, '0')
-  //     const day = String(d.getDate()).padStart(2, '0')
-  //     return `${y}-${m}-${day}`
-  //   }
-  //   const getDates = async () => {
-  //     const resolvedMaPhim = (movie && (movie.maPhim || movie.maPhim === 0))
-  //       ? movie.maPhim
-  //       : (Number(maPhim) || null)
-  //     if (!resolvedMaPhim) return setDateTimeMap({})
-
-  //     try {
-  //       const res = await publicApi.get('/suatchieu', { params: { maPhim: resolvedMaPhim, page: 1, limit: 200 } })
-  //       const rows = res.data?.data || res.data || []
-  //       const map = {}
-  //       const toLocalDate = (iso) => {
-  //         if (!iso) return null
-  //         const d = new Date(iso)
-  //         const y = d.getFullYear()
-  //         const m = String(d.getMonth() + 1).padStart(2, '0')
-  //         const day = String(d.getDate()).padStart(2, '0')
-  //         return `${y}-${m}-${day}`
-  //       }
-
-  //       rows.forEach(r => {
-  //         const dt = r.gioBatDau ? toLocalDate(r.gioBatDau) : null
-  //         if (!dt) return
-  //         if (!map[dt]) map[dt] = []
-  //         map[dt].push({
-  //           maSuatChieu: r.maSuatChieu,
-  //           gioBatDau: r.gioBatDau,
-  //           giaVeCoBan: r.giaVeCoBan
-  //         })
-  //       })
-
-  //       // ✅ Lọc chỉ lấy ngày chiếu từ hôm nay trở đi (bỏ qua suất chiếu đã qua)
-  //       const today = new Date()
-  //       today.setHours(0, 0, 0, 0)
-
-  //       const filteredMap = {}
-  //       Object.keys(map)
-  //         .filter(k => {
-  //           const d = new Date(k)
-  //           d.setHours(0, 0, 0, 0)
-  //           return d >= today
-  //         })
-  //         .sort((a, b) => new Date(a) - new Date(b))
-  //         .forEach(k => {
-  //           filteredMap[k] = map[k]
-  //         })
-
-  //       setDateTimeMap(filteredMap)
-
-  //       // ✅ Nếu hôm nay có suất chiếu thì chọn hôm nay, nếu không thì chọn ngày gần nhất kế tiếp
-  //       if (filteredMap[formatLocalDate(today)]) {
-  //         setSelectedDate(formatLocalDate(today))
-  //       } else if (Object.keys(filteredMap).length > 0) {
-  //         setSelectedDate(Object.keys(filteredMap)[0])
-  //       } else {
-  //         setSelectedDate(null)
-  //       }
-  //     } catch (err) {
-  //       console.error('Lỗi khi lấy ngày chiếu', err)
-  //       setDateTimeMap({})
-  //       setSelectedDate(new Date().toLocaleDateString('sv-SE'))
-  //     }
-  //   }
-  //   getDates()
-  // }, [movie, maPhim])
 
   useEffect(() => {
     if (!selectedDate) {
@@ -145,6 +75,31 @@ const ChiTietPhim = () => {
     }
   }, [])
 
+  useEffect(() => {
+    if (!user || !authIntent) return;
+
+    if (
+      authIntent.action === 'danhGia' &&
+      String(authIntent.maPhim) === String(maPhim)
+    ) {
+      setShowDanhGia(true);
+    }
+
+    if (
+      authIntent.action === 'likePhim' &&
+      String(authIntent.maPhim) === String(maPhim)
+    ) {
+      toggleLike(); // hoặc setLiked(true)
+    }
+
+    if (authIntent.action === 'chon-suatChieu') {
+      navigate(`/chon-ghe/${authIntent.maSuatChieu}`);
+    }
+
+    dispatch(clearAuthIntent());
+  }, [user, authIntent, maPhim]);
+
+
 
   if (!movie || currentStatus === 'loading') return <Loading />
 
@@ -152,8 +107,8 @@ const ChiTietPhim = () => {
 
 
   const otherMovies = (Array.isArray(allMovies) ? allMovies : [])
-    .filter(m => m.maPhim !== Number(maPhim))  // bỏ phim hiện tại
-    .slice(0, 3)  // chỉ lấy 3 phim khác
+    .filter(m => m.maPhim !== Number(maPhim))
+    .slice(0, 3)
 
 
   const overview = movie.noiDung || movie.overview || ''
@@ -163,7 +118,8 @@ const ChiTietPhim = () => {
 
   const handleDanhGiaClick = () => {
     if (!user) {
-      setShowLoginModal(true);  // mở modal đăng nhập
+      dispatch(setAuthIntent({ action: 'danhGia', maPhim }));
+      setShowLoginModal(true);
       return;
     }
     setShowDanhGia(true);
@@ -171,8 +127,9 @@ const ChiTietPhim = () => {
 
   const toggleLike = async () => {
     if (!user) {
-      setShowLoginModal(true)  // mở modal đăng nhập
-      return
+      dispatch(setAuthIntent({ action: 'likePhim', maPhim }));
+      setShowLoginModal(true)
+      return;
     }
 
     try {
@@ -303,8 +260,15 @@ const ChiTietPhim = () => {
               maPhim={maPhim}
               selected={selectedDate}
               onSelect={setSelectedDate}
+              selectRap={selectedRap}
+              onSelectRap={setSelectedRap}
+              all={true}
             />
-            <SuatChieu maPhim={movie.maPhim || Number(maPhim)} date={selectedDate} />
+            <SuatChieu
+              maPhim={movie.maPhim || Number(maPhim)}
+              date={selectedDate}
+              maRap={selectedRap}
+            />
           </div>
         </div>
 

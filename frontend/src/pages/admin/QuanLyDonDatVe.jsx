@@ -169,7 +169,7 @@ const QuanLyDonDatVe = () => {
                   ${order.trangThai === "Thành công"
                         ? "bg-green-500/10 text-green-400 border border-green-500/40"
                         : "bg-red-500/10 text-red-400 border border-red-500/40"}
-    `}
+                  `}
                   >
                     {order.trangThai}
                   </span>

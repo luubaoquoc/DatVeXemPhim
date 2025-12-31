@@ -1,19 +1,20 @@
 import React, { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { useNavigate } from 'react-router-dom'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import Dangnhap from './Dangnhap'
 import useApi from '../hooks/useApi'
+import { setAuthIntent } from '../redux/features/authSlice'
 
-const SuatChieu = ({ maPhim, date }) => {
+const SuatChieu = ({ maPhim, date, maRap }) => {
+  const api = useApi()
+  const dispatch = useDispatch()
   const { user } = useSelector((state) => state.auth || {})
   const navigate = useNavigate()
   const [raps, setRaps] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [showLogin, setShowLogin] = useState(false)
-  const [pendingShowtime, setPendingShowtime] = useState(null)
-  const api = useApi()
 
   useEffect(() => {
     if (!maPhim || !date) {
@@ -28,7 +29,7 @@ const SuatChieu = ({ maPhim, date }) => {
       setError(null)
       try {
         const res = await api.get('/suatchieu/raps', {
-          params: { maPhim, date },
+          params: { maPhim, date, maRap: maRap !== 'all' ? maRap : undefined },
         })
         if (!cancelled) {
           const now = new Date()
@@ -47,7 +48,7 @@ const SuatChieu = ({ maPhim, date }) => {
                       now.toLocaleDateString('vi-VN')
                     return {
                       ...sc,
-                      isDisabled: sameDay && showTime < now, // ✅ disable nếu đã qua giờ hiện tại
+                      isDisabled: sameDay && showTime < now,
                     }
                   }),
                 }))
@@ -71,26 +72,19 @@ const SuatChieu = ({ maPhim, date }) => {
     return () => {
       cancelled = true
     }
-  }, [maPhim, date])
+  }, [maPhim, date, maRap])
 
-  useEffect(() => {
-    if (user && pendingShowtime) {
-      navigate(`/chon-ghe/${pendingShowtime}`)
-      window.scrollTo(0, 0)
-      setPendingShowtime(null)
-      setShowLogin(false)
-    }
-  }, [user, pendingShowtime, maPhim, date, navigate])
+
 
   const onPickShow = (maSuatChieu, disabled) => {
-    if (disabled) return // ✅ chặn bấm suất đã qua
+    if (disabled) return;
     if (!maSuatChieu) {
       toast.error('maSuatChieu không hợp lệ')
-      return
+      return;
     }
 
     if (!user) {
-      setPendingShowtime(maSuatChieu)
+      dispatch(setAuthIntent({ action: 'chon-suatChieu', maSuatChieu }));
       setShowLogin(true)
       return
     }
@@ -154,7 +148,7 @@ const SuatChieu = ({ maPhim, date }) => {
                             onPickShow(sc.maSuatChieu, sc.isDisabled)
                           }
                           disabled={sc.isDisabled}
-                          className={`px-3 py-1 rounded text-sm border cursor-pointer
+                          className={`px-3 py-1 rounded text-sm border
                             ${sc.isDisabled
                               ? 'bg-gray-700/50 text-gray-400 border-gray-600 cursor-not-allowed'
                               : 'bg-white/5 hover:bg-primary/90 border-primary/30 cursor-pointer'

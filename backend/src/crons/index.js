@@ -1,6 +1,7 @@
 import cron from "node-cron";
 import { xoaVeDangCho } from "./xoaVeDangCho.js";
 import { xoaNguoiDungChuaXacThuc } from "./xoaNguoiDungChuaXacThuc.js";
+import { updateTranThaiChieu } from "./updateTranThaiChieu.js";
 
 //  Cron 1: Xóa vé chưa thanh toán (mỗi 1 phút)
 cron.schedule("*/1 * * * *", async () => {
@@ -12,6 +13,12 @@ cron.schedule("*/1 * * * *", async () => {
 cron.schedule("0 2 * * *", async () => {
   console.log("[CRON] Đang dọn tài khoản chưa xác thực...");
   await xoaNguoiDungChuaXacThuc();
+});
+
+
+cron.schedule("0 0 * * *", async () => {
+  console.log("[CRON] Đang cập nhật trạng thái chiếu phim...");
+  await updateTranThaiChieu();
 });
 
 

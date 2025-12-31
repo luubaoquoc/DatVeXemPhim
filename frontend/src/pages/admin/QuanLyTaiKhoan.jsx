@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { PlusIcon, PencilIcon, Trash2Icon, SearchIcon } from "lucide-react"
+import { PlusIcon, PencilIcon, Trash2Icon, SearchIcon, UnlockIcon, LockIcon } from "lucide-react"
 import toast from "react-hot-toast"
 import useApi from "../../hooks/useApi"
 import Pagination from "../../components/admin/Paginnation"
@@ -141,6 +141,29 @@ const QuanLyTaiKhoan = () => {
     }
   }
 
+  // Khóa tài khoản
+  const handleKhoaTaiKhoan = async (maTaiKhoan) => {
+    try {
+      await api.put(`/taikhoan/${maTaiKhoan}/khoa`)
+      toast.success("Đã khóa tài khoản!")
+      fetchData()
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Khóa tài khoản thất bại!")
+    }
+  }
+
+  // Mở khóa tài khoản
+  const handleMoKhoaTaiKhoan = async (maTaiKhoan) => {
+    try {
+      await api.put(`/taikhoan/${maTaiKhoan}/mo-khoa`)
+      toast.success("Đã mở khóa tài khoản!")
+      fetchData()
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Mở khóa thất bại!")
+    }
+  }
+
+
 
   // Mở modal thêm/sửa
   const openModal = (data = null) => {
@@ -271,11 +294,33 @@ const QuanLyTaiKhoan = () => {
                   <PencilIcon size={18} />
                 </button>
 
-                <DeleteForm
-                  title="Tài khoản"
-                  itemName={taiKhoan.hoTen}
-                  onDelete={() => handleDelete(taiKhoan.maTaiKhoan)}
-                />
+                {taiKhoan.maTaiKhoan !== user.maTaiKhoan && (
+                  taiKhoan.khoaTaiKhoan ? (
+                    <button
+                      onClick={() => handleMoKhoaTaiKhoan(taiKhoan.maTaiKhoan)}
+                      className="p-2 text-red-400 hover:bg-red-500/20 rounded cursor-pointer"
+                      title="Khóa"
+                    >
+                      <LockIcon size={18} />
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => handleKhoaTaiKhoan(taiKhoan.maTaiKhoan)}
+                      className="p-2 text-green-400 hover:bg-green-500/20 rounded cursor-pointer"
+                      title="Mở khóa"
+                    >
+                      <UnlockIcon size={18} />
+
+                    </button>
+                  )
+                )}
+
+                {taiKhoan.maTaiKhoan !== user.maTaiKhoan && (
+                  <DeleteForm
+                    title="Tài khoản"
+                    itemName={taiKhoan.hoTen}
+                    onDelete={() => handleDelete(taiKhoan.maTaiKhoan)}
+                  />)}
               </td>
             </tr>
           ))}

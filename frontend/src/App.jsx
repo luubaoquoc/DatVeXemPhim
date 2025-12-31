@@ -42,6 +42,7 @@ import ChiTietLichChieu from './pages/ChiTietLichChieu'
 import Rap from './pages/Rap'
 import DatVeThanhCong from './pages/DatVeThanhCong'
 import QuanLyKhuyenMai from './pages/admin/QuanLyKhuyenMai'
+import RoleRoute from './components/admin/RoleRoute'
 
 const App = () => {
 
@@ -128,19 +129,92 @@ const App = () => {
           <Route path='van-hanh/check-in' element={<CheckInVe />} />
           <Route path='van-hanh/ban-ve-tai-quay' element={<BanVeTaiQuay />} />
           <Route path='van-hanh/lich-su-ban-ve' element={<LichSuBanVe />} />
-          <Route path='quan-ly-phim' element={<QuanLyphim />} />
-          <Route path='quan-ly-dao-dien' element={<QuanLyDaoDien />} />
-          <Route path='quan-ly-dien-vien' element={<QuanLyDienVien />} />
-          <Route path='quan-ly-the-loai' element={<QuanLyTheLoai />} />
-          <Route path='quan-ly-danh-gia' element={<QuanLyDanhGia />} />
-          <Route path='banner' element={<Banner />} />
-          <Route path='quan-ly-rap' element={<QuanLyRap />} />
-          <Route path='quan-ly-phong-chieu' element={<PhongChieu />} />
-          <Route path='quan-ly-ghe' element={<QuanLyGhe />} />
-          <Route path='quan-ly-suat-chieu' element={<QuanLySuatChieu />} />
+          <Route path='quan-ly-phim'
+            element={
+              <RoleRoute allowRoles={[4]}>
+                <QuanLyphim />
+              </RoleRoute>
+
+            }
+          />
+          <Route path='quan-ly-dao-dien'
+            element={
+              <RoleRoute allowRoles={[4]}>
+                <QuanLyDaoDien />
+              </RoleRoute>
+            }
+          />
+          <Route path='quan-ly-dien-vien'
+            element={
+              <RoleRoute allowRoles={[4]}>
+                <QuanLyDienVien />
+              </RoleRoute>
+            }
+          />
+          <Route path='quan-ly-the-loai'
+            element={
+              <RoleRoute allowRoles={[4]}>
+                <QuanLyTheLoai />
+              </RoleRoute>
+            }
+          />
+          <Route path='quan-ly-danh-gia'
+            element={
+              <RoleRoute allowRoles={[4]}>
+                <QuanLyDanhGia />
+              </RoleRoute>
+            }
+          />
+          <Route path='banner'
+            element={
+              <RoleRoute allowRoles={[4]}>
+                <Banner />
+              </RoleRoute>
+            }
+          />
+          <Route path='quan-ly-rap'
+            element={
+              <RoleRoute allowRoles={[4]}>
+                <QuanLyRap />
+              </RoleRoute>
+            }
+          />
+          <Route path='quan-ly-phong-chieu'
+            element={
+              <RoleRoute allowRoles={[3, 4]}>
+                <PhongChieu />
+              </RoleRoute>
+            }
+          />
+          <Route path='quan-ly-ghe'
+            element={
+              <RoleRoute allowRoles={[3, 4]}>
+                <QuanLyGhe />
+              </RoleRoute>
+            }
+          />
+          <Route path='quan-ly-suat-chieu'
+            element={
+              <RoleRoute allowRoles={[3, 4]}>
+                <QuanLySuatChieu />
+              </RoleRoute>
+            }
+          />
           <Route path='quan-ly-don-dat-ve' element={<QuanLyDonDatVe />} />
-          <Route path='quan-ly-khuyen-mai' element={<QuanLyKhuyenMai />} />
-          <Route path='quan-ly-tai-khoan' element={<QuanLyTaiKhoan />} />
+          <Route path='quan-ly-khuyen-mai'
+            element={
+              <RoleRoute allowRoles={[4]}>
+                <QuanLyKhuyenMai />
+              </RoleRoute>
+            }
+          />
+          <Route path='quan-ly-tai-khoan'
+            element={
+              <RoleRoute allowRoles={[3, 4]}>
+                <QuanLyTaiKhoan />
+              </RoleRoute>
+            }
+          />
         </Route>
 
       </Routes>

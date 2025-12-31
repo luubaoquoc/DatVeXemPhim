@@ -8,6 +8,7 @@ import { Eye, EyeOff } from "lucide-react";
 
 const Dangnhap = ({ onClose }) => {
   const dispatch = useDispatch()
+  const navigate = useNavigate();
   const [hoTen, setHoTen] = useState("");
   const [email, setEmail] = useState("");
   const [matKhau, setMatKhau] = useState("");
@@ -21,7 +22,7 @@ const Dangnhap = ({ onClose }) => {
   const { status } = useSelector((state) => state.auth);
   const loading = status === 'loading';
 
-  const navigate = useNavigate();
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -34,8 +35,6 @@ const Dangnhap = ({ onClose }) => {
 
         if ([2, 3, 4].includes(vaitro)) {
           navigate('/admin');
-        } else {
-          navigate('/');
         }
         onClose();
       } else {

@@ -1,7 +1,7 @@
 import express from 'express';
 import {
   getAllDatVe, createDatVe, getDatVe, listMyDatVes, getGheDaDat, createCheckoutForDatVe,
-  deleteDatVe, checkInDatVe, getThongTinDatVe, BanVeTaiQuay, getGheDangDat, capNhatGheDangDat
+  deleteDatVe, checkInDatVe, getThongTinDatVe, BanVeTaiQuay, getGheDangDat, capNhatGheDangDat, cancelDatVe
 } from '../controllers/datVeControllers.js';
 import { authenticateToken, hasRole } from '../middleware/authMiddleware.js';
 
@@ -18,6 +18,7 @@ router.post('/thanhtoan', authenticateToken, hasRole(2, 3, 4), BanVeTaiQuay);
 router.get('/ghe-da-dat/:maSuatChieu', authenticateToken, getGheDaDat);
 router.get('/:maDatVe/ghes', authenticateToken, getGheDangDat);
 router.put('/:maDatVe/ghes', authenticateToken, capNhatGheDangDat);
+router.delete('/:maDatVe/cancel', authenticateToken, cancelDatVe);
 router.delete('/:maDatVe', authenticateToken, hasRole(3, 4), deleteDatVe);
 
 export default router;

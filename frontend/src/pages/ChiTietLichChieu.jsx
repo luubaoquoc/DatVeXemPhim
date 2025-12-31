@@ -3,16 +3,24 @@ import { useParams, useNavigate } from 'react-router-dom'
 import useApi from '../hooks/useApi'
 import DateSelect from '../components/DateSelect'
 import { MapPin, PhoneCall } from 'lucide-react'
+import { useDispatch, useSelector } from 'react-redux'
+import toast from 'react-hot-toast'
+import { clearAuthIntent, setAuthIntent } from '../redux/features/authSlice'
+import Dangnhap from '../components/Dangnhap'
 
 const ChiTietLichChieu = () => {
   const api = useApi()
   const navigate = useNavigate()
+  const dispatch = useDispatch()
   const { maRap } = useParams()
-
+  const user = useSelector(state => state.auth.user)
+  const authIntent = useSelector(state => state.auth.authIntent)
   const [dateSelected, setDateSelected] = useState(null)
   const [rap, setRap] = useState(null)
   const [phims, setPhims] = useState([])
   const [loading, setLoading] = useState(false)
+  const [showLogin, setShowLogin] = useState(false)
+
 
   useEffect(() => {
     const fetchRap = async () => {
@@ -55,7 +63,22 @@ const ChiTietLichChieu = () => {
     fetchLichChieu()
   }, [maRap, dateSelected])
 
+  useEffect(() => {
+    if (!user || !authIntent) return;
+    if (authIntent.action === 'chon-suatChieu' && authIntent.maSuatChieu) {
+      navigate(`/chon-ghe/${authIntent.maSuatChieu}`)
+      window.scrollTo(0, 0)
+      dispatch(clearAuthIntent())
+    }
+
+  }, [user, authIntent, navigate, dispatch])
+
   console.log(phims);
+
+  const handleSelectRap = (newMaRap) => {
+    if (!newMaRap || newMaRap === 'all') return
+    navigate(`/lich-chieu/${newMaRap}`)
+  }
 
   const isPastShowtime = (gioBatDau, dateSelected) => {
     const now = new Date()
@@ -82,6 +105,22 @@ const ChiTietLichChieu = () => {
     })
     return Object.values(map)
   }
+
+  const onPickShow = (maSuatChieu, disabled) => {
+    if (disabled) return;
+    if (!maSuatChieu) {
+      toast.error('maSuatChieu không hợp lệ')
+      return
+    }
+    if (!user) {
+      dispatch(clearAuthIntent())
+      dispatch(setAuthIntent({ action: 'chon-suatChieu', maSuatChieu }))
+      setShowLogin(true)
+      return
+    }
+    navigate(`/chon-ghe/${maSuatChieu}`)
+    window.scrollTo(0, 0)
+  }
   return (
     <div className="px-6 md:px-16 lg:px-40 py-34">
       {rap && (
@@ -104,6 +143,9 @@ const ChiTietLichChieu = () => {
       <DateSelect
         selected={dateSelected}
         onSelect={setDateSelected}
+        selectRap={maRap}
+        onSelectRap={handleSelectRap}
+        all={false}
       />
 
       {/* ===== LOADING ===== */}
@@ -155,7 +197,7 @@ const ChiTietLichChieu = () => {
                               }
                           `}
                             onClick={() => {
-                              if (!isPast) navigate(`/chon-ghe/${sc.maSuatChieu}`)
+                              onPickShow(sc.maSuatChieu, isPast)
                             }}
                           >
                             {new Date(sc.gioBatDau).toLocaleTimeString('vi-VN', {
@@ -183,6 +225,8 @@ const ChiTietLichChieu = () => {
           Không có suất chiếu cho ngày này
         </p>
       )}
+
+      {showLogin && (<Dangnhap onClose={() => setShowLogin(false)} />)}
     </div>
   )
 }

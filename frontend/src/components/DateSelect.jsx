@@ -1,16 +1,29 @@
 import React, { useState, useEffect } from 'react'
 import BlurCircle from './BlurCircle'
 import { ChevronLeftIcon, ChevronRightIcon, Type } from 'lucide-react'
+import useApi from '../hooks/useApi'
 
 
-const DateSelect = ({ selected: selectedProp, onSelect }) => {
+const DateSelect = ({ selected: selectedProp, onSelect, selectRap, onSelectRap, all }) => {
 
-
-
-
+  const api = useApi()
   const [internalSelected, setInternalSelected] = useState(null)
   const selected = selectedProp ?? internalSelected
+  const [raps, setRaps] = useState([])
 
+
+  useEffect(() => {
+    const fetchRaps = async () => {
+      try {
+        const response = await api.get('/rap')
+        setRaps(response.data.data || []);
+      } catch (error) {
+        console.error('Lấy danh sách rạp thất bại:', error);
+      }
+    };
+
+    fetchRaps();
+  }, []);
 
 
   // default select today (even if no shows) when uncontrolled
@@ -28,7 +41,7 @@ const DateSelect = ({ selected: selectedProp, onSelect }) => {
   }
 
   // build array: today and next 4 days (local)
-  const dates = Array.from({ length: 7 }).map((_, i) => {
+  const dates = Array.from({ length: 6 }).map((_, i) => {
     const dt = new Date()
     dt.setDate(dt.getDate() + i)
     return formatLocalDate(dt)
@@ -45,35 +58,49 @@ const DateSelect = ({ selected: selectedProp, onSelect }) => {
 
         <div className='w-full'>
           <p className='text-lg font-semibold'>Lịch chiếu</p>
-          <div className='flex items-center justify-center gap-6 text-sm mt-5'>
-            <ChevronLeftIcon width={28} className='cursor-pointer hover:text-gray-400' />
-            <span className='grid grid-cols-3 md:flex flex-wrap justify-center  gap-4'>
-              {dates.map((date) => {
-                // const shows = dateTime?.[date] || []
-                // const hasShows = Array.isArray(shows) && shows.length > 0
-                // Dates are always selectable; if no shows, show muted style
-                return (
-                  <button
-                    key={date}
-                    onClick={() => {
-                      if (onSelect) onSelect(date)
-                      else setInternalSelected(date)
-                    }}
-                    className={`relative flex flex-col items-center justify-center h-18 w-18 
+          <div className='flex flex-wrap justify-between items-center'>
+            <div className='flex items-center justify-center gap-6 text-sm mt-5 '>
+              <ChevronLeftIcon width={28} className='cursor-pointer hover:text-gray-400' />
+              <span className='grid grid-cols-2 md:flex gap-4 '>
+                {dates.map((date) => {
+                  return (
+                    <button
+                      key={date}
+                      onClick={() => {
+                        if (onSelect) onSelect(date)
+                        else setInternalSelected(date)
+                      }}
+                      className={`relative flex flex-col items-center justify-center h-18 w-18 
                 aspect-square rounded cursor-pointer ${selected === date ? 'bg-primary text-white' : 'border border-primary/70'} `}>
-                    <span className='text-lg'>{new Date(date).getDate()}</span>
-                    <span className='text-xs'>{new Date(date).toLocaleDateString('vi-VN', { month: 'short' })}</span>
-                    {/* optional badge for counts
+                      <span className='text-lg'>{new Date(date).getDate()}</span>
+                      <span className='text-xs'>{new Date(date).toLocaleDateString('vi-VN', { month: 'short' })}</span>
+                      {/* optional badge for counts
                     {hasShows && (
                       <span className='absolute -top-2 -right-2 bg-primary text-white text-xs rounded-full px-1'>
                         {shows.length}
                       </span>
                     )} */}
-                  </button>
-                )
-              })}
-            </span>
-            <ChevronRightIcon width={28} className='cursor-pointer hover:text-gray-400' />
+                    </button>
+                  )
+                })}
+              </span>
+              <ChevronRightIcon width={28} className='cursor-pointer hover:text-gray-400' />
+            </div>
+            <div>
+              <select
+                value={selectRap || 'all'}
+                onChange={(e) => onSelectRap(e.target.value)}
+                className="bg-black border border-primary rounded px-3 py-2 text-sm"
+              >
+                {all && <option value="all">Tất cả rạp</option>}
+                {raps?.map((rap) => (
+                  <option key={rap.maRap} value={rap.maRap}>
+                    {rap.tenRap}
+                  </option>
+                ))}
+              </select>
+
+            </div>
           </div>
         </div>
 

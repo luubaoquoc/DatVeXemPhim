@@ -6,6 +6,6 @@ const router = express.Router();
 router.post('/momo-ipn', momoIPN);
 router.post('/create-vnpay', createVNPay)
 router.get('/vnpay-return', vnpayReturn)
-router.post('/stripe-webhook', express.raw({ type: 'application/json' }), stripeWebhook);
+// router.post('/stripe-webhook', express.raw({ type: 'application/json' }), stripeWebhook);
 
 export default router;

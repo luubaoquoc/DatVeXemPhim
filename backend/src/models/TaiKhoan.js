@@ -20,6 +20,11 @@ const TaiKhoan = sequelize.define('TaiKhoan', {
   otpMa: { type: DataTypes.STRING(6), allowNull: true },
   otpHetHan: { type: DataTypes.DATE, allowNull: true },
   anhDaiDien: { type: DataTypes.STRING, defaultValue: null, allowNull: true },
+  khoaTaiKhoan: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false
+  },
 
   maVaiTro: {
     type: DataTypes.INTEGER,

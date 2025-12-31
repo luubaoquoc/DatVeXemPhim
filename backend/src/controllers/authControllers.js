@@ -164,6 +164,8 @@ export const login = async (req, res) => {
     const isMatchMatkhau = await bcrypt.compare(matKhau, user.matKhau);
     if (!isMatchMatkhau) return res.status(400).json({ message: "Mật khẩu hoặc Email không chính xác!" });
 
+    if (user.khoaTaiKhoan) return res.status(403).json({ message: "Tài khoản đã bị khóa. Vui lòng liên hệ quản trị viên." });
+
     const payload = { maTaiKhoan: user.maTaiKhoan };
     const accessToken = createAccessToken(payload);
     const refreshToken = createRefreshToken(payload);

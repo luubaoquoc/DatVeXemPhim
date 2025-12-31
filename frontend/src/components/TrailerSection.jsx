@@ -56,6 +56,7 @@ const TrailerSection = () => {
 
       <div className='relative mt-6'>
         <BlurCircle top='-100px' right='-100px' />
+        <BlurCircle bottom='-300px' left='-100px' />
 
         {currentTrailer && (
           <ReactPlayer

@@ -72,6 +72,7 @@ export const getRapsForMovieDate = async (req, res) => {
   try {
     const maPhim = Number(req.query.maPhim);
     const date = req.query.date;
+    const maRapQuery = req.query.maRap;
     if (!maPhim || !date) return res.status(400).json({ message: 'maPhim và date là bắt buộc' });
 
     const start = new Date(date + 'T00:00:00');
@@ -80,6 +81,9 @@ export const getRapsForMovieDate = async (req, res) => {
     const { maVaiTro, maRap } = req.user || {};
 
     let phongWhere = {};
+    if (maRapQuery) {
+      phongWhere.maRap = maRapQuery;
+    }
     if (maVaiTro === 2 || maVaiTro === 3) {
       phongWhere.maRap = maRap;
     }
@@ -103,7 +107,8 @@ export const getRapsForMovieDate = async (req, res) => {
               as: 'rap'
             }]
         }
-      ]
+      ],
+      order: [['gioBatDau', 'ASC']]
     });
 
     // map to structured response: rap, phong, suatChieu list
@@ -171,7 +176,8 @@ export const getLichChieuByRapDate = async (req, res) => {
           as: "phim",
           attributes: ["maPhim", "tenPhim", "poster", "thoiLuong", "noiDung"]
         }
-      ]
+      ],
+      order: [["gioBatDau", "ASC"]]
     });
 
     const map = {};
@@ -204,6 +210,29 @@ export const getLichChieuByRapDate = async (req, res) => {
   }
 };
 
+export const getSuatByPhong = async (req, res) => {
+  try {
+    const maPhong = Number(req.query.maPhong);
+    const date = req.query.date;
+    if (!maPhong || !date) return res.status(400).json({ message: 'maPhong và date là bắt buộc' });
+    const start = new Date(date + 'T00:00:00');
+    const end = new Date(date + 'T23:59:59');
+    const rows = await SuatChieu.findAll({
+      where: {
+        maPhong,
+        gioBatDau: {
+          [Op.between]: [start, end]
+        }
+      },
+      order: [['gioBatDau', 'ASC']]
+    });
+    return res.json(rows);
+  } catch (error) {
+    console.error('Lỗi lấy suất chiếu theo phòng:', error);
+    return res.status(500).json({ message: 'Lỗi server' });
+  }
+};
+
 
 // GET /api/suatchieu/:maSuatChieu
 export const getSuatChieu = async (req, res) => {
@@ -229,7 +258,8 @@ export const getSuatChieu = async (req, res) => {
             }
           ]
         }
-      ]
+      ],
+      order: [['gioBatDau', 'DESC']]
     });
     if (!sc) return res.status(404).json({ message: 'Suất chiếu không tồn tại' });
     return res.json(sc);

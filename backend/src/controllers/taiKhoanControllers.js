@@ -274,4 +274,34 @@ export const changePassword = async (req, res) => {
   }
 };
 
+export const khoaTaiKhoan = async (req, res) => {
+  try {
+    const maTaiKhoan = Number(req.params.maTaiKhoan);
+    if (typeof maTaiKhoan !== 'number') {
+      return res.status(400).json({ message: "Thông tin không hợp lệ" });
+    }
+    const user = await TaiKhoan.findByPk(maTaiKhoan);
+    if (!user) return res.status(404).json({ message: "Người dùng không tồn tại" });
+    await user.update({ khoaTaiKhoan: true });
+    return res.json({ message: "Khóa tài khoản thành công" });
+  } catch (error) {
+    console.error("khoaTaiKhoan error:", error);
+    return res.status(500).json({ message: "Lỗi server" });
+  }
+};
 
+export const moKhoaTaiKhoan = async (req, res) => {
+  try {
+    const maTaiKhoan = Number(req.params.maTaiKhoan);
+    if (typeof maTaiKhoan !== 'number') {
+      return res.status(400).json({ message: "Thông tin không hợp lệ" });
+    }
+    const user = await TaiKhoan.findByPk(maTaiKhoan);
+    if (!user) return res.status(404).json({ message: "Người dùng không tồn tại" });
+    await user.update({ khoaTaiKhoan: false });
+    return res.json({ message: "Mở khóa tài khoản thành công" });
+  } catch (error) {
+    console.error("moKhoaTaiKhoan error:", error);
+    return res.status(500).json({ message: "Lỗi server" });
+  }
+};

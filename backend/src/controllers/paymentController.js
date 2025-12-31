@@ -4,6 +4,7 @@ import ChiTietDatVe from '../models/ChiTietDatVe.js';
 import { DatVe, Ghe, KhuyenMai, LichSuDungMa, Phim, PhongChieu, Rap, SuatChieu, TaiKhoan, ThanhToan } from '../models/index.js';
 import { sendVerificationEmail } from '../utils/sendEmail.js';
 import { Op } from 'sequelize';
+import { stripe } from '../helpers/stripe.js';
 
 
 const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:5173';
@@ -221,7 +222,7 @@ export const vnpayReturn = async (req, res) => {
  *  Stripe webhook
  */
 export const stripeWebhook = async (req, res) => {
-  console.log('🔥 Stripe webhook received');
+  console.log(' Stripe webhook received');
 
   const sig = req.headers['stripe-signature'];
   let event;
@@ -262,6 +263,83 @@ export const stripeWebhook = async (req, res) => {
       { trangThai: 'Đã thanh toán' },
       { where: { maDatVe: orderId } }
     );
+
+    // 2. Lấy thông tin vé để gửi mail – KHÔNG LOCK
+    try {
+      const fullOrder = await DatVe.findOne({
+        where: { maDatVe: orderId },
+        include: [
+          {
+            model: TaiKhoan,
+            as: 'khachHang',
+            attributes: ['email']
+          },
+          {
+            model: SuatChieu,
+            as: 'suatChieu',
+            include: [{
+              model: Phim,
+              as: 'phim',
+              attributes: ['tenPhim']
+            },
+            {
+              model: PhongChieu,
+              as: 'phongChieu',
+              include: [
+                {
+                  model: Rap,
+                  as: 'rap',
+                  attributes: ['tenRap']
+                }
+              ],
+              attributes: ['tenPhong']
+            }
+            ],
+            attributes: ['gioBatDau']
+          },
+          {
+            model: ChiTietDatVe,
+            as: 'chiTietDatVes',
+            attributes: ['maGhe'],
+            include: [
+              {
+                model: Ghe,
+                as: 'ghe',
+                attributes: ['hang', 'soGhe']
+              }
+            ]
+          }
+        ]
+      });
+      const tenPhim = fullOrder?.suatChieu?.phim?.tenPhim || 'Không xác định';
+      const tenRap = fullOrder?.suatChieu?.phongChieu?.rap?.tenRap || 'Không xác định';
+      const tenPhong = fullOrder?.suatChieu?.phongChieu?.tenPhong || 'Không xác định';
+      const gioBatDau = fullOrder?.suatChieu?.gioBatDau || 'Không xác định';
+      const soGhe = fullOrder?.chiTietDatVes?.map(ct => `${ct.ghe.hang}${ct.ghe.soGhe}`).join(', ') || 'Chưa chọn';
+      const tongTien = session.amount_total;
+      const thoiGianThanhToan = new Date(session.created * 1000);
+
+
+      await sendVerificationEmail({
+        to: fullOrder?.khachHang?.email,
+        subject: `Xác nhận vé xem phim #${orderId}`,
+        html: `
+          <h2>Thanh toán thành công!</h2>
+          <p>Cảm ơn bạn đã đặt vé tại hệ thống của chúng tôi.</p>
+          <p>Mã đặt vé: <b>${orderId}</b></p>
+          <p><b>Phim:</b> ${tenPhim}</p>
+          <p><b>Rạp:</b> ${tenRap}</p>
+          <p><b>Phòng:</b> ${tenPhong}</p>
+          <p><b>Suất chiếu:</b> ${gioBatDau}</p>
+          <p><b>Ghế:</b> ${soGhe}</p>
+          <p><b>Tổng tiền:</b> ${(Number(tongTien) / 100).toLocaleString('vi-VN')} VND</p>
+          <p><b>Thời gian thanh toán:</b> ${thoiGianThanhToan.toLocaleString('vi-VN')}</p>
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${orderId}" />
+          `
+      })
+    } catch (error) {
+      console.error('stripeWebhook email error:', error);
+    }
   } else if (event.type === 'checkout.session.expired') {
     // Payment failed or expired
     await datVe.update({ trangThai: 'Thất bại' });
@@ -271,5 +349,7 @@ export const stripeWebhook = async (req, res) => {
       { where: { maDatVe: orderId } }
     );
   }
+
   res.status(200).json({ received: true });
+
 };

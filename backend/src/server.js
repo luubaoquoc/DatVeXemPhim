@@ -23,6 +23,7 @@ import dashboard from './routes/dashboardRoutes.js';
 import danhGiaRoutes from './routes/danhGiaRoutes.js';
 import khuyenMaiRoutes from './routes/khuyenMaiRoutes.js';
 import './crons/index.js';
+import { stripeWebhook } from "./controllers/paymentController.js";
 // import { runAllCronsNow } from './crons/index.js';
 
 
@@ -51,9 +52,13 @@ app.use(cors({
 //   }
 // });
 
-
-app.use('/api/payment', paymentRoutes);
+app.post(
+  '/api/payment/stripe-webhook',
+  express.raw({ type: 'application/json' }),
+  stripeWebhook
+);
 app.use(express.json());
+app.use('/api/payment', paymentRoutes);
 app.use("/api/auth", authRoutes);
 app.use('/api/taikhoan', taiKhoanRoutes);
 app.use('/api/phim', phimRoutes);

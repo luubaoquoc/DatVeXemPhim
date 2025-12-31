@@ -55,7 +55,7 @@ const ChiTietLichSuDatVe = (
             </div>
             <div className=" p-2">
               <h4 className="text-center mb-2 text-primary font-medium text-xl">Thông tin thanh toán</h4>
-              <p className="font-semibold mb-1 text-primary">Mã thanh toán: {thanhToan.maThanhToan}</p>
+              <p><span className="text-primary">Mã thanh toán: </span> {thanhToan.maThanhToan}</p>
               <p><span className="text-primary">Tổng tiền: </span> {Number(bookings.tongTien).toLocaleString('vi-VN')} VND</p>
               <p><span className="text-primary">Phương thức: </span> {thanhToan.phuongThuc || 'N/A'}</p>
               <p><span className="text-primary">Ngày thanh toán: </span> {thanhToan.ngayThanhToan ? new Date(thanhToan.ngayThanhToan).toLocaleString() : 'N/A'}</p>
