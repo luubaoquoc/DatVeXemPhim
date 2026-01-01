@@ -20,7 +20,7 @@ const ChatWindow = ({ onClose }) => {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:5000/api/ai/chatbot", {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/ai/chatbot`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: input })
