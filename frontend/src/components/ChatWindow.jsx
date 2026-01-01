@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { X } from "lucide-react";
+import { Send, X } from "lucide-react";
 
 const ChatWindow = ({ onClose }) => {
   const [messages, setMessages] = useState([
@@ -45,7 +45,7 @@ const ChatWindow = ({ onClose }) => {
   return (
     <div className="fixed bottom-24 right-6 z-50
                  w-80 h-[420px]
-                 bg-white rounded-xl shadow-2xl
+                 bg-black/80 rounded-xl shadow-2xl
                  flex flex-col overflow-hidden"
     >
       {/* Header */}
@@ -63,7 +63,7 @@ const ChatWindow = ({ onClose }) => {
             key={i}
             className={`max-w-[80%] px-3 py-2 rounded-lg
               ${m.role === "user"
-                ? "bg-blue-600 text-white ml-auto"
+                ? "bg-primary-dull text-white ml-auto"
                 : "bg-gray-200 text-black"
               }`}
           >
@@ -85,13 +85,13 @@ const ChatWindow = ({ onClose }) => {
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => e.key === "Enter" && sendMessage()}
           placeholder="Nhập câu hỏi..."
-          className="flex-1 border rounded-lg px-3 py-2 text-sm text-black outline-none"
+          className="flex-1 border-b rounded-lg px-3 py-1 text-sm text-white outline-none"
         />
         <button
           onClick={sendMessage}
           className="bg-primary-dull text-white px-3 rounded-lg cursor-pointer"
         >
-          Gửi
+          <Send size={16} />
         </button>
       </div>
     </div>

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import ChatWindow from "./ChatWindow";
-import { MessageCircle } from "lucide-react";
+import chatIcon from "../assets/chatBox.jpg";
 
 const ChatWidget = () => {
   const [open, setOpen] = useState(false);
@@ -15,9 +15,9 @@ const ChatWidget = () => {
         onClick={() => setOpen(!open)}
         className="fixed bottom-6 right-6 z-50
                    bg-primary-dull hover:bg-primary cursor-pointer
-                   text-white p-4 rounded-full shadow-lg"
+                   text-white rounded-full shadow-lg"
       >
-        <MessageCircle size={24} />
+        <img src={chatIcon} alt="Chat Icon" className="w-16 h-16 rounded-full" title="chat box" />
       </button>
     </>
   );

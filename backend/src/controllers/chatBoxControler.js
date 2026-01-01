@@ -75,6 +75,7 @@ export const chatWithAI = async (req, res) => {
     // Chuẩn hóa dữ liệu cho AI
     const movieContext = movies.map(m => ({
       tenPhim: m.tenPhim,
+      poster: m.poster,
       theLoai: m.theLoais.map(t => t.tenTheLoai).join(", "),
       suatChieu: m.suatChieus.map(s => s.gioBatDau),
       diemTB:
