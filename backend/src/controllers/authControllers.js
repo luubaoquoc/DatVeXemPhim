@@ -11,7 +11,7 @@ const createRefreshToken = (user) => {
   return jwt.sign(user, process.env.JWT_REFRESH_SECRET, { expiresIn: "7d" });
 };
 
-// Đăng ký tài khoản
+
 export const register = async (req, res) => {
   try {
     const { hoTen, email, matKhau } = req.body;
@@ -78,7 +78,7 @@ export const register = async (req, res) => {
 }
 
 
-// Xác thực OTP
+
 export const verifyOtp = async (req, res) => {
   try {
     const { email, otp } = req.body;
@@ -122,9 +122,9 @@ export const resendOtp = async (req, res) => {
     if (user.emailXacThuc)
       return res.status(400).json({ message: "Tài khoản đã được xác thực." });
 
-    // Tạo mã OTP mới
+
     const newOtp = Math.floor(100000 + Math.random() * 900000);
-    const newExpiry = Date.now() + 5 * 60 * 1000; // 5 phút
+    const newExpiry = Date.now() + 5 * 60 * 1000;
 
     await user.update({
       otpMa: newOtp,
@@ -170,11 +170,10 @@ export const login = async (req, res) => {
     const accessToken = createAccessToken(payload);
     const refreshToken = createRefreshToken(payload);
 
-    // Set cookie so browser can store the refresh token.
-    // Use path:"/" so it's available to all auth endpoints. Adjust sameSite/secure for production (HTTPS).
+
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // true in production when using HTTPS
+      secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       path: "/",
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 ngày

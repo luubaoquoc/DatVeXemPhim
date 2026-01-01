@@ -10,10 +10,8 @@ import { useSelector } from "react-redux";
 
 const QuanLyDonDatVe = () => {
   const api = useApi(true);
-
+  const current = import.meta.env.VITE_CURRENCY;
   const user = useSelector((state) => state.auth.user)
-
-
 
   const [donDatVe, setDonDatVe] = useState([])
   const [loading, setLoading] = useState(true)
@@ -160,7 +158,7 @@ const QuanLyDonDatVe = () => {
                 <td className="p-2">{order.tongSoGhe} ghế</td>
 
                 <td className="p-2 font-semibold">
-                  {order.tongTien.toLocaleString()} VND
+                  {order.tongTien.toLocaleString("vi-VN")} {current}
                 </td>
 
                 <td className="p-2">

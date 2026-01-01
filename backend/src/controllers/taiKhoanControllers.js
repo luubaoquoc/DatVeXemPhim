@@ -6,7 +6,7 @@ import streamifier from 'streamifier'
 import VaiTro from '../models/VaiTro.js';
 import { Op } from 'sequelize';
 
-// GET /api/taikhoan?page=1&limit=20
+// Lấy danh sách tài khoản với phân trang và lọc
 export const listUsers = async (req, res) => {
   try {
 
@@ -25,25 +25,18 @@ export const listUsers = async (req, res) => {
       ...(maVaiTro && { maVaiTro }),
     };
 
-    //  Admin: xem tất cả
     if (roleUser === 4) {
       if (maRap) {
         whereOp.maRap = maRap;
       }
     }
-
-    //  Quản lý rạp: chỉ xem user thuộc rạp của mình
     else if (roleUser === 3) {
       whereOp.maRap = rapUser;
     }
-
-    //  Role khác không được phép
     else {
       return res.status(403).json({ message: "Không có quyền truy cập" });
     }
 
-
-    // Lấy danh sách tài khoản với phân trang
     const { count, rows } = await TaiKhoan.findAndCountAll({
       where: whereOp,
       include: [
@@ -80,7 +73,7 @@ export const listVaiTro = async (req, res) => {
 };
 
 
-
+// tạo tài khoản
 export const createTaiKhoan = async (req, res) => {
   try {
 
@@ -120,7 +113,7 @@ export const createTaiKhoan = async (req, res) => {
   }
 };
 
-// GET /api/taikhoan/:maTaiKhoan
+// lấy thông tin tài khoản
 export const getUser = async (req, res) => {
   try {
     const ma = Number(req.params.maTaiKhoan);
@@ -138,23 +131,17 @@ export const getUser = async (req, res) => {
 
 
 
-// PUT /api/taikhoan/:maTaiKhoan
+// cập nhật tài khoản
 export const updateUser = async (req, res) => {
   try {
     const { maVaiTro: roleUser, maRap: rapUser } = req.user;
     const ma = Number(req.params.maTaiKhoan);
-
-
-
 
     if (!ma) return res.status(400).json({ message: 'maTaiKhoan không hợp lệ' });
 
     const user = await TaiKhoan.findByPk(ma);
     if (!user) return res.status(404).json({ message: 'Người dùng không tồn tại' });
 
-
-
-    // chỉ cho sửa các trường sau
     const { hoTen, email, soDienThoai, maVaiTro, maRap } = req.body;
 
     //  Quản lý rạp không được gán role khác 2,3
@@ -187,7 +174,7 @@ export const updateUser = async (req, res) => {
   }
 };
 
-// DELETE /api/taikhoan/:maTaiKhoan
+// xóa tài khoản
 export const deleteUser = async (req, res) => {
   try {
     const ma = Number(req.params.maTaiKhoan);
@@ -204,6 +191,8 @@ export const deleteUser = async (req, res) => {
   }
 };
 
+
+// upload avatar
 export const uploadAvatar = async (req, res) => {
   try {
     const ma = Number(req.params.maTaiKhoan);
@@ -216,7 +205,6 @@ export const uploadAvatar = async (req, res) => {
       return res.status(400).json({ message: "Vui lòng chọn ảnh" });
     }
 
-    // Upload Cloudinary
     const uploadResult = await new Promise((resolve, reject) => {
       const stream = cloudinary.uploader.upload_stream(
         {
@@ -234,7 +222,6 @@ export const uploadAvatar = async (req, res) => {
       streamifier.createReadStream(req.file.buffer).pipe(stream);
     });
 
-    // update db
     await user.update({ anhDaiDien: uploadResult.secure_url });
 
     return res.json({
@@ -248,7 +235,7 @@ export const uploadAvatar = async (req, res) => {
   }
 };
 
-// PUT /api/taikhoan/:maTaiKhoan/change-password
+// đổi mật khẩu
 export const changePassword = async (req, res) => {
   try {
     const ma = Number(req.params.maTaiKhoan);
@@ -274,6 +261,8 @@ export const changePassword = async (req, res) => {
   }
 };
 
+
+// khóa tài khoản
 export const khoaTaiKhoan = async (req, res) => {
   try {
     const maTaiKhoan = Number(req.params.maTaiKhoan);
@@ -290,6 +279,8 @@ export const khoaTaiKhoan = async (req, res) => {
   }
 };
 
+
+// mở khóa tài khoản
 export const moKhoaTaiKhoan = async (req, res) => {
   try {
     const maTaiKhoan = Number(req.params.maTaiKhoan);

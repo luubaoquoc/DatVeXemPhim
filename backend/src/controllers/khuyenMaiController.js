@@ -3,13 +3,13 @@ import LichSuDungMa from "../models/LichSuDungMa.js";
 import sequelize from "../configs/sequelize.js";
 import { Op } from "sequelize";
 
+
+// kiểm tra mã khuyến mãi
 export const kiemTraMaKhuyenMai = async (req, res) => {
   try {
 
     const { maTaiKhoan } = req.user;
     const { maKhuyenMai, tongTien } = req.body;
-
-
 
     const km = await KhuyenMai.findOne({
       where: {
@@ -66,7 +66,7 @@ export const kiemTraMaKhuyenMai = async (req, res) => {
 
 
 
-//2. DANH SÁCH (ADMIN)
+// lấy danh sách khuyến mãi
 export const getDanhSachKhuyenMai = async (req, res) => {
   try {
     const { page = 1, limit = 10, search = "" } = req.query;
@@ -90,9 +90,8 @@ export const getDanhSachKhuyenMai = async (req, res) => {
   }
 };
 
-/* =========================
-   3. TẠO KHUYẾN MÃI
-========================= */
+
+// tạo khuyến mãi
 export const taoKhuyenMai = async (req, res) => {
   try {
     const {
@@ -128,9 +127,7 @@ export const taoKhuyenMai = async (req, res) => {
   }
 };
 
-/* =========================
-   4. CẬP NHẬT
-========================= */
+// cập nhật khuyến mãi
 export const capNhatKhuyenMai = async (req, res) => {
   try {
     const { id } = req.params;
@@ -147,9 +144,7 @@ export const capNhatKhuyenMai = async (req, res) => {
   }
 };
 
-/* =========================
-   5. XOÁ
-========================= */
+// xoá khuyến mãi
 export const xoaKhuyenMai = async (req, res) => {
   try {
     const { id } = req.params;

@@ -3,7 +3,7 @@ import Phim from "../models/Phim.js";
 import TaiKhoan from "../models/TaiKhoan.js";
 import { Op } from "sequelize";
 
-export const listDanhGias = async (req, res) => {
+export const getAllDanhGia = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;

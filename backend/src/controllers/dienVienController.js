@@ -3,7 +3,7 @@ import streamifier from 'streamifier'
 import DienVien from '../models/DienVien.js'
 import { Op } from "sequelize";
 
-
+// Lấy tất cả diễn viên
 export const getAllDienVien = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
@@ -35,6 +35,7 @@ export const getAllDienVien = async (req, res) => {
   }
 }
 
+// Thêm diễn viên
 export const createDienVien = async (req, res) => {
   try {
     let { tenDienVien, ngaySinh, tieuSu } = req.body
@@ -76,6 +77,7 @@ export const createDienVien = async (req, res) => {
   }
 }
 
+// Cập nhật diễn viên
 export const updateDienVien = async (req, res) => {
   try {
     const { maDienVien } = req.params
@@ -115,6 +117,7 @@ export const updateDienVien = async (req, res) => {
   }
 }
 
+// Xóa diễn viên
 export const deleteDienVien = async (req, res) => {
   try {
     const { maDienVien } = req.params

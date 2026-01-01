@@ -37,6 +37,7 @@ const generateSeats = (maPhong, tongSoGhe) => {
 };
 
 
+// Kiểm tra phòng có suất chiếu trong tương lai không
 const hasFutureShowtime = async (maPhong) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -54,9 +55,7 @@ const hasFutureShowtime = async (maPhong) => {
 };
 
 
-/* =======================================
-   1. LẤY DANH SÁCH PHÒNG CHIẾU
-======================================= */
+// lấy danh sách phòng chiếu với phân trang và lọc
 export const listPhongChieu = async (req, res) => {
   try {
 
@@ -101,19 +100,15 @@ export const listPhongChieu = async (req, res) => {
   }
 };
 
-/* =======================================
-   2. THÊM MỚI PHÒNG CHIẾU + GENERATE GHẾ
-======================================= */
+// thêm mới phòng chiếu + sinh ghế
 export const themMoiPhongChieu = async (req, res) => {
   const { maRap, tenPhong, tongSoGhe, trangThai } = req.body;
   if (!maRap || !tenPhong || !tongSoGhe)
     return res.status(400).json({ message: "Vui lòng điền đầy đủ tất cả các trường" });
 
   try {
-    // 1. tạo phòng
     const phong = await PhongChieu.create({ maRap, tenPhong, tongSoGhe, trangThai });
 
-    // 2. tạo seat
     const seats = generateSeats(phong.maPhong, tongSoGhe);
     await Ghe.bulkCreate(seats);
 
@@ -128,9 +123,7 @@ export const themMoiPhongChieu = async (req, res) => {
   }
 };
 
-/* =======================================
-   3. SỬA PHÒNG CHIẾU (TỰ CẬP NHẬT GHẾ)
-======================================= */
+// sửa phòng chiếu + cập nhật ghế nếu thay đổi tổng số ghế
 export const suaPhongChieu = async (req, res) => {
   const { maPhong } = req.params;
   const { maRap, tenPhong, tongSoGhe, trangThai } = req.body;
@@ -139,7 +132,7 @@ export const suaPhongChieu = async (req, res) => {
     const phong = await PhongChieu.findByPk(maPhong);
     if (!phong) return res.status(404).json({ message: "Không tìm thấy phòng" });
 
-    // kiểm tra có suất chiếu tương lai ko
+
     const hasShowtime = await hasFutureShowtime(maPhong);
     if (hasShowtime) {
       return res.status(400).json({ message: "Phòng có suất chiếu tương lai, không thể sửa" });
@@ -147,7 +140,6 @@ export const suaPhongChieu = async (req, res) => {
 
     const oldTotal = phong.tongSoGhe;
 
-    // 1. update phòng
     await phong.update({
       maRap: maRap ?? phong.maRap,
       tenPhong: tenPhong ?? phong.tenPhong,
@@ -155,9 +147,8 @@ export const suaPhongChieu = async (req, res) => {
       trangThai: trangThai ?? phong.trangThai
     });
 
-    // 2. nếu thay đổi tổng số ghế → update lại ghế
     if (tongSoGhe && tongSoGhe !== oldTotal) {
-      await Ghe.destroy({ where: { maPhong } }); // xoá toàn bộ ghế
+      await Ghe.destroy({ where: { maPhong } });
       const newSeats = generateSeats(maPhong, tongSoGhe);
       await Ghe.bulkCreate(newSeats);
     }
@@ -173,9 +164,7 @@ export const suaPhongChieu = async (req, res) => {
   }
 };
 
-/* =======================================
-   4. XOÁ PHÒNG CHIẾU (XÓA GHẾ TRƯỚC)
-======================================= */
+// xóa phòng chiếu + ghế
 export const xoaPhongChieu = async (req, res) => {
   const { maPhong } = req.params;
 
@@ -183,7 +172,6 @@ export const xoaPhongChieu = async (req, res) => {
     const phong = await PhongChieu.findByPk(maPhong);
     if (!phong) return res.status(404).json({ message: "Không tìm thấy phòng" });
 
-    // kiểm tra có suất chiếu tương lai ko
     const hasShowtime = await hasFutureShowtime(maPhong);
     if (hasShowtime) {
       return res.status(400).json({ message: "Phòng có suất chiếu tương lai, không thể xóa" });

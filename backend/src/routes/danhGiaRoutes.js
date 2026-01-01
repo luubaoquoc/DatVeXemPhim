@@ -1,10 +1,10 @@
 import express from 'express';
-import { listDanhGias, updateDanhGia, deleteDanhGia } from '../controllers/danhGiaController.js';
+import { getAllDanhGia, updateDanhGia, deleteDanhGia } from '../controllers/danhGiaController.js';
 import { authenticateToken, isAdmin } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-router.get('/', authenticateToken, isAdmin, listDanhGias);
+router.get('/', authenticateToken, isAdmin, getAllDanhGia);
 router.put('/:maDanhGia', authenticateToken, isAdmin, updateDanhGia);
 router.delete('/:maDanhGia', authenticateToken, isAdmin, deleteDanhGia);
 

@@ -5,7 +5,10 @@ import streamifier from 'streamifier'
 // Lấy tất cả ảnh banner
 export const getAllAnhBanner = async (req, res) => {
   try {
-    const anhBanners = await AnhBanner.findAll();
+    const anhBanners = await AnhBanner.findAll({
+      order: [['maAnhBanner', 'DESC']]
+    });
+
     res.json(anhBanners);
   } catch (error) {
     console.error(error);
@@ -36,7 +39,6 @@ export const createAnhBanner = async (req, res) => {
           }
         )
 
-        // Dùng streamifier để tạo stream an toàn từ buffer
         streamifier.createReadStream(req.file.buffer).pipe(stream)
       })
 
@@ -60,7 +62,7 @@ export const updateAnhBanner = async (req, res) => {
 
     if (!anhBanner) return res.status(404).json({ message: 'Không tìm thấy ảnh banner' });
 
-    let posterUrl = anhBanner.anh; // giữ nguyên nếu không có file mới
+    let posterUrl = anhBanner.anh;
 
     if (req.file) {
       const uploadResult = await new Promise((resolve, reject) => {
@@ -93,7 +95,7 @@ export const updateAnhBanner = async (req, res) => {
   }
 }
 
-// Xóa ảnh banner
+
 export const deleteAnhBanner = async (req, res) => {
   try {
     const { maAnhBanner } = req.params;

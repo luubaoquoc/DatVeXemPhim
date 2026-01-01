@@ -17,12 +17,12 @@ const MoviesCard = ({ movie }) => {
       </div>
       <p className='font-medium mt-2 truncate'>{movie.tenPhim}</p>
 
-      <p className='text-sm text-gray-400 mt-2'>
+      <p className='text-sm text-gray-400 mt-1'>
         {new Date(movie.ngayCongChieu).getFullYear()} - {movie.theLoais.slice(0, 2).map(
           genre => genre.tenTheLoai).join(" | ")} - {timeFormat(movie.thoiLuong)}
       </p>
 
-      <div className='flex items-center justify-between mt-4 pb-3'>
+      <div className='flex items-center justify-between mt-2'>
         <button onClick={() => { navigate(`/phims/${movie.maPhim}`); scrollTo(0, 0) }}
           className='px-4 py-2 text-sm bg-primary-dull hover:bg-primary transition
         rounded-full font-medium cursor-pointer'>

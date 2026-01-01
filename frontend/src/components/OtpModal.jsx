@@ -5,8 +5,8 @@ import useApi from '../hooks/useApi';
 const OtpModal = ({ email, otp, setOtp, setShowOtpModal, setIsLogin }) => {
   const api = useApi()
   const inputsRef = useRef([]);
-  const [isResending, setIsResending] = useState(false); // tránh spam
-  const [timer, setTimer] = useState(0); // đếm ngược resend
+  const [isResending, setIsResending] = useState(false);
+  const [timer, setTimer] = useState(0);
 
   // Khi người dùng nhập vào từng ô
   const handleChange = (e, index) => {

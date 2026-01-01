@@ -1,6 +1,8 @@
 import TheLoai from '../models/TheLoai.js'
 import { Op } from "sequelize";
 
+
+// Lấy tất cả thể loại với phân trang và lọc
 export const getAllTheLoai = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
@@ -30,6 +32,8 @@ export const getAllTheLoai = async (req, res) => {
   }
 }
 
+
+// Thêm thể loại
 export const createTheLoai = async (req, res) => {
   try {
     const { tenTheLoai, moTa } = req.body
@@ -45,6 +49,7 @@ export const createTheLoai = async (req, res) => {
   }
 }
 
+// Cập nhật thể loại
 export const updateTheLoai = async (req, res) => {
   try {
     const { maTheLoai } = req.params
@@ -58,6 +63,7 @@ export const updateTheLoai = async (req, res) => {
   }
 }
 
+// Xóa thể loại
 export const deleteTheLoai = async (req, res) => {
   try {
     const { maTheLoai } = req.params

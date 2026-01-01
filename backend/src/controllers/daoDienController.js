@@ -121,7 +121,6 @@ export const updateDaoDien = async (req, res) => {
           }
         )
 
-        // Dùng streamifier để tạo stream an toàn từ buffer
         streamifier.createReadStream(req.file.buffer).pipe(stream)
       })
 

@@ -11,7 +11,7 @@ import { xoaVeHetHan } from '../crons/xoaVeHetHan.js';
 
 
 
-// GET /api/don-dat-ve
+// lấy tất cả đặt vé với phân trang, tìm kiếm, lọc
 export const getAllDatVe = async (req, res) => {
   try {
 
@@ -32,10 +32,10 @@ export const getAllDatVe = async (req, res) => {
       }
       phongWhere = { maRap };
     }
-    // WHERE conditions
+
     let whereOp = {};
 
-    //  Search theo maDatVe, tên phim, tên người đặt
+
     if (search) {
       whereOp = {
         [Op.or]: [
@@ -43,8 +43,6 @@ export const getAllDatVe = async (req, res) => {
         ]
       };
     }
-
-
 
     //  Lọc trạng thái
     if (status === "success") {
@@ -143,7 +141,7 @@ export const getAllDatVe = async (req, res) => {
 
 
 
-// POST /api/datve    body: { maSuatChieu, chiTiet: ["A1","A2"] or chiTiet: [{ soGhe: 'A1', giaBan }, ...], tongTien }
+// tạo đơn đặt vé
 export const createDatVe = async (req, res) => {
   const t = await sequelize.transaction();
   try {
@@ -155,7 +153,7 @@ export const createDatVe = async (req, res) => {
     if (!maSuatChieu || !Array.isArray(chiTiet) || chiTiet.length === 0)
       return res.status(400).json({ message: 'Dữ liệu đặt vé không hợp lệ' });
 
-    // Format: chiTiet = [{ maGhe, giaVe }, ...]
+
     const maGheList = chiTiet.map(g => g.maGhe);
     console.log(maGheList);
 
@@ -232,7 +230,7 @@ export const createDatVe = async (req, res) => {
   }
 };
 
-// POST /api/datve/:maDatVe/checkout  - create payment redirect for an existing pending booking
+// checkout cho đặt vé
 export const createCheckoutForDatVe = async (req, res) => {
   const t = await sequelize.transaction();
   try {
@@ -243,19 +241,19 @@ export const createCheckoutForDatVe = async (req, res) => {
     const { phuongThuc, tongTien, khuyenMaiId } = req.body;
     if (!maDatVe || !phuongThuc) return res.status(400).json({ message: 'Dữ liệu không hợp lệ' });
 
-    // load booking with lock
+
     const datVe = await DatVe.findByPk(maDatVe, { transaction: t, lock: t.LOCK.UPDATE });
     if (!datVe) {
       await t.rollback();
       return res.status(404).json({ message: 'Đặt vé không tồn tại' });
     }
-    // ownership check
+
     if (datVe.maTaiKhoanDatVe !== maTaiKhoan) {
       await t.rollback();
       return res.status(403).json({ message: 'Không có quyền truy cập' });
     }
 
-    // must be pending and not expired
+
     if (datVe.trangThai !== 'Đang chờ') {
       await t.rollback();
       return res.status(400).json({ message: 'Đặt vé không ở trạng thái đang chờ' });
@@ -277,7 +275,6 @@ export const createCheckoutForDatVe = async (req, res) => {
       { transaction: t }
     );
 
-    // update or create payment record
     const thanhToan = await ThanhToan.findOne({
       where: { maDatVe },
       transaction: t,
@@ -297,7 +294,6 @@ export const createCheckoutForDatVe = async (req, res) => {
       },
       { transaction: t });
 
-    // call payment provider
     let redirectUrl;
     if (phuongThuc === 'momo') redirectUrl = await createMoMoPayment(datVe, thanhToan.soTien);
     else if (phuongThuc === 'vnpay') redirectUrl = await createVNPayPayment(datVe, thanhToan.soTien, req);
@@ -317,9 +313,7 @@ export const createCheckoutForDatVe = async (req, res) => {
   }
 };
 
-
-
-// GET /api/datve/user  - list bookings of current user
+// lấy danh sách đặt vé của chính mình với phân trang, tìm kiếm
 export const listMyDatVes = async (req, res) => {
   try {
     const maTaiKhoan = req.user?.maTaiKhoan;
@@ -404,6 +398,7 @@ export const listMyDatVes = async (req, res) => {
   }
 };
 
+// lấy danh sách ghế đang đặt cho một mã đặt vé
 export const getGheDangDat = async (req, res) => {
   const maDatVe = Number(req.params.maDatVe);
 
@@ -417,6 +412,8 @@ export const getGheDangDat = async (req, res) => {
   res.json(seats);
 };
 
+
+// lấy danh sách ghế đã được đặt cho một suất chiếu (trừ mã đặt vé hiện tại nếu có)
 export const getGheDaDat = async (req, res) => {
   try {
     const maSuatChieu = Number(req.params.maSuatChieu);
@@ -428,7 +425,7 @@ export const getGheDaDat = async (req, res) => {
       include: [
         {
           model: DatVe,
-          as: 'datVe', // alias đã define trong association
+          as: 'datVe',
           where: {
             maSuatChieu,
             trangThai: { [Op.in]: ['Đang chờ', 'Đang thanh toán', 'Thành công'] },
@@ -436,17 +433,17 @@ export const getGheDaDat = async (req, res) => {
               { trangThai: 'Thanh công' },
               { thoiHanThanhToan: { [Op.gt]: new Date() } },
             ],
-            ...(maDatVe ? { maDatVe: { [Op.ne]: maDatVe } } : {}) // exclude current booking if maDatVe provided
+            ...(maDatVe ? { maDatVe: { [Op.ne]: maDatVe } } : {})
           },
           attributes: []
         },
         {
           model: Ghe,
-          as: 'ghe', // alias bạn đặt trong association ChiTietDatVe -> Ghe
+          as: 'ghe',
           attributes: ['hang', 'soGhe']
         }
       ],
-      attributes: ['maGhe'] // vẫn lấy maGhe để tham chiếu
+      attributes: ['maGhe']
     });
 
 
@@ -466,6 +463,7 @@ export const getGheDaDat = async (req, res) => {
   }
 };
 
+// cập nhật lại danh sách ghế cho một mã đặt vé
 export const capNhatGheDangDat = async (req, res) => {
   const { seats } = req.body;
   const maDatVe = req.params.maDatVe;
@@ -486,7 +484,7 @@ export const capNhatGheDangDat = async (req, res) => {
 
 
 
-// GET /api/datve/:maDatVe - get booking detail (owner or admin)
+// lấy thông tin đặt vé theo mã
 export const getDatVe = async (req, res) => {
   try {
     const maDatVe = Number(req.params.maDatVe)
@@ -540,7 +538,7 @@ export const getDatVe = async (req, res) => {
   }
 }
 
-
+// xóa đặt vé
 export const deleteDatVe = async (req, res) => {
   try {
     const maDatVe = Number(req.params.maDatVe);
@@ -555,7 +553,7 @@ export const deleteDatVe = async (req, res) => {
   }
 };
 
-
+// lấy thông tin đặt vé theo mã chi tiết
 export const getThongTinDatVe = async (req, res) => {
   const maChiTiet = Number(req.params.maChiTiet);
   console.log(maChiTiet);
@@ -606,7 +604,7 @@ export const getThongTinDatVe = async (req, res) => {
 };
 
 
-
+// check-in đặt vé
 export const checkInDatVe = async (req, res) => {
   try {
     const maChiTiet = Number(req.params.maChiTiet);
@@ -632,7 +630,7 @@ export const checkInDatVe = async (req, res) => {
   }
 };
 
-
+// bán vé tại quầy
 export const BanVeTaiQuay = async (req, res) => {
   const t = await sequelize.transaction();
   try {
@@ -644,7 +642,7 @@ export const BanVeTaiQuay = async (req, res) => {
 
     if (!maSuatChieu || !Array.isArray(seats) || seats.length === 0)
       return res.status(400).json({ message: 'Dữ liệu đặt vé không hợp lệ' });
-    // Format: seats = [{ maGhe, giaVe }, ...]
+
     const maGheList = seats?.map(g => g.maGhe);
 
     console.log(maGheList);
@@ -709,7 +707,17 @@ export const BanVeTaiQuay = async (req, res) => {
           attributes: ["maSuatChieu", "gioBatDau", "gioKetThuc"],
           include: [
             { model: Phim, as: "phim", attributes: ['maPhim', 'tenPhim', 'poster'] },
-            { model: PhongChieu, as: "phongChieu", attributes: ['maPhong', 'tenPhong', 'maRap'], include: [{ model: Rap, as: "rap", attributes: ['maRap', 'tenRap', 'diaChi'] }] }
+            {
+              model: PhongChieu,
+              as: "phongChieu",
+              attributes: ['maPhong', 'tenPhong', 'maRap'],
+              include: [
+                {
+                  model: Rap,
+                  as: "rap",
+                  attributes: ['maRap', 'tenRap', 'diaChi']
+                }]
+            }
           ]
         },
         {
@@ -730,7 +738,7 @@ export const BanVeTaiQuay = async (req, res) => {
   }
 };
 
-
+// hủy đặt vé
 export const cancelDatVe = async (req, res) => {
   const t = await sequelize.transaction();
   try {

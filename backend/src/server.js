@@ -22,6 +22,7 @@ import anhBannerRoutes from './routes/anhBannerRoutes.js';
 import dashboard from './routes/dashboardRoutes.js';
 import danhGiaRoutes from './routes/danhGiaRoutes.js';
 import khuyenMaiRoutes from './routes/khuyenMaiRoutes.js';
+import chatBoxRoutes from './routes/chatBoxRoutes.js';
 import './crons/index.js';
 import { stripeWebhook } from "./controllers/paymentController.js";
 // import { runAllCronsNow } from './crons/index.js';
@@ -75,6 +76,7 @@ app.use('/api/anhbanner', anhBannerRoutes);
 app.use('/api/admin', dashboard);
 app.use('/api/danhgia', danhGiaRoutes);
 app.use('/api/khuyenmai', khuyenMaiRoutes);
+app.use('/api/ai', chatBoxRoutes);
 
 
 if (process.env.NODE_ENV === "production") {

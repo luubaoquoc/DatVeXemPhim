@@ -19,7 +19,7 @@ export const getDashboardData = async (req, res) => {
 
 
     // ===== CARDS =====
-    // ===== DOANH THU HÔM NAY =====
+    // doanh thu hôm nay
     const doanhThuHomNay = await ThanhToan.findOne({
       attributes: [[fn("SUM", col("ThanhToan.soTien")), "tong"]],
       include: [{
@@ -83,7 +83,7 @@ export const getDashboardData = async (req, res) => {
       where: literal("DATE(ngayTao) = CURDATE()")
     })
 
-    // ===== DOANH THU 7 NGÀY =====
+    // doanh thu 7 ngày
     const doanhThu7Ngay = await ThanhToan.findAll({
       attributes: [
         [fn("DATE", col("ngayThanhToan")), "ngay"],
@@ -119,7 +119,7 @@ export const getDashboardData = async (req, res) => {
     })
 
 
-    // ===== TOP PHIM =====
+    // top phim tuần
     const topPhimTuan = await DatVe.findAll({
       attributes: [
         [col("suatChieu.phim.maPhim"), "maPhim"],
@@ -178,7 +178,7 @@ export const getDashboardData = async (req, res) => {
   }
 }
 
-// ==================== FILTER ====================
+// filter dashboard
 export const filterDashboard = async (req, res) => {
   try {
     const { type, from, to, month, year } = req.query

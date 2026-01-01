@@ -34,9 +34,9 @@ const PhimForm = ({ onSubmit, onClose, editPhim }) => {
     const fetchData = async () => {
       try {
         const [dd, dv, tl] = await Promise.all([
-          api.get('/daodien'),
-          api.get('/dienvien'),
-          api.get('/theloai')
+          api.get('/daodien', { params: { limit: 1000 } }),
+          api.get('/dienvien', { params: { limit: 1000 } }),
+          api.get('/theloai', { params: { limit: 1000 } })
         ]);
 
         setDaoDiens(dd.data.data);

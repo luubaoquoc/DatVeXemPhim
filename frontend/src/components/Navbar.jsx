@@ -104,9 +104,9 @@ const Navbar = () => {
           onClick={() => setOpenDienAnhDropdown(prev => !prev)}
           onMouseLeave={() => setOpenDienAnhDropdown(false)}
         >
-          <div className="flex items-center gap-1 cursor-pointer hover:text-primary">
+          <div className=" cursor-pointer hover:text-primary">
             <span>Góc Điện Ảnh</span>
-            <ChevronDown className=" w-4 h-4 text-gray-400" />
+
           </div>
 
           <div
@@ -140,9 +140,8 @@ const Navbar = () => {
           onClick={() => setOpenRapDropdown(prev => !prev)}
           onMouseLeave={() => setOpenRapDropdown(false)}
         >
-          <div className="flex items-center gap-1 cursor-pointer hover:text-primary">
+          <div className=" cursor-pointer hover:text-primary">
             <span>Rạp/Giá vé</span>
-            <ChevronDown className=" w-4 h-4 text-gray-400" />
           </div>
           <div
             className={`absolute right-[-70px] mt-2 w-48 max-h-60 overflow-y-auto bg-black/90 shadow-lg rounded-lg border-b py-2 z-50

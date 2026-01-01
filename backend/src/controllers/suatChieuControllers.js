@@ -1,8 +1,8 @@
 import { SuatChieu, Phim, PhongChieu, Rap, Ghe } from '../models/index.js';
 import { Op } from 'sequelize';
 
-
-export const listSuatChieus = async (req, res) => {
+// lấy danh sách suất chiếu với phân trang và lọc
+export const getAllSuatChieu = async (req, res) => {
   try {
 
     const { maVaiTro, maRap } = req.user || {};
@@ -67,7 +67,7 @@ export const listSuatChieus = async (req, res) => {
 
 
 
-
+// Lấy danh sách rạp có suất chiếu của phim vào ngày nhất định
 export const getRapsForMovieDate = async (req, res) => {
   try {
     const maPhim = Number(req.query.maPhim);
@@ -111,7 +111,7 @@ export const getRapsForMovieDate = async (req, res) => {
       order: [['gioBatDau', 'ASC']]
     });
 
-    // map to structured response: rap, phong, suatChieu list
+
     const map = {};
     for (const r of rows) {
       const pc = r.phongChieu;
@@ -152,7 +152,7 @@ export const getRapsForMovieDate = async (req, res) => {
   }
 };
 
-
+// Lấy lịch chiếu theo rạp và ngày
 export const getLichChieuByRapDate = async (req, res) => {
   try {
     const { maRap, date } = req.query;
@@ -210,6 +210,8 @@ export const getLichChieuByRapDate = async (req, res) => {
   }
 };
 
+
+// Lấy suất chiếu theo phòng và ngày
 export const getSuatByPhong = async (req, res) => {
   try {
     const maPhong = Number(req.query.maPhong);
@@ -234,7 +236,7 @@ export const getSuatByPhong = async (req, res) => {
 };
 
 
-// GET /api/suatchieu/:maSuatChieu
+// lấy thông tin suất chiếu theo mã suất chiếu
 export const getSuatChieu = async (req, res) => {
   try {
     const ma = Number(req.params.maSuatChieu);
@@ -273,8 +275,6 @@ export const createSuatChieu = async (req, res) => {
   try {
     const body = req.body;
 
-
-    // Nếu payload là array → xử lý batch create
     if (Array.isArray(body)) {
 
       // Format datetime
@@ -359,7 +359,7 @@ export const createSuatChieu = async (req, res) => {
 };
 
 
-// PUT /api/suatchieu/:maSuatChieu (admin)
+// cập nhật suất chiếu
 export const updateSuatChieu = async (req, res) => {
   try {
     const ma = Number(req.params.maSuatChieu);
@@ -381,7 +381,7 @@ export const updateSuatChieu = async (req, res) => {
 
     const body = { ...req.body };
 
-    // 🔒 ÉP TÍNH LẠI GIỜ KẾT THÚC
+    // ÉP TÍNH LẠI GIỜ KẾT THÚC
     if (body.gioBatDau) {
       const start = new Date(body.gioBatDau);
       if (isNaN(start)) {
@@ -400,7 +400,7 @@ export const updateSuatChieu = async (req, res) => {
       body.gioKetThuc = end;
     }
 
-    // ❌ XÓA gioKetThuc nếu FE gửi rác
+    // Xóa gioKetThuc nếu FE gửi rác
     if (!body.gioKetThuc) {
       delete body.gioKetThuc;
     }
@@ -418,7 +418,7 @@ export const updateSuatChieu = async (req, res) => {
   }
 };
 
-// DELETE /api/suatchieu/:maSuatChieu (admin)
+// xóa suất chiếu
 export const deleteSuatChieu = async (req, res) => {
   try {
     const ma = Number(req.params.maSuatChieu);

@@ -3,9 +3,7 @@ import streamifier from 'streamifier'
 import Rap from "../models/Rap.js";
 import { Op } from "sequelize";
 
-/* =======================================
-   LẤY DANH SÁCH RẠP (CÓ TÌM KIẾM + PHÂN TRANG)
-======================================= */
+// Lấy danh sách rạp với phân trang và lọc
 export const getRaps = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
@@ -37,9 +35,7 @@ export const getRaps = async (req, res) => {
   }
 };
 
-/* =======================================
-   LẤY 1 RẠP
-======================================= */
+// Lấy thông tin rạp theo mã rạp
 export const getRapById = async (req, res) => {
   try {
     const { maRap } = req.params;
@@ -54,9 +50,7 @@ export const getRapById = async (req, res) => {
   }
 };
 
-/* =======================================
-   THÊM RẠP
-======================================= */
+// Thêm mới rạp
 export const createRap = async (req, res) => {
   try {
     const { tenRap, diaChi, soDienThoai, srcMap } = req.body;
@@ -102,9 +96,7 @@ export const createRap = async (req, res) => {
   }
 };
 
-/* =======================================
-   SỬA RẠP
-======================================= */
+// Cập nhật thông tin rạp
 export const updateRap = async (req, res) => {
   try {
     const { maRap } = req.params;
@@ -154,9 +146,7 @@ export const updateRap = async (req, res) => {
   }
 };
 
-/* =======================================
-   XÓA RẠP
-======================================= */
+// Xóa rạp
 export const deleteRap = async (req, res) => {
   try {
     const { maRap } = req.params;

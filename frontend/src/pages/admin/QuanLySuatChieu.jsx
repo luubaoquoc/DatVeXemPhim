@@ -11,6 +11,7 @@ import SearchInput from "../../components/SearchInput";
 
 const QuanLySuatChieu = () => {
   const api = useApi(true)
+  const current = import.meta.env.VITE_CURRENCY;
 
   const [suatChieus, setSuatChieus] = useState([])
   const [phong, setPhong] = useState([])
@@ -177,7 +178,7 @@ const QuanLySuatChieu = () => {
                   : "-"}
               </td>
 
-              <td className="p-2">{sc.giaVeCoBan || "-"}</td>
+              <td className="p-2">{sc.giaVeCoBan ? `${sc.giaVeCoBan.toLocaleString("vi-VN")} ${current}` : "-"}</td>
 
               <td className="p-2">
                 <button

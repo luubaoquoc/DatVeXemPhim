@@ -43,6 +43,7 @@ import Rap from './pages/Rap'
 import DatVeThanhCong from './pages/DatVeThanhCong'
 import QuanLyKhuyenMai from './pages/admin/QuanLyKhuyenMai'
 import RoleRoute from './components/admin/RoleRoute'
+import ChatWidget from './components/ChatWidget'
 
 const App = () => {
 
@@ -219,6 +220,7 @@ const App = () => {
 
       </Routes>
       {!isAdminRoute && <Footer />}
+      {!isAdminRoute && <ChatWidget />}
 
     </>
   )

@@ -1,7 +1,7 @@
 import Ghe from "../models/Ghe.js";
 import { Op } from "sequelize";
 
-// GET /ghe?maPhong=...
+// Lấy danh sách ghế theo phòng
 export const listGheByPhong = async (req, res) => {
   try {
     const { maPhong } = req.query;
@@ -20,7 +20,7 @@ export const listGheByPhong = async (req, res) => {
   }
 };
 
-// PUT /ghe/:maGhe
+// Cập nhật trạng thái ghế
 export const updateGhe = async (req, res) => {
   try {
     const { maGhe } = req.params;
@@ -37,5 +37,4 @@ export const updateGhe = async (req, res) => {
   }
 };
 
-;
 

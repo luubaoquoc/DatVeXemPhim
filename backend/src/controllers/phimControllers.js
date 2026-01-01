@@ -4,7 +4,7 @@ import cloudinary from '../configs/cloudinary.js';
 import streamifier from 'streamifier'
 
 
-
+// Kiểm tra phim có suất chiếu trong tương lai không
 const hasFutureShowtime = async (maPhim) => {
   const now = new Date();
 
@@ -21,9 +21,9 @@ const hasFutureShowtime = async (maPhim) => {
 };
 
 
-// GET /api/phim?page=1&limit=20&q=keyword
 
-export const listPhims = async (req, res) => {
+// lấy danh sách phim với phân trang, tìm kiếm và lọc
+export const getAllPhim = async (req, res) => {
   try {
     const trangThaiChieu = req.query.trangThaiChieu || "";
     const page = parseInt(req.query.page) || 1;
@@ -39,7 +39,6 @@ export const listPhims = async (req, res) => {
     // Tổng số phim
     const totalItems = await Phim.count({ where: whereOp });
 
-    // Lấy phim với join optional
     const rows = await Phim.findAll({
       where: whereOp,
       include: [
@@ -75,7 +74,7 @@ export const listPhims = async (req, res) => {
 };
 
 
-// GET /api/phim/:maPhim
+// Lấy chi tiết phim
 export const getPhim = async (req, res) => {
   try {
     const phim = await Phim.findByPk(req.params.maPhim, {
@@ -104,7 +103,7 @@ export const getPhim = async (req, res) => {
   }
 };
 
-// ================== TẠO PHIM MỚI ==================
+// tạo phim mới
 export const createPhim = async (req, res) => {
   try {
     let {
@@ -124,7 +123,6 @@ export const createPhim = async (req, res) => {
 
     console.log(req.file)
 
-    // Parse JSON nếu frontend gửi chuỗi
     try {
       if (typeof maTheLoai === 'string') maTheLoai = JSON.parse(maTheLoai)
       if (typeof maDienVien === 'string') maDienVien = JSON.parse(maDienVien)
@@ -160,7 +158,6 @@ export const createPhim = async (req, res) => {
           }
         )
 
-        // Dùng streamifier để tạo stream an toàn từ buffer
         streamifier.createReadStream(req.file.buffer).pipe(stream)
       })
 
@@ -193,7 +190,7 @@ export const createPhim = async (req, res) => {
   }
 }
 
-// ================== CẬP NHẬT PHIM ==================
+// Cập nhật phim
 export const updatePhim = async (req, res) => {
   try {
     const { maPhim } = req.params
@@ -229,7 +226,6 @@ export const updatePhim = async (req, res) => {
 
     let posterUrl = phim.poster
 
-    //  Nếu có ảnh mới thì upload lại
     if (req.file) {
       const uploadStream = () =>
         new Promise((resolve, reject) => {
@@ -254,7 +250,6 @@ export const updatePhim = async (req, res) => {
       posterUrl = result.secure_url
     }
 
-    //  Cập nhật thông tin phim
     await phim.update({
       tenPhim,
       noiDung: moTa,
@@ -269,7 +264,6 @@ export const updatePhim = async (req, res) => {
       phuDe
     })
 
-    //  Cập nhật liên kết
     if (maTheLoai) await phim.setTheLoais(maTheLoai)
     if (maDienVien) await phim.setDienViens(maDienVien)
 
@@ -280,7 +274,7 @@ export const updatePhim = async (req, res) => {
   }
 }
 
-// ================== XÓA PHIM ==================
+// Xoá phim
 export const deletePhim = async (req, res) => {
   try {
     const { maPhim } = req.params;
@@ -300,12 +294,12 @@ export const deletePhim = async (req, res) => {
   }
 };
 
-// POST /api/phim/:maPhim/like  - like a movie
+// thích phim
 export const likePhim = async (req, res) => {
   try {
     const maPhim = parseInt(req.params.maPhim);
     const maTaiKhoan = req.user?.maTaiKhoan;
-    if (!maTaiKhoan) return res.status(401).json({ message: 'Unauthorized' });
+    if (!maTaiKhoan) return res.status(401).json({ message: 'Không có quyền truy cập' });
 
     const phim = await Phim.findByPk(maPhim);
     if (!phim) return res.status(404).json({ message: 'Phim không tồn tại' });
@@ -321,12 +315,12 @@ export const likePhim = async (req, res) => {
   }
 };
 
-// DELETE /api/phim/:maPhim/like  - unlike a movie
+// bỏ thích phim
 export const unlikePhim = async (req, res) => {
   try {
     const maPhim = parseInt(req.params.maPhim);
     const maTaiKhoan = req.user?.maTaiKhoan;
-    if (!maTaiKhoan) return res.status(401).json({ message: 'Unauthorized' });
+    if (!maTaiKhoan) return res.status(401).json({ message: 'Không có quyền truy cập' });
 
     const record = await Phim_UaThich.findOne({ where: { maPhim, maTaiKhoan } });
     if (!record) return res.status(404).json({ message: 'Chưa thích phim này' });
@@ -339,11 +333,11 @@ export const unlikePhim = async (req, res) => {
   }
 };
 
-// GET /api/phim/liked  - get current user's liked movies
+// Lấy danh sách phim đã thích của user
 export const getLikedPhims = async (req, res) => {
   try {
     const maTaiKhoan = req.user?.maTaiKhoan;
-    if (!maTaiKhoan) return res.status(401).json({ message: 'Unauthorized' });
+    if (!maTaiKhoan) return res.status(401).json({ message: 'Không có quyền truy cập' });
 
     const user = await TaiKhoan.findByPk(maTaiKhoan, {
       include: [
@@ -377,7 +371,6 @@ export const getLikedPhims = async (req, res) => {
       return plainPhim;
     });
 
-    // trả về danh sách phim
     return res.json({ data });
   } catch (err) {
     console.error('getLikedPhims error:', err);
@@ -390,7 +383,7 @@ export const getUserDanhGia = async (req, res) => {
   try {
     const maPhim = parseInt(req.params.maPhim);
     const maTaiKhoan = req.user?.maTaiKhoan;
-    if (!maTaiKhoan) return res.status(401).json({ message: 'Unauthorized' });
+    if (!maTaiKhoan) return res.status(401).json({ message: 'Không có quyền truy cập' });
     const danhGia = await DanhGia.findOne({ where: { maPhim, maTaiKhoan } });
     if (!danhGia) return res.status(404).json({ message: 'Chưa đánh giá phim này' });
     res.json({ data: danhGia });
@@ -406,7 +399,7 @@ export const danhGiaPhim = async (req, res) => {
     const maPhim = parseInt(req.params.maPhim);
     const maTaiKhoan = req.user?.maTaiKhoan;
     const { diem } = req.body;
-    if (!maTaiKhoan) return res.status(401).json({ message: 'Unauthorized' });
+    if (!maTaiKhoan) return res.status(401).json({ message: 'Không có quyền truy cập' });
 
     const phim = await Phim.findByPk(maPhim);
     if (!phim) return res.status(404).json({ message: 'Phim không tồn tại' });
