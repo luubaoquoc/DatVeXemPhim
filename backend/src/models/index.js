@@ -68,15 +68,11 @@ SuatChieu.belongsTo(PhongChieu, { foreignKey: 'maPhong', as: 'phongChieu' });
 SuatChieu.hasMany(DatVe, { foreignKey: 'maSuatChieu', as: 'datVes' });
 DatVe.belongsTo(SuatChieu, { foreignKey: 'maSuatChieu', as: 'suatChieu' });
 
-// DatVe now stores both the customer and (optionally) the staff who sold the
-// ticket using maTaiKhoanDatVe and maNhanVienBanVe. Create two associations
-// so you can eager-load either the customer or the staff member.
+
 TaiKhoan.hasMany(DatVe, { foreignKey: 'maTaiKhoanDatVe', as: 'datVes' });
 DatVe.belongsTo(TaiKhoan, { foreignKey: 'maTaiKhoanDatVe', as: 'khachHang' });
 
 
-
-// Optional: association for the staff who sold the ticket
 TaiKhoan.hasMany(DatVe, { foreignKey: 'maNhanVienBanVe', as: 'datVeBan' });
 DatVe.belongsTo(TaiKhoan, { foreignKey: 'maNhanVienBanVe', as: 'nhanVien' });
 
@@ -85,8 +81,6 @@ ChiTietDatVe.belongsTo(DatVe, { foreignKey: 'maDatVe', as: 'datVe' });
 
 Ghe.hasMany(ChiTietDatVe, { foreignKey: 'maGhe', as: 'chiTietDatVes', onDelete: 'CASCADE' });
 ChiTietDatVe.belongsTo(Ghe, { foreignKey: 'maGhe', as: 'ghe' });
-// Previously DatVe had ChiTietDatVe entries linking to Ghe; now seat labels are stored
-// directly on DatVe.soGhe (comma-separated list). No ChiTietDatVe or Ghe associations.
 
 LichSuDungMa.belongsTo(TaiKhoan, { foreignKey: 'maTaiKhoan', as: 'taiKhoan' });
 TaiKhoan.hasMany(LichSuDungMa, { foreignKey: 'maTaiKhoan', as: 'lichSuDungMas' });

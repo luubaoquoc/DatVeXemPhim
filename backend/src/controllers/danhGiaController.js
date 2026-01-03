@@ -55,8 +55,7 @@ export const updateDanhGia = async (req, res) => {
       return res.status(404).json({ message: "Đánh giá không tồn tại" });
     }
 
-    danhGia.diem = diem;
-    await danhGia.save();
+    await danhGia.update({ diem, ngayDanhGia: new Date() });
 
     res.json({ message: "Cập nhật thành công", data: danhGia });
   } catch (error) {

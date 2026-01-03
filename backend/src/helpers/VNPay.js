@@ -21,7 +21,7 @@ export const createVNPayPayment = async (datVe, tongTien, req) => {
 
   const expireDate = moment()
     .tz('Asia/Ho_Chi_Minh')
-    .add(15, 'minutes')
+    .add(5, 'minutes')
     .format('YYYYMMDDHHmmss')
 
   const paymentUrl = vnpay.buildPaymentUrl({

@@ -72,7 +72,7 @@ const ChatWindow = ({ onClose }) => {
         ))}
 
         {loading && (
-          <div className="bg-gray-200 px-3 py-2 rounded-lg w-fit">
+          <div className="bg-gray-200 px-3 py-2 rounded-lg w-fit text-black">
             Đang trả lời...
           </div>
         )}

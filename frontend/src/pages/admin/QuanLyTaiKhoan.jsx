@@ -221,7 +221,7 @@ const QuanLyTaiKhoan = () => {
           search={search}
           setSearch={setSearch}
           setCurrentPage={setCurrentPage}
-          item="tên tài khoản"
+          item="email"
         />
 
         {/* Trạng thái */}

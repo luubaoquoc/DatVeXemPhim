@@ -30,6 +30,7 @@ const SoDoGheNgoi = () => {
   const [selectedTime, setSelectedTime] = useState(null);
   const [timeLeft, setTimeLeft] = useState(null);
   const [roomShows, setRoomShows] = useState([]);
+  const [loading, setLoading] = useState(false);
 
 
   /* ====================== LOAD DATA ====================== */
@@ -212,6 +213,7 @@ const SoDoGheNgoi = () => {
     if (!selectedSeats.length) return toast.error("Vui lòng chọn ghế");
 
     try {
+      setLoading(true);
       const chiTiet = buildChiTiet();
 
       // UPDATE
@@ -255,6 +257,8 @@ const SoDoGheNgoi = () => {
       });
     } catch (err) {
       toast.error(err?.message || "Đặt vé thất bại");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -360,6 +364,7 @@ const SoDoGheNgoi = () => {
           onBack={handleBackFromSeatMap}
           onAction={handleThanhToan}
           actionLabel="Tiếp tục"
+          loading={loading}
         />
       </div>
     </div>

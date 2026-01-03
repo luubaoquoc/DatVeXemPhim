@@ -113,9 +113,9 @@ const QuanLyDanhGia = () => {
               <td className="p-2">{d.taiKhoan.hoTen}</td>
               <td className="p-2">{d.phim.tenPhim}</td>
               <td className="p-2">{d.diem}</td>
-              <td className="p-2">{new Date(d.ngayDanhGia).toLocaleDateString()}</td>
+              <td className="p-2">{d.ngayDanhGia}</td>
 
-              <td className="p-2">
+              <td className="p-2 text-center">
                 <button
                   onClick={() => openEdit(d)}
                   className="p-2 text-gray-400 hover:bg-primary/20 rounded cursor-pointer transition"

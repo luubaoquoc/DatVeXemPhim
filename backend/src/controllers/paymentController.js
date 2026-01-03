@@ -215,8 +215,12 @@ export const vnpayReturn = async (req, res) => {
   } catch (error) {
     console.error('vnpayReturn email error:', error);
   }
-  return res.redirect(`${CLIENT_URL}/dat-ve-thanh-cong?status=${vnp_ResponseCode}&maDatVe=${orderId}`);
-}
+  if (success) {
+    return res.redirect(`${CLIENT_URL}/dat-ve-thanh-cong?status=${vnp_ResponseCode}&maDatVe=${orderId}`);
+  } else {
+    return res.redirect(`${CLIENT_URL}/lich-su-dat-ve?status=${vnp_ResponseCode}&maDatVe=${orderId}`);
+  }
+};
 
 /**
  *  Stripe webhook

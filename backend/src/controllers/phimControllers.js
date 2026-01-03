@@ -412,6 +412,7 @@ export const danhGiaPhim = async (req, res) => {
     });
     if (!created) {
       danhGia.diem = diem;
+      danhGia.ngayDanhGia = new Date();
       await danhGia.save();
     }
 

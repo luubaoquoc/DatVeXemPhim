@@ -53,6 +53,8 @@ const ThanhToan = () => {
   const [showAgeModal, setShowAgeModal] = useState(false)
   const [ageMessage, setAgeMessage] = useState('')
 
+  const [loading, setLoading] = useState(false)
+
 
   useEffect(() => {
     setDiscount(0);
@@ -133,6 +135,7 @@ const ThanhToan = () => {
 
   const handleConfirm = async () => {
     try {
+      setLoading(true)
       const phuongThuc = selectedMethod.toLowerCase()
 
       // Nếu đã có maDatVe (được tạo khi giữ chỗ) -> gọi checkout endpoint để tạo redirectUrl cho booking hiện tại
@@ -168,7 +171,10 @@ const ThanhToan = () => {
       console.error(err)
       const msg = err?.response?.data?.message || 'Đặt vé thất bại'
       toast.error(msg)
+    } finally {
+      setLoading(false)
     }
+
   }
 
   const handleClickThanhToan = () => {
@@ -286,6 +292,7 @@ const ThanhToan = () => {
           })}
           onAction={handleClickThanhToan}
           actionLabel="Thanh toán"
+          loading={loading}
         />
       </div>
       {showAgeModal && <XacNhanTuoiModal doTuoi={phim.phanLoai} ageMessage={ageMessage} setShowAgeModal={setShowAgeModal} handleConfirm={handleConfirm} />}

@@ -11,6 +11,7 @@ import { Line } from "react-chartjs-2";
 import Loading from "../../components/Loading";
 import useApi from "../../hooks/useApi";
 import BlurCircle from "../../components/BlurCircle";
+import aiIcon from '../../assets/ai.png';
 
 import {
   Chart as ChartJS,
@@ -57,6 +58,9 @@ const AdminDashboard = () => {
   const [month, setMonth] = useState("");
   const [year, setYear] = useState("");
 
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiAnalysis, setAiAnalysis] = useState("");
+
   const fetchData = async () => {
     try {
       setLoading(true);
@@ -92,6 +96,8 @@ const AdminDashboard = () => {
       console.log(err);
     }
   };
+
+
 
   useEffect(() => {
     const fetchRaps = async () => {
@@ -166,6 +172,27 @@ const AdminDashboard = () => {
     }
   }
 
+  const analyzeRevenueByAI = async () => {
+    try {
+      setAiLoading(true);
+
+      const sourceData = filterResult?.data ?? dashboard.doanhThu7Ngay;
+      const topPhim = filterResult?.topPhim ?? dashboard.topPhimTuan;
+
+      const res = await api.post("/ai/phan-tich-doanh-thu", {
+        filterType,
+        chartData: sourceData,
+        topPhim,
+        maRap
+      });
+
+      setAiAnalysis(res.data.analysis);
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setAiLoading(false);
+    }
+  };
 
 
   const Card = ({ icon, label, value, color }) => (
@@ -319,11 +346,42 @@ const AdminDashboard = () => {
                     {item.tenPhim}
                   </p>
                   <p className="text-gray-400">Vé bán: {item.soVe}</p>
+                  <p className="text-green-400 text-sm">
+                    💰 Doanh thu: {Number(item.doanhThu).toLocaleString()} {currency}
+                  </p>
                 </div>
               </li>
             ))}
           </ul>
         </div>
+      </div>
+
+      <div className="mt-5">
+        <button
+          onClick={analyzeRevenueByAI}
+          className="bg-primary-dull px-4 py-2 rounded-lg hover:bg-primary cursor-pointer"
+        >
+          <img src={aiIcon} alt="AI Icon" className="w-6 h-6 inline-block mr-2" />
+          Phân tích doanh thu bằng AI
+        </button>
+
+        {aiLoading && (
+          <p className="text-gray-400 mt-3">
+            AI đang phân tích dữ liệu...
+          </p>
+        )}
+
+        {aiAnalysis && (
+          <div className="mt-4 bg-black border border-primary rounded-xl p-4">
+            <h3 className="font-semibold mb-2">
+              Nhận xét từ AI
+            </h3>
+
+            <pre className="whitespace-pre-wrap text-gray-300 text-sm leading-relaxed">
+              {aiAnalysis}
+            </pre>
+          </div>
+        )}
       </div>
 
       <BlurCircle top="200px" right="-10%" />

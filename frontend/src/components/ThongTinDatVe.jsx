@@ -3,7 +3,7 @@ import isoTimeFormat from "../lib/isoTimeFormat";
 import { Clock } from 'lucide-react';
 import { dateFormat } from '../lib/dateFormat';
 
-const ThongoTinDatVe = (
+const ThongTinDatVe = (
   { phim,
     phong,
     rap,
@@ -18,7 +18,9 @@ const ThongoTinDatVe = (
     timeLeft,
     onBack,
     onAction,
-    actionLabel = "Thanh toán", }
+    actionLabel = "Thanh toán",
+    loading = false,
+  }
 ) => {
 
   const currency = import.meta.env.VITE_CURRENCY || "đ";
@@ -133,9 +135,16 @@ const ThongoTinDatVe = (
         {onAction && (
           <button
             onClick={onAction}
-            className="p-2 bg-primary-dull hover:bg-primary text-white rounded w-full cursor-pointer flex items-center justify-center gap-2"
+            disabled={loading}
+            className={`p-2 text-white rounded w-full cursor-pointer flex items-center justify-center gap-2
+              ${loading ? 'bg-gray-600 cursor-not-allowed' : 'bg-primary hover:bg-primary/90'}`}
           >
-            {actionLabel}
+            {loading ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              </>
+            )
+              : actionLabel}
           </button>
         )}
       </div>
@@ -143,4 +152,4 @@ const ThongoTinDatVe = (
   )
 }
 
-export default ThongoTinDatVe
+export default ThongTinDatVe

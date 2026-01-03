@@ -44,6 +44,7 @@ import DatVeThanhCong from './pages/DatVeThanhCong'
 import QuanLyKhuyenMai from './pages/admin/QuanLyKhuyenMai'
 import RoleRoute from './components/admin/RoleRoute'
 import ChatWidget from './components/ChatWidget'
+import GoiYPhim from './pages/GoiYPhim'
 
 const App = () => {
 
@@ -115,7 +116,7 @@ const App = () => {
             </ProtectedRoute>
           } />
 
-
+        <Route path='/goi-y-phim' element={<GoiYPhim />} />
 
 
 

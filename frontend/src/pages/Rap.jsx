@@ -87,7 +87,7 @@ const Rap = () => {
                 </div>
 
                 <div className="flex items-center justify-center h-[45px] border-b border-gray-800 text-3xl font-semibold">
-                  60.000
+                  65.000
                 </div>
 
                 <div className="flex items-center justify-center h-[45px] border-b border-gray-800 text-3xl font-semibold">

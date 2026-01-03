@@ -243,7 +243,55 @@ export const filterDashboard = async (req, res) => {
       raw: true
     })
 
-    res.json({ data })
+    // ================= TOP PHIM THEO FILTER =================
+    const topPhim = await DatVe.findAll({
+      attributes: [
+        [col("suatChieu.phim.maPhim"), "maPhim"],
+        [col("suatChieu.phim.tenPhim"), "tenPhim"],
+        [col("suatChieu.phim.poster"), "poster"],
+        [fn("COUNT", col("DatVe.maDatVe")), "soVe"],
+        [fn("SUM", col("thanhToan.soTien")), "doanhThu"]
+      ],
+      include: [
+        {
+          model: ThanhToan,
+          as: "thanhToan",
+          attributes: [],
+          where: { trangThai: "Thành công" }
+        },
+        {
+          model: SuatChieu,
+          as: "suatChieu",
+          required: true,
+          attributes: [],
+          include: [
+            {
+              model: Phim,
+              as: "phim",
+              required: true,
+              attributes: []
+            },
+            {
+              model: PhongChieu,
+              as: "phongChieu",
+              required: true,
+              attributes: [],
+              where: maRap ? { maRap } : {}
+            }
+          ]
+        }
+      ],
+      where: {
+        trangThai: "Thành công",
+        ngayDat: { [Op.between]: [start, end] }
+      },
+      group: ["suatChieu.phim.maPhim"],
+      order: [[fn("COUNT", col("DatVe.maDatVe")), "DESC"]],
+      limit: 5,
+      raw: true
+    });
+
+    res.json({ data, topPhim })
 
   } catch (err) {
     console.log(err)

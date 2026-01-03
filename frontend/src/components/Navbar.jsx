@@ -160,8 +160,11 @@ const Navbar = () => {
               </Link>
             ))}
           </div>
-
         </div>
+        <Link onClick={() => { scrollTo(0, 0); setIsOpen(false) }}
+          to='/goi-y-phim' className={`hover:text-primary ${isActive("/goi-y-phim") ? "text-primary" : ""}`}>
+          Gợi Ý Phim
+        </Link>
       </div>
 
       <div className='flex items-center gap-8'>

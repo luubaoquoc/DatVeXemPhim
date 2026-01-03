@@ -9,12 +9,15 @@ import sequelize from "../configs/sequelize.js";
 import PhongChieu from "../models/PhongChieu.js";
 import Rap from "../models/Rap.js";
 import KhuyenMai from "../models/KhuyenMai.js";
-import { Op } from "sequelize";
+import { QueryTypes, Op, fn, col, literal } from "sequelize";
+import DatVe from "../models/DatVe.js";
 
 const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY
 });
 
+
+// Chat với AI
 export const chatWithAI = async (req, res) => {
   const { message } = req.body;
 
@@ -154,3 +157,209 @@ export const chatWithAI = async (req, res) => {
   }
 };
 
+
+
+
+// Gợi ý phim cá nhân hóa
+export const getRecommendedMovies = async (req, res) => {
+  try {
+
+    console.log("USER FROM OPTIONAL AUTH:", req.user);
+
+    if (!req.user) {
+      return await fallbackMovies(res);
+    }
+
+
+
+    const maTaiKhoan = req.user.maTaiKhoan;
+    console.log("maTaiKhoan:", maTaiKhoan);
+
+
+    const favoriteGenres = await sequelize.query(
+      `
+      SELECT tl.maTheLoai, COUNT(*) AS movieCount
+      FROM DAT_VE dv
+      JOIN SUAT_CHIEU sc ON dv.maSuatChieu = sc.maSuatChieu
+      JOIN PHIM p ON sc.maPhim = p.maPhim
+      JOIN PHIM_THE_LOAI pt ON p.maPhim = pt.maPhim
+      JOIN THE_LOAI tl ON pt.maTheLoai = tl.maTheLoai
+      WHERE dv.maTaiKhoanDatVe = :maTaiKhoan
+      GROUP BY tl.maTheLoai
+      ORDER BY movieCount DESC
+      LIMIT 3
+      `,
+      {
+        replacements: { maTaiKhoan },
+        type: QueryTypes.SELECT
+      }
+    );
+
+    if (!favoriteGenres.length) {
+      return await fallbackMovies(res);
+    }
+
+    const genreIds = favoriteGenres.map(g => g.maTheLoai);
+
+
+    const movies = await Phim.findAll({
+      where: { trangThaiChieu: "Đang chiếu" },
+      include: [
+        {
+          model: TheLoai,
+          as: "theLoais",
+          where: { maTheLoai: genreIds },
+          through: { attributes: [] }
+        },
+        {
+          model: DanhGia,
+          as: "danhGias",
+          attributes: ["diem"],
+          required: false
+        },
+        {
+          model: SuatChieu,
+          as: "suatChieus",
+          required: true
+        }
+      ],
+      order: [
+        ["ngayCongChieu", "DESC"]
+      ],
+      limit: 10
+    });
+
+
+    const data = movies.map(phim => {
+      const avgRating =
+        phim.danhGias.length > 0
+          ? (
+            phim.danhGias.reduce(
+              (sum, dg) => sum + Number(dg.diem),
+              0
+            ) / phim.danhGias.length
+          ).toFixed(1)
+          : "0.0";
+
+      return {
+        ...phim.toJSON(),
+        rating: avgRating
+      };
+    });
+
+    return res.json({
+      type: "personalized",
+      movies: data
+    });
+
+  } catch (err) {
+    console.error("AI Recommendation error:", err);
+    res.status(500).json({ message: "Lỗi gợi ý phim" });
+  }
+};
+
+
+const fallbackMovies = async (res) => {
+  const hotMovies = await Phim.findAll({
+    where: { trangThaiChieu: "Đang chiếu" },
+    attributes: {
+      include: [[fn("AVG", col("danhGias.diem")), "rating"]]
+    },
+    include: [
+      {
+        model: DanhGia,
+        as: "danhGias",
+        attributes: [],
+        required: false
+      }
+    ],
+    group: ["Phim.maPhim"],
+    order: [
+      [literal("rating"), "DESC"],
+      ["ngayCongChieu", "DESC"]
+    ],
+    limit: 4,
+    subQuery: false,
+    raw: true
+  });
+
+  const movies = await Phim.findAll({
+    where: { maPhim: hotMovies.map(m => m.maPhim) },
+    include: [
+      { model: TheLoai, as: "theLoais", through: { attributes: [] } }
+    ]
+  });
+
+  const ratingMap = {};
+  const orderMap = {};
+
+  hotMovies.forEach((m, i) => {
+    ratingMap[m.maPhim] = m.rating ? Number(m.rating).toFixed(1) : "0.0";
+    orderMap[m.maPhim] = i;
+  });
+
+  const data = movies
+    .map(p => ({
+      ...p.toJSON(),
+      rating: ratingMap[p.maPhim] || "0.0"
+    }))
+    .sort((a, b) => orderMap[a.maPhim] - orderMap[b.maPhim]);
+
+  return res.json({
+    type: "fallback",
+    movies: data
+  });
+};
+
+
+
+export const analyzeRevenueAI = async (req, res) => {
+  try {
+    const { chartData, topPhim, filterType, maRap } = req.body;
+
+    const doanhThuText = chartData
+      .map(d => `- ${d.label || d.ngay}: ${d.tong}`)
+      .join("\n");
+
+    const topPhimText = topPhim?.length
+      ? topPhim.map(p =>
+        `- ${p.tenPhim}: ${p.soVe} vé, ${Number(p.doanhThu).toLocaleString()} VNĐ`
+      ).join("\n")
+      : "Không có dữ liệu";
+
+    const prompt = `
+    Bạn là trợ lý AI cho quản trị viên hệ thống rạp chiếu phim.
+
+    Dữ liệu doanh thu (${filterType}) ${maRap ? `của rạp ${maRap}` : "toàn hệ thống"}:
+
+      DOANH THU (${filterType}):
+${doanhThuText}
+
+ TOP PHIM:
+${topPhimText}
+
+    Yêu cầu:
+1. Nhận xét xu hướng doanh thu
+2. Nhận xét top phim bán chạy
+3. Đề xuất hành động cho admin
+Ngắn gọn – rõ ràng – tiếng Việt.
+`;
+
+    const completion = await groq.chat.completions.create({
+      model: "llama-3.1-8b-instant",
+      messages: [
+        { role: "system", content: "Bạn là chuyên gia phân tích dữ liệu kinh doanh." },
+        { role: "user", content: prompt }
+      ],
+      temperature: 0.3
+    });
+
+    return res.json({
+      analysis: completion.choices[0].message.content
+    });
+
+  } catch (error) {
+    console.error("Groq AI error:", error);
+    res.status(500).json({ message: "AI phân tích thất bại" });
+  }
+};

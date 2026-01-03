@@ -288,7 +288,7 @@ const ChiTietPhim = () => {
           </div>
           <div className='flex justify-center mt-5'>
             <button onClick={() => { navigate('/phims'); scrollTo(0, 0) }}
-              className=' flex px-10 py-3 border border-primary hover:bg-primary-dull transition rounded-md
+              className=' flex px-10 py-3 border border-primary bg-primary-dull hover:bg-primary transition rounded-md
           font-medium cursor-pointer'>
               Xem thêm
               <ChevronRight />

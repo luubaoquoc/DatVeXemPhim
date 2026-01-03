@@ -21,7 +21,12 @@ export const listUsers = async (req, res) => {
 
     const offset = (page - 1) * limit;
     const whereOp = {
-      ...(search && { hoTen: { [Op.like]: `%${search}%` } }),
+      ...(search && {
+        [Op.or]: {
+          email: { [Op.like]: `%${search}%` },
+          hoTen: { [Op.like]: `%${search}%` }
+        },
+      }),
       ...(maVaiTro && { maVaiTro }),
     };
 
