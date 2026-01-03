@@ -125,29 +125,37 @@ export const getDashboardData = async (req, res) => {
         [col("suatChieu.phim.maPhim"), "maPhim"],
         [col("suatChieu.phim.tenPhim"), "tenPhim"],
         [col("suatChieu.phim.poster"), "poster"],
-        [fn("COUNT", col("DatVe.maDatVe")), "soVe"]
+        [fn("COUNT", col("DatVe.maDatVe")), "soVe"],
+        [fn("SUM", col("thanhToan.soTien")), "doanhThu"]
       ],
-      include: [{
-        model: SuatChieu,
-        as: "suatChieu",
-        required: true,
-        attributes: [],
-        include: [
-          {
-            model: Phim,
-            as: "phim",
-            required: true,
-            attributes: []
-          },
-          {
-            model: PhongChieu,
-            as: "phongChieu",
-            required: true,
-            attributes: [],
-            where: maRap ? { maRap } : {}
-          }
-        ]
-      }],
+      include: [
+        {
+          model: ThanhToan,
+          as: "thanhToan",
+          attributes: [],
+          where: { trangThai: "Thành công" }
+        },
+        {
+          model: SuatChieu,
+          as: "suatChieu",
+          required: true,
+          attributes: [],
+          include: [
+            {
+              model: Phim,
+              as: "phim",
+              required: true,
+              attributes: []
+            },
+            {
+              model: PhongChieu,
+              as: "phongChieu",
+              required: true,
+              attributes: [],
+              where: maRap ? { maRap } : {}
+            }
+          ]
+        }],
       where: {
         trangThai: "Thành công",
         ngayDat: {
@@ -257,6 +265,7 @@ export const filterDashboard = async (req, res) => {
           model: ThanhToan,
           as: "thanhToan",
           attributes: [],
+          required: true,
           where: { trangThai: "Thành công" }
         },
         {
@@ -285,9 +294,13 @@ export const filterDashboard = async (req, res) => {
         trangThai: "Thành công",
         ngayDat: { [Op.between]: [start, end] }
       },
-      group: ["suatChieu.phim.maPhim"],
-      order: [[fn("COUNT", col("DatVe.maDatVe")), "DESC"]],
+      group: ["suatChieu.phim.maPhim",
+        "suatChieu.phim.tenPhim",
+        "suatChieu.phim.poster"
+      ],
+      order: [[fn("SUM", col("thanhToan.soTien")), "DESC"]],
       limit: 5,
+      subQuery: false,
       raw: true
     });
 

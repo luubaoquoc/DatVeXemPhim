@@ -172,12 +172,13 @@ const AdminDashboard = () => {
     }
   }
 
+  const sourceData = filterResult?.data ?? dashboard.doanhThu7Ngay;
+  const topPhim = filterResult?.topPhim ?? dashboard.topPhimTuan;
   const analyzeRevenueByAI = async () => {
     try {
       setAiLoading(true);
 
-      const sourceData = filterResult?.data ?? dashboard.doanhThu7Ngay;
-      const topPhim = filterResult?.topPhim ?? dashboard.topPhimTuan;
+
 
       const res = await api.post("/ai/phan-tich-doanh-thu", {
         filterType,
@@ -331,11 +332,13 @@ const AdminDashboard = () => {
         {/* TOP PHIM */}
         <div className="bg-black border border-primary rounded-xl p-6 flex-1">
           <h2 className="text-xl mb-4 font-semibold flex items-center gap-2">
-            <StarIcon /> Top phim bán chạy tuần
+            <StarIcon />
+            Top phim bán chạy
+            {filterType !== "7days" && " (theo bộ lọc)"}
           </h2>
 
           <ul className="space-y-4">
-            {dashboard.topPhimTuan.map((item, i) => (
+            {topPhim.map((item, i) => (
               <li key={i} className="flex items-center gap-4">
                 <img
                   src={item.poster}
@@ -345,9 +348,12 @@ const AdminDashboard = () => {
                   <p className="text-lg font-medium">
                     {item.tenPhim}
                   </p>
-                  <p className="text-gray-400">Vé bán: {item.soVe}</p>
+                  <p className="text-gray-400">
+                    Vé bán: {item.soVe}
+                  </p>
                   <p className="text-green-400 text-sm">
-                    💰 Doanh thu: {Number(item.doanhThu).toLocaleString()} {currency}
+                    Doanh thu:{" "}
+                    {Number(item.doanhThu).toLocaleString("vi-VN")} {currency}
                   </p>
                 </div>
               </li>
