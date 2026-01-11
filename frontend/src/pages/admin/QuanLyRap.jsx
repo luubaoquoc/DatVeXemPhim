@@ -223,7 +223,7 @@ const Rap = () => {
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <div>
-                    <label className='block mb-1 font-medium text-primary'>Tên rạp</label>
+                    <label className='block mb-1 font-medium text-primary'>Tên rạp <span className="text-red-500">*</span></label>
                     <input
                       type="text"
                       name="tenRap"
@@ -235,18 +235,19 @@ const Rap = () => {
                     />
                   </div>
                   <div>
-                    <label className='block mb-1 font-medium text-primary'>Địa chỉ</label>
+                    <label className='block mb-1 font-medium text-primary'>Địa chỉ <span className="text-red-500">*</span></label>
                     <input
                       type="text"
                       name="diaChi"
                       className="w-full p-2 mb-4 rounded bg-[#111] border border-gray-600 text-white"
                       value={formData.diaChi || ""}
                       onChange={handleChange}
+                      required
                     />
                   </div>
 
                   <div>
-                    <label className="block mb-1 font-medium text-primary">Số điện thoại</label>
+                    <label className="block mb-1 font-medium text-primary">Số điện thoại <span className="text-red-500">*</span></label>
                     <input
                       type="text"
                       name="soDienThoai"
@@ -258,7 +259,7 @@ const Rap = () => {
                   </div>
                 </div>
                 <div>
-                  <label className='block mb-1 font-medium text-primary'>Hình ảnh</label>
+                  <label className='block mb-1 font-medium text-primary'>Hình ảnh <span className="text-red-500">*</span></label>
                   <div className="">
                     <input
                       type="file"
@@ -266,6 +267,7 @@ const Rap = () => {
                       name="hinhAnh"
                       className="w-full h-[3rem] p-2 mb-4 rounded bg-[#111] border border-gray-600 text-white"
                       onChange={handleChange}
+                      required
                     />
                     {
                       formData.hinhAnh && (

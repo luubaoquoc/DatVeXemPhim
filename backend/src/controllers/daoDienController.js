@@ -42,7 +42,7 @@ export const createDaoDien = async (req, res) => {
     if (!ngaySinh || ngaySinh === "") {
       ngaySinh = null;
     }
-    if (!tenDaoDien) return res.status(400).json({ message: 'Thiếu tên đạo diễn' })
+    if (!tenDaoDien || tenDaoDien.trim() === "") return res.status(400).json({ message: 'Tên đạo diễn là bắt buộc và không được để trống' })
 
     const existingDaoDien = await DaoDien.findOne({ where: { tenDaoDien } });
     if (existingDaoDien) return res.status(400).json({ message: 'Đạo diễn với tên này đã tồn tại' });

@@ -45,6 +45,8 @@ import QuanLyKhuyenMai from './pages/admin/QuanLyKhuyenMai'
 import RoleRoute from './components/admin/RoleRoute'
 import ChatWidget from './components/ChatWidget'
 import GoiYPhim from './pages/GoiYPhim'
+import ComBoDoAn from './pages/ComBoDoAn'
+import QuanLyComboDoAn from './pages/admin/QuanLyComboDoAn'
 
 const App = () => {
 
@@ -74,6 +76,14 @@ const App = () => {
           element={
             <ProtectedRoute>
               <SoDoGheNgoi />
+            </ProtectedRoute>
+          } />
+
+        <Route
+          path="/chon-combo"
+          element={
+            <ProtectedRoute>
+              <ComBoDoAn />
             </ProtectedRoute>
           } />
 
@@ -203,6 +213,14 @@ const App = () => {
             }
           />
           <Route path='quan-ly-don-dat-ve' element={<QuanLyDonDatVe />} />
+
+          <Route path='quan-ly-combo-do-an'
+            element={
+              <RoleRoute allowRoles={[3, 4]}>
+                <QuanLyComboDoAn />
+              </RoleRoute>
+            }
+          />
           <Route path='quan-ly-khuyen-mai'
             element={
               <RoleRoute allowRoles={[4]}>

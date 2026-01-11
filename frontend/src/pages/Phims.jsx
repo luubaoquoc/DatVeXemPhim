@@ -74,7 +74,7 @@ const Phims = () => {
     </div>
   ) : (
     <div className='flex flex-col items-center justify-center h-screen'>
-      <h1 className='text-3xl font-bold text-center'>No movies available</h1>
+      <h1 className='text-3xl font-bold text-center'>Hiện chưa có phim!</h1>
     </div>
   )
 }

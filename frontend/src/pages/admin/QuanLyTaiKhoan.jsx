@@ -342,7 +342,7 @@ const QuanLyTaiKhoan = () => {
             </h2>
             <form onSubmit={handleSubmit}>
               <div>
-                <label className='block mb-1 font-medium text-primary'>Họ tên</label>
+                <label className='block mb-1 font-medium text-primary'>Họ tên <span className="text-red-500">*</span></label>
                 <input
                   type="text"
                   name="hoTen"
@@ -354,7 +354,7 @@ const QuanLyTaiKhoan = () => {
                 />
               </div>
               <div>
-                <label className='block mb-1 font-medium text-primary'>Email</label>
+                <label className='block mb-1 font-medium text-primary'>Email <span className="text-red-500">*</span></label>
                 <input
                   type="email"
                   name="email"
@@ -368,7 +368,7 @@ const QuanLyTaiKhoan = () => {
               <div>
                 {!editTaiKhoan && (
                   <>
-                    <label className="block mb-1 font-medium text-primary">Mật khẩu</label>
+                    <label className="block mb-1 font-medium text-primary">Mật khẩu <span className="text-red-500">*</span></label>
                     <input
                       type="password"
                       name="matKhau"
@@ -393,7 +393,7 @@ const QuanLyTaiKhoan = () => {
               </div>
 
               <div>
-                <label className="block mb-1 font-medium text-primary">Chọn vai trò</label>
+                <label className="block mb-1 font-medium text-primary">Chọn vai trò <span className="text-red-500">*</span></label>
                 <select
                   name="maVaiTro"
                   className="w-full p-2 mb-4 rounded bg-[#111] border border-gray-600 text-white cursor-pointer"
@@ -411,7 +411,7 @@ const QuanLyTaiKhoan = () => {
 
               {isRapRequired && (
                 <div>
-                  <label className="block mb-1 font-medium text-primary">Chọn rạp</label>
+                  <label className="block mb-1 font-medium text-primary">Chọn rạp <span className="text-red-500">*</span></label>
                   <select
                     name="maRap"
                     className="w-full p-2 mb-4 rounded bg-[#111] border border-gray-600 text-white cursor-pointer"

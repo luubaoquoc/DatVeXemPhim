@@ -17,5 +17,4 @@ createRoot(document.getElementById('root')).render(
   </BrowserRouter>,
 )
 
-// ensure this module has at least one export so fast-refresh works in dev
 export { }

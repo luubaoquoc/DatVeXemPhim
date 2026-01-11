@@ -284,8 +284,6 @@ const QuanLyDashboard = () => {
           </ul>
         </div>
       </div>
-
-      <BlurCircle top="200px" right="-10%" />
     </div>
   );
 };

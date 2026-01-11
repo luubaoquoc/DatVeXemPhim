@@ -4,7 +4,7 @@ import toast from 'react-hot-toast'
 import useApi from '../hooks/useApi'
 import momo from '../assets/vi-momo.jpg'
 import vnpay from '../assets/vnpay.png'
-import ThongoTinDatVe from '../components/ThongTinDatVe'
+import ThongTinDatVe from '../components/ThongTinDatVe'
 import XacNhanTuoiModal from '../components/XacNhanTuoiModal'
 
 const AGE_RULES = {
@@ -40,22 +40,31 @@ const ThanhToan = () => {
 
 
 
-  const total = (selectedSeats.length || 0) * (pricePerSeat || 0)
+
 
   const [promo, setPromo] = useState('')
   const [discount, setDiscount] = useState(0)
-  const [finalTotal, setFinalTotal] = useState(total)
   const [khuyenMaiId, setKhuyenMaiId] = useState(null)
   const [selectedMethod, setSelectedMethod] = useState('vnpay')
   const [timeLeft, setTimeLeft] = useState(null);
-
+  const [selectedCombos, setSelectedCombos] = useState([])
 
   const [showAgeModal, setShowAgeModal] = useState(false)
   const [ageMessage, setAgeMessage] = useState('')
 
   const [loading, setLoading] = useState(false)
 
+  const comboTotal = selectedCombos.reduce(
+    (sum, c) => sum + c.soLuong * c.giaTaiThoiDiem,
+    0
+  );
+  const seatTotal =
+    selectedSeats.length * pricePerSeat;
 
+
+
+  const total = seatTotal + comboTotal;
+  const [finalTotal, setFinalTotal] = useState(total)
   useEffect(() => {
     setDiscount(0);
     setFinalTotal(total);
@@ -83,6 +92,18 @@ const ThanhToan = () => {
 
     fetchBooking();
   }, [state?.maDatVe]);
+
+  useEffect(() => {
+    if (!state?.maDatVe) return;
+
+    const fetchCombos = async () => {
+      const res = await api.get(`/combodoan/${state.maDatVe}/combos`);
+      setSelectedCombos(res.data);
+    };
+
+    fetchCombos();
+  }, [state?.maDatVe]);
+
 
   useEffect(() => {
     if (timeLeft === null) return;
@@ -274,7 +295,7 @@ const ThanhToan = () => {
         </p>
       </div>
       <div className='flex flex-1 justify-center md:justify-end mt-10 md:mt-0'>
-        <ThongoTinDatVe
+        <ThongTinDatVe
           phim={state.phim}
           phong={state.phong}
           rap={state.phong?.rap}
@@ -284,12 +305,18 @@ const ThanhToan = () => {
           selectedTime={state.gioBatDau}
           date={state.gioBatDau}
           giaVeCoBan={state.pricePerSeat}
+          selectedCombos={state.selectedCombos}
+          comboTotal={comboTotal}
           discount={discount}
           finalTotal={finalTotal}
           timeLeft={timeLeft}
-          onBack={() => navigate(`/chon-ghe/${state.maSuatChieu}`, {
-            state: { maDatVe: state.maDatVe }
-          })}
+          onBack={() =>
+            navigate('/chon-combo', {
+              state: {
+                ...state
+              }
+            })
+          }
           onAction={handleClickThanhToan}
           actionLabel="Thanh toán"
           loading={loading}

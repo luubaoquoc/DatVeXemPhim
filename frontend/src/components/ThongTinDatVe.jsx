@@ -13,6 +13,8 @@ const ThongTinDatVe = (
     selectedTime,
     date,
     giaVeCoBan,
+    selectedCombos = [],
+    comboTotal = 0,
     discount = 0,
     finalTotal,
     timeLeft,
@@ -28,6 +30,8 @@ const ThongTinDatVe = (
 
 
   const tongThanhToan = typeof finalTotal === 'number' ? finalTotal : total;
+
+  console.log(selectedCombos);
 
 
   return (
@@ -99,16 +103,43 @@ const ThongTinDatVe = (
             {total.toLocaleString('vi-VN')} {currency}
           </p>
         </div>
-        {discount > 0 && (
-          <div className="mt-2 border-t border-gray-700 pt-3 flex justify-between items-center">
-            <p className="text-sm text-gray-300">Giảm giá:</p>
-            <p className="font-semibold text-xl text-primary">
-              -{discount.toLocaleString('vi-VN')} {currency}
-            </p>
-          </div>
-        )}
-      </div>
 
+      </div>
+      {selectedCombos.length > 0 && (
+        <div className="mt-3 border-t border-gray-700 pt-3">
+
+
+          <div className="space-y-1 text-sm">
+            {selectedCombos.map(c => (
+              <div
+                key={c.maCombo}
+                className="flex justify-between text-gray-300"
+              >
+                <span>
+                  {c.ComBoDoAn?.tenCombo} <span className='font-bold text-primary'>× {c.soLuong}</span>
+                </span>
+                <span>
+                  {(c.soLuong * c.giaTaiThoiDiem).toLocaleString('vi-VN')} {currency}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex justify-between mt-2 font-semibold text-primary">
+            <span>Tổng combo:</span>
+            <span>{comboTotal.toLocaleString('vi-VN')} {currency}</span>
+          </div>
+        </div>
+      )}
+
+      {discount > 0 && (
+        <div className="mt-2 border-t border-gray-700 pt-3 flex justify-between items-center">
+          <p className="text-sm text-gray-300">Giảm giá:</p>
+          <p className="font-semibold text-xl text-primary">
+            -{discount.toLocaleString('vi-VN')} {currency}
+          </p>
+        </div>
+      )}
       <div className="mt-4 border-t border-gray-700 pt-3 flex justify-between items-center">
         <p className="text-sm text-gray-300">Tổng cộng:</p>
         <p className="font-semibold text-xl text-primary">

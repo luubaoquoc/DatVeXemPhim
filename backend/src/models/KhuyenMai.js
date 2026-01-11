@@ -33,6 +33,11 @@ const KhuyenMai = sequelize.define('KhuyenMai', {
     type: DataTypes.INTEGER,
     defaultValue: 0,
   },
+  ngayBatDau: {
+    type: DataTypes.DATE,
+    allowNull: false,
+    defaultValue: DataTypes.NOW
+  },
   ngayHetHan: {
     type: DataTypes.DATE,
     allowNull: false,

@@ -75,8 +75,10 @@ export const getRapsForMovieDate = async (req, res) => {
     const maRapQuery = req.query.maRap;
     if (!maPhim || !date) return res.status(400).json({ message: 'maPhim và date là bắt buộc' });
 
-    const start = new Date(date + 'T00:00:00');
-    const end = new Date(date + 'T23:59:59');
+    
+    const start = `${date} 00:00:00`;
+    const end   = `${date} 23:59:59`;
+
 
     const { maVaiTro, maRap } = req.user || {};
 
@@ -159,8 +161,8 @@ export const getLichChieuByRapDate = async (req, res) => {
     if (!maRap || !date)
       return res.status(400).json({ message: "maRap và date là bắt buộc" });
 
-    const start = new Date(date + "T00:00:00");
-    const end = new Date(date + "T23:59:59");
+    const start = `${date} 00:00:00`;
+    const end   = `${date} 23:59:59`;
 
     const rows = await SuatChieu.findAll({
       where: { gioBatDau: { [Op.between]: [start, end] } },
@@ -217,8 +219,8 @@ export const getSuatByPhong = async (req, res) => {
     const maPhong = Number(req.query.maPhong);
     const date = req.query.date;
     if (!maPhong || !date) return res.status(400).json({ message: 'maPhong và date là bắt buộc' });
-    const start = new Date(date + 'T00:00:00');
-    const end = new Date(date + 'T23:59:59');
+    const start = `${date} 00:00:00`;
+    const end   = `${date} 23:59:59`;
     const rows = await SuatChieu.findAll({
       where: {
         maPhong,
@@ -239,9 +241,9 @@ export const getSuatByPhong = async (req, res) => {
 // lấy thông tin suất chiếu theo mã suất chiếu
 export const getSuatChieu = async (req, res) => {
   try {
-    const ma = Number(req.params.maSuatChieu);
-    if (!ma) return res.status(400).json({ message: 'maSuatChieu không hợp lệ' });
-    const sc = await SuatChieu.findByPk(ma, {
+    const maSuatChieu = Number(req.params.maSuatChieu);
+    if (!maSuatChieu) return res.status(400).json({ message: 'maSuatChieu không hợp lệ' });
+    const sc = await SuatChieu.findByPk(maSuatChieu, {
       include: [
         {
           model: Phim,

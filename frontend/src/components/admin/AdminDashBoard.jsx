@@ -4,6 +4,7 @@ import {
   CalendarCheck2,
   UserPlusIcon,
   StarIcon,
+  Download,
 } from "lucide-react";
 
 import React, { useEffect, useState } from "react";
@@ -212,7 +213,17 @@ const AdminDashboard = () => {
 
   return (
     <div className="p-6 text-white">
-      <h1 className="text-3xl font-semibold mb-6 max-md:text-2xl">Tổng quan • GoCinema</h1>
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
+
+        <h1 className="text-3xl font-semibold mb-6 max-md:text-2xl">Tổng quan • GoCinema</h1>
+
+        <div className="flex items-center gap-3 border border-primary px-4 py-2 rounded-lg cursor-pointer bg-primary-dull hover:bg-primary">
+          <Download />
+
+          Xuất báo cáo
+
+        </div>
+      </div>
 
       <select
         value={maRap}
@@ -390,7 +401,6 @@ const AdminDashboard = () => {
         )}
       </div>
 
-      <BlurCircle top="200px" right="-10%" />
     </div>
   );
 };

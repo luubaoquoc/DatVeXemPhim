@@ -264,6 +264,7 @@ const PhongChieu = () => {
                   className="w-full p-2 mb-4 rounded bg-[#111] border border-gray-600 text-white"
                   value={formData.tongSoGhe || ""}
                   onChange={handleChange}
+                  required
                 />
               </div>
 

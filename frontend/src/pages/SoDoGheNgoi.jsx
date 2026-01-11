@@ -32,6 +32,10 @@ const SoDoGheNgoi = () => {
   const [roomShows, setRoomShows] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  const [selectedCombos, setSelectedCombos] = useState([]);
+  const [comboTotal, setComboTotal] = useState(0);
+
+
 
   /* ====================== LOAD DATA ====================== */
 
@@ -70,7 +74,7 @@ const SoDoGheNgoi = () => {
 
     try {
       const { data } = await api.get("/ghe", { params: { maPhong } });
-      const list = data?.items || data || [];
+      const list = data || [];
 
       setSeats(
         list.map(s => ({
@@ -111,7 +115,7 @@ const SoDoGheNgoi = () => {
     }
   }, [maDatVe, api]);
 
-  /* ====================== EFFECTS ====================== */
+
 
   useEffect(() => { loadShow(); }, [loadShow]);
   useEffect(() => { loadRoomShows(); }, [loadRoomShows]);
@@ -128,6 +132,8 @@ const SoDoGheNgoi = () => {
         const res = await api.get(`/datve/${maDatVe}`);
         const expire = new Date(res.data.thoiHanThanhToan).getTime();
         const diff = Math.floor((expire - Date.now()) / 1000);
+
+
         setTimeLeft(Math.max(0, diff));
       } catch (err) {
         console.error('Fetch booking failed:', err);
@@ -138,6 +144,32 @@ const SoDoGheNgoi = () => {
 
     fetchBooking();
   }, [maDatVe]);
+
+  useEffect(() => {
+    if (!maDatVe) {
+      setSelectedCombos([]);
+      setComboTotal(0);
+      return;
+    }
+
+    const loadCombos = async () => {
+      try {
+        const { data } = await api.get(`/combodoan/${maDatVe}/combos`);
+        setSelectedCombos(data);
+
+        const total = data.reduce(
+          (sum, c) => sum + c.soLuong * c.giaTaiThoiDiem,
+          0
+        );
+        setComboTotal(total);
+      } catch (err) {
+        console.error("Load combo failed", err);
+      }
+    };
+
+    loadCombos();
+  }, [maDatVe]);
+
 
   useEffect(() => {
     if (timeLeft === null) return;
@@ -220,7 +252,7 @@ const SoDoGheNgoi = () => {
       if (maDatVe) {
         await api.put(`/datve/${maDatVe}/ghes`, { seats: chiTiet });
 
-        navigate("/thanh-toan", {
+        navigate("/chon-combo", {
           state: {
             maDatVe,
             maSuatChieu,
@@ -242,7 +274,7 @@ const SoDoGheNgoi = () => {
         chiTiet,
       });
 
-      navigate("/thanh-toan", {
+      navigate("/chon-combo", {
         state: {
           maDatVe: data.maDatVe,
           thoiHanThanhToan: data.thoiHanThanhToan,
@@ -360,6 +392,11 @@ const SoDoGheNgoi = () => {
           selectedSeats={selectedSeats}
           selectedTime={selectedTime}
           giaVeCoBan={show.giaVeCoBan}
+          selectedCombos={selectedCombos}
+          comboTotal={comboTotal}
+          finalTotal={
+            selectedSeats.length * show.giaVeCoBan + comboTotal
+          }
           timeLeft={timeLeft}
           onBack={handleBackFromSeatMap}
           onAction={handleThanhToan}

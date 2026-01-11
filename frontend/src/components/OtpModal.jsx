@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import useApi from '../hooks/useApi';
 
@@ -7,19 +7,40 @@ const OtpModal = ({ email, otp, setOtp, setShowOtpModal, setIsLogin }) => {
   const inputsRef = useRef([]);
   const [isResending, setIsResending] = useState(false);
   const [timer, setTimer] = useState(0);
+  const processingRef = useRef(false);
 
   // Khi người dùng nhập vào từng ô
-  const handleChange = (e, index) => {
-    const value = e.target.value.replace(/\D/, ''); // chỉ cho phép nhập số
-    const otpArray = otp.split('');
-    otpArray[index] = value;
-    const newOtp = otpArray.join('');
-    setOtp(newOtp);
+  const handleChange = useCallback((e, index) => {
+    // Ngăn xử lý duplicate
+    if (processingRef.current) return;
+    processingRef.current = true;
 
-    if (value && index < 5) {
-      inputsRef.current[index + 1].focus();
+    const input = e.target.value;
+
+    // Chỉ cho phép nhập 1 số
+    const digit = input.replace(/\D/g, '').slice(-1);
+
+    if (digit) {
+      // Tạo mảng OTP mới
+      const otpArray = otp.padEnd(6, ' ').split('').slice(0, 6);
+      otpArray[index] = digit;
+
+      const newOtp = otpArray.join('').replace(/\s+$/, '');
+      setOtp(newOtp);
+
+      // Chuyển sang ô tiếp theo
+      if (index < 5) {
+        requestAnimationFrame(() => {
+          inputsRef.current[index + 1]?.focus();
+        });
+      }
     }
-  };
+
+    // Reset flag sau khi xử lý xong
+    setTimeout(() => {
+      processingRef.current = false;
+    }, 50);
+  }, [otp, setOtp]);
 
   // Xử lý phím Backspace
   const handleKeyDown = (e, index) => {

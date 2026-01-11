@@ -12,17 +12,39 @@ export const kiemTraMaKhuyenMai = async (req, res) => {
     const { maKhuyenMai, tongTien } = req.body;
 
     const km = await KhuyenMai.findOne({
-      where: {
-        maKhuyenMai,
-        trangThai: true,
-        ngayHetHan: { [Op.gt]: new Date() },
-        soLuotSuDung: { [Op.gt]: 0 },
-      },
+      where: { maKhuyenMai },
     });
 
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+
+    const ngayBatDau = new Date(km.ngayBatDau);
+    ngayBatDau.setHours(0, 0, 0, 0);
+
+    const ngayHetHan = new Date(km.ngayHetHan);
+    ngayHetHan.setHours(23, 59, 59, 999);
     if (!km) {
-      return res.status(400).json({ message: "Mã khuyến mãi không hợp lệ hoặc đã hết hạn" });
+      return res.status(400).json({ message: "Mã khuyến mãi không tồn tại" });
     }
+
+
+    //  Chưa tới ngày bắt đầu
+    if (now < ngayBatDau) {
+      return res.status(400).json({ message: "Mã khuyến mãi chưa bắt đầu" });
+    }
+
+    //  Trạng thái
+    if (!km.trangThai || ngayHetHan < now) {
+      return res.status(400).json({ message: "Mã khuyến mãi đã hết hạn" });
+    }
+
+
+    //  Hết lượt sử dụng
+    if (km.soLuotSuDung <= 0) {
+      return res.status(400).json({ message: "Mã khuyến mãi đã hết lượt sử dụng" });
+    }
+
+
 
     const daSuDung = await LichSuDungMa.findOne({
       where: {
@@ -69,21 +91,36 @@ export const kiemTraMaKhuyenMai = async (req, res) => {
 // lấy danh sách khuyến mãi
 export const getDanhSachKhuyenMai = async (req, res) => {
   try {
-    const { page = 1, limit = 10, search = "" } = req.query;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const search = req.query.search || "";
+    const trangThai = req.query.trangThai || "";
     const offset = (page - 1) * limit;
 
-    const { rows, count } = await KhuyenMai.findAndCountAll({
-      where: {
-        maKhuyenMai: { [Op.like]: `%${search}%` }
-      },
+    const whereOp = {
+      ...(search && { maKhuyenMai: { [Op.like]: `%${search}%` } }),
+      ...(trangThai === "chua_bat_dau" && { ngayBatDau: { [Op.gt]: new Date() } }),
+      ...(trangThai === "dang_ap_dung" && {
+        ngayBatDau: { [Op.lte]: new Date() },
+        ngayHetHan: { [Op.gt]: new Date() },
+      }),
+      ...(trangThai === "het_han" && { ngayHetHan: { [Op.lte]: new Date() } }),
+    };
+
+    const totalItems = await KhuyenMai.count({ where: whereOp });
+
+    const rows = await KhuyenMai.findAll({
+      where: whereOp,
       order: [["id", "DESC"]],
-      limit: Number(limit),
-      offset
+      offset: parseInt(offset),
+      limit: parseInt(limit),
     });
 
     res.json({
       data: rows,
-      totalPages: Math.ceil(count / limit)
+      totalItems,
+      totalPages: Math.ceil(totalItems / limit),
+      currentPage: page
     });
   } catch (err) {
     res.status(500).json({ message: "Lỗi lấy danh sách khuyến mãi" });
@@ -101,6 +138,7 @@ export const taoKhuyenMai = async (req, res) => {
       giamToiDa,
       giaTriDonToiThieu,
       soLuotSuDung,
+      ngayBatDau,
       ngayHetHan,
       trangThai
     } = req.body;
@@ -117,6 +155,7 @@ export const taoKhuyenMai = async (req, res) => {
       giamToiDa,
       giaTriDonToiThieu,
       soLuotSuDung,
+      ngayBatDau,
       ngayHetHan,
       trangThai
     });

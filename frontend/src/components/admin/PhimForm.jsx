@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import Select from "react-select";
 import toast from 'react-hot-toast'
 import useApi from '../../hooks/useApi'
+import { X } from 'lucide-react';
 
 const PhimForm = ({ onSubmit, onClose, editPhim }) => {
 
@@ -151,8 +152,14 @@ const PhimForm = ({ onSubmit, onClose, editPhim }) => {
 
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-      <div className="bg-black/90 border border-primary p-6 rounded-xl w-[950px] text-white overflow-y-auto no-scrollbar max-h-[90vh] max-md:m-4">
+      <div className="bg-black/90 border border-primary p-6 rounded-xl w-[950px] text-white overflow-y-auto no-scrollbar max-h-[90vh] max-md:m-4 relative">
 
+        <button
+          className="absolute top-3 right-3 text-gray-300 hover:text-red-400 cursor-pointer"
+          onClick={onClose}
+        >
+          <X size={22} />
+        </button>
         <h2 className="text-2xl font-semibold mb-4 text-center text-primary">
           {editPhim ? 'Sửa phim' : 'Thêm phim mới'}
         </h2>
@@ -163,7 +170,7 @@ const PhimForm = ({ onSubmit, onClose, editPhim }) => {
           <div className='grid md:grid-cols-2 gap-4'>
             <div className='flex flex-col gap-3'>
               <div>
-                <label className='block mb-1 font-medium text-primary'>Tên phim</label>
+                <label className='block mb-1 font-medium text-primary'>Tên phim <span className="text-red-500">*</span></label>
                 <input
                   name="tenPhim"
                   value={formData.tenPhim}
@@ -176,7 +183,7 @@ const PhimForm = ({ onSubmit, onClose, editPhim }) => {
 
               {/* Đạo diễn - react-select */}
               <div className="flex flex-col gap-1">
-                <label className="font-medium text-primary">Đạo diễn</label>
+                <label className="font-medium text-primary">Đạo diễn <span className="text-red-500">*</span></label>
                 <Select
                   className="react-select-container"
                   classNamePrefix="react-select"
@@ -188,7 +195,7 @@ const PhimForm = ({ onSubmit, onClose, editPhim }) => {
                 />
               </div>
               <div className="flex flex-col gap-1">
-                <label className="font-medium text-primary">Thể loại</label>
+                <label className="font-medium text-primary">Thể loại <span className="text-red-500">*</span></label>
                 <Select
                   isMulti
                   className="react-select-container"
@@ -202,7 +209,7 @@ const PhimForm = ({ onSubmit, onClose, editPhim }) => {
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="font-medium text-primary">Diễn viên</label>
+                <label className="font-medium text-primary">Diễn viên <span className="text-red-500">*</span></label>
                 <Select
                   isMulti
                   className="react-select-container"
@@ -218,7 +225,7 @@ const PhimForm = ({ onSubmit, onClose, editPhim }) => {
             <div>
               {/* Poster */}
               <div>
-                <label className="block mb-1 font-medium text-primary">Ảnh Poster</label>
+                <label className="block mb-1 font-medium text-primary">Ảnh Poster <span className="text-red-500">*</span></label>
                 <input
                   type="file"
                   accept="image/*"
@@ -243,7 +250,7 @@ const PhimForm = ({ onSubmit, onClose, editPhim }) => {
 
           {/* Nội dung phim */}
           <div>
-            <label className="font-medium text-primary">Nội dung phim</label>
+            <label className="font-medium text-primary">Nội dung phim <span className="text-red-500">*</span></label>
             <textarea
               name="moTa"
               value={formData.moTa}
@@ -256,7 +263,7 @@ const PhimForm = ({ onSubmit, onClose, editPhim }) => {
 
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <label className="block mb-1 font-medium text-primary">Thời lượng (phút)</label>
+              <label className="block mb-1 font-medium text-primary">Thời lượng (phút) <span className="text-red-500">*</span></label>
               <input
                 name="thoiLuong"
                 type="number"
@@ -268,7 +275,7 @@ const PhimForm = ({ onSubmit, onClose, editPhim }) => {
             </div>
 
             <div>
-              <label className="block mb-1 font-medium text-primary">Ngày công chiếu</label>
+              <label className="block mb-1 font-medium text-primary">Ngày công chiếu <span className="text-red-500">*</span></label>
               <input
                 name="ngayCongChieu"
                 type="date"
@@ -332,7 +339,7 @@ const PhimForm = ({ onSubmit, onClose, editPhim }) => {
 
           {/* Trailer */}
           <div>
-            <label className="block mb-1 font-medium text-primary">Trailer</label>
+            <label className="block mb-1 font-medium text-primary">Trailer <span className="text-red-500">*</span></label>
             <input
               type="text"
               name="trailer"

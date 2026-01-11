@@ -9,8 +9,8 @@ import { setAuthIntent } from '../redux/features/authSlice'
 const SuatChieu = ({ maPhim, date, maRap }) => {
   const api = useApi()
   const dispatch = useDispatch()
-  const { user } = useSelector((state) => state.auth || {})
   const navigate = useNavigate()
+  const { user } = useSelector((state) => state.auth || {})
   const [raps, setRaps] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -117,13 +117,13 @@ const SuatChieu = ({ maPhim, date, maRap }) => {
         <div className='space-y-6'>
           {raps.map((rap) => (
             <div
-              key={rap.maRap || rap.id || rap.tenRap}
+              key={rap.maRap || rap.tenRap}
               className='bg-primary/5 p-4 rounded'
             >
               <div className='flex items-center justify-between mb-3'>
                 <div>
                   <div className='font-semibold'>
-                    {rap.tenRap || rap.name || 'Rạp'}
+                    {rap.tenRap || 'Rạp'}
                   </div>
                   {rap.diaChi && (
                     <div className='text-sm text-gray-400'>{rap.diaChi}</div>
@@ -134,11 +134,11 @@ const SuatChieu = ({ maPhim, date, maRap }) => {
               <div className='space-y-3 flex flex-col md:flex-wrap gap-2'>
                 {(rap.phongChieus || []).map((phong) => (
                   <div
-                    key={phong.maPhong || phong.id || phong.tenPhong}
+                    key={phong.maPhong || phong.tenPhong}
                     className='mb-2 flex flex-row items-center gap-6'
                   >
                     <div className='text-sm font-medium mb-2'>
-                      {phong.tenPhong || phong.name || 'Phòng'}
+                      {phong.tenPhong || 'Phòng'}
                     </div>
                     <div className='flex flex-wrap gap-2'>
                       {(phong.suatChieus || []).map((sc) => (

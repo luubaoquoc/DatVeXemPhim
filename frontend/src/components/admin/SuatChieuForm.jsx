@@ -3,6 +3,7 @@ import Select from "react-select";
 import toast from "react-hot-toast";
 import useApi from "../../hooks/useApi";
 import { ToLocalInput } from "../../lib/formatDatetimeLocal";
+import { X } from "lucide-react";
 
 const SuatChieuForm = ({ onSubmit, onClose, editItem }) => {
   const api = useApi(true)
@@ -196,8 +197,14 @@ const SuatChieuForm = ({ onSubmit, onClose, editItem }) => {
   =============================== */
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 ">
-      <div className="bg-black/90 border border-primary p-6 rounded-xl w-[650px] text-white overflow-y-auto max-h-[90vh] no-scrollbar max-md:m-4">
+      <div className="bg-black/90 border border-primary p-6 rounded-xl w-[650px] text-white overflow-y-auto max-h-[90vh] no-scrollbar max-md:m-4 relative">
 
+        <button
+          className="absolute top-3 right-3 text-gray-300 hover:text-red-400 cursor-pointer"
+          onClick={onClose}
+        >
+          <X size={22} />
+        </button>
         <h2 className="text-2xl font-semibold mb-4 text-center text-primary">
           {editItem ? "Sửa suất chiếu" : "Thêm suất chiếu mới"}
         </h2>
@@ -206,7 +213,7 @@ const SuatChieuForm = ({ onSubmit, onClose, editItem }) => {
 
           {/* PHIM */}
           <div className="flex flex-col gap-1">
-            <label className="block mb-1 font-medium text-primary">Phim</label>
+            <label className="block mb-1 font-medium text-primary">Phim <span className="text-red-500">*</span></label>
             <Select
               className="react-select-container"
               classNamePrefix="react-select"
@@ -220,7 +227,7 @@ const SuatChieuForm = ({ onSubmit, onClose, editItem }) => {
 
           {/* PHÒNG */}
           <div className="flex flex-col gap-1">
-            <label className="block mb-1 font-medium text-primary">Phòng chiếu</label>
+            <label className="block mb-1 font-medium text-primary">Phòng chiếu <span className="text-red-500">*</span></label>
             <Select
               className="react-select-container"
               classNamePrefix="react-select"
@@ -239,7 +246,7 @@ const SuatChieuForm = ({ onSubmit, onClose, editItem }) => {
 
           {/* KHUNG GIỜ */}
           <div className="space-y-3">
-            <label className="block mb-1 font-medium text-primary">Khung giờ suất chiếu</label>
+            <label className="block mb-1 font-medium text-primary">Khung giờ suất chiếu <span className="text-red-500">*</span></label>
 
             {timeSlots.map((slot, index) => (
               <div key={index} className="p-3 border border-gray-700 bg-[#111]/60 rounded-lg space-y-2">
@@ -298,7 +305,7 @@ const SuatChieuForm = ({ onSubmit, onClose, editItem }) => {
 
           {/* GIÁ VÉ */}
           <div>
-            <label className="font-medium text-primary">Giá vé</label>
+            <label className="font-medium text-primary">Giá vé <span className="text-red-500">*</span></label>
             <input
               type="number"
               name="giaVeCoBan"

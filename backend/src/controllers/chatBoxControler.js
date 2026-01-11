@@ -35,7 +35,7 @@ export const chatWithAI = async (req, res) => {
         {
           model: SuatChieu,
           as: "suatChieus",
-          attributes: ["gioBatDau"],
+          attributes: ["gioBatDau", "giaVeCoBan"],
           where: sequelize.where(
             sequelize.fn("DATE", sequelize.col("gioBatDau")),
             sequelize.fn("CURDATE")
@@ -68,11 +68,16 @@ export const chatWithAI = async (req, res) => {
     const khuyenMais = await KhuyenMai.findAll({
       where: {
         trangThai: true,
+        ngayBatDau: {
+          [Op.lte]: new Date()
+        },
         ngayHetHan: {
           [Op.gte]: new Date()
         }
       }
     });
+
+    const rap = await Rap.findAll();
 
 
     // Chuẩn hóa dữ liệu cho AI
@@ -80,7 +85,12 @@ export const chatWithAI = async (req, res) => {
       tenPhim: m.tenPhim,
       poster: m.poster,
       theLoai: m.theLoais.map(t => t.tenTheLoai).join(", "),
-      suatChieu: m.suatChieus.map(s => s.gioBatDau),
+      suatChieu: m.suatChieus.map(s => ({
+        gioBatDau: s.gioBatDau,
+        giaVeCoBan: s.giaVeCoBan.toLocaleString(),
+        phongChieu: s.phongChieu.tenPhong,
+        rapChieu: s.phongChieu.rap.tenRap
+      })),
       diemTB:
         m.danhGias.length > 0
           ? (
@@ -107,9 +117,19 @@ export const chatWithAI = async (req, res) => {
         ? `${km.giaTriDonToiThieu.toLocaleString()}đ`
         : "Không yêu cầu",
 
+      ngayBatDau: km.ngayBatDau
+        ? new Date(km.ngayBatDau).toISOString().split("T")[0]
+        : "Không xác định",
+
       hetHan: km.ngayHetHan
         ? new Date(km.ngayHetHan).toISOString().split("T")[0]
         : "Không xác định"
+    }));
+
+    const rapContext = rap.map(r => ({
+      tenRap: r.tenRap,
+      diaChi: r.diaChi,
+      soDienThoai: r.soDienThoai
     }));
 
 
@@ -124,6 +144,9 @@ export const chatWithAI = async (req, res) => {
     ${promotionContext.length > 0
         ? JSON.stringify(promotionContext, null, 2)
         : "Hiện không có khuyến mãi nào"}
+
+    Dữ liệu rạp chiếu:
+    ${JSON.stringify(rapContext, null, 2)}
 
     Câu hỏi người dùng:
     "${message}"
@@ -226,7 +249,7 @@ export const getRecommendedMovies = async (req, res) => {
       order: [
         ["ngayCongChieu", "DESC"]
       ],
-      limit: 10
+      limit: 8
     });
 
 

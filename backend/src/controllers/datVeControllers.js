@@ -430,7 +430,7 @@ export const getGheDaDat = async (req, res) => {
             maSuatChieu,
             trangThai: { [Op.in]: ['Đang chờ', 'Đang thanh toán', 'Thành công'] },
             [Op.or]: [
-              { trangThai: 'Thanh công' },
+              { trangThai: 'Thành công' },
               { thoiHanThanhToan: { [Op.gt]: new Date() } },
             ],
             ...(maDatVe ? { maDatVe: { [Op.ne]: maDatVe } } : {})
@@ -553,7 +553,7 @@ export const deleteDatVe = async (req, res) => {
   }
 };
 
-// lấy thông tin đặt vé theo mã chi tiết
+// lấy thông tin đặt vé theo mã chi tiết để check-in
 export const getThongTinDatVe = async (req, res) => {
   const maChiTiet = Number(req.params.maChiTiet);
   console.log(maChiTiet);
@@ -584,17 +584,14 @@ export const getThongTinDatVe = async (req, res) => {
       ]
     });
 
-    //  Không tìm thấy mã đặt vé
     if (!Ve) {
       return res.status(404).json({ message: "Không tìm thấy vé" });
     }
 
-    //  Vé chưa thanh toán
     if (Ve.trangThai !== "Đã thanh toán" && Ve.trangThai !== "Đã check-in") {
       return res.status(400).json({ message: "Vé chưa thanh toán thành công" });
     }
 
-    //  OK → trả về thông tin vé
     return res.json(Ve);
 
   } catch (error) {

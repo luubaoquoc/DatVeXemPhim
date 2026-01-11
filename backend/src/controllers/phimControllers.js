@@ -25,10 +25,10 @@ const hasFutureShowtime = async (maPhim) => {
 // lấy danh sách phim với phân trang, tìm kiếm và lọc
 export const getAllPhim = async (req, res) => {
   try {
-    const trangThaiChieu = req.query.trangThaiChieu || "";
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const search = req.query.search || "";
+    const trangThaiChieu = req.query.trangThaiChieu || "";
 
     const offset = (page - 1) * limit;
     const whereOp = {
@@ -36,7 +36,6 @@ export const getAllPhim = async (req, res) => {
       ...(trangThaiChieu && { trangThaiChieu: trangThaiChieu })
     };
 
-    // Tổng số phim
     const totalItems = await Phim.count({ where: whereOp });
 
     const rows = await Phim.findAll({
@@ -62,10 +61,10 @@ export const getAllPhim = async (req, res) => {
     });
 
     return res.json({
-      totalItems,
-      currentPage: page,
-      totalPages: Math.ceil(totalItems / limit),
       data,
+      totalItems,
+      totalPages: Math.ceil(totalItems / limit),
+      currentPage: page,
     });
   } catch (error) {
     console.error('listPhims error:', error);
@@ -121,7 +120,26 @@ export const createPhim = async (req, res) => {
       phuDe
     } = req.body
 
+    let posterUrl
     console.log(req.file)
+
+    if (!tenPhim || !moTa) {
+      return res.status(400).json({ message: 'Tên phim và mô tả là bắt buộc' });
+    }
+    if (!thoiLuong || isNaN(parseInt(thoiLuong))) {
+      return res.status(400).json({ message: 'Thời lượng là bắt buộc và phải là số' });
+    }
+
+    if (!ngayCongChieu || isNaN(Date.parse(ngayCongChieu))) {
+      return res.status(400).json({ message: 'Ngày công chiếu là bắt buộc và phải là định dạng ngày tháng' });
+    }
+
+    if (trailer && !trailer.startsWith('http')) {
+      return res.status(400).json({ message: 'Trailer phải là một URL hợp lệ' });
+    }
+    if (!maDaoDien || !maTheLoai || !maDienVien) {
+      return res.status(400).json({ message: 'Đạo diễn, thể loại và diễn viên là bắt buộc' });
+    }
 
     try {
       if (typeof maTheLoai === 'string') maTheLoai = JSON.parse(maTheLoai)
@@ -130,7 +148,6 @@ export const createPhim = async (req, res) => {
       console.error('JSON parse error:', e)
     }
 
-    let posterUrl = null
 
     const phim = await Phim.findOne({ where: { tenPhim } });
     if (phim) {

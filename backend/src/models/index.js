@@ -18,6 +18,8 @@ import Phim_UaThich from './Phim_UaThich.js';
 import ChiTietDatVe from './ChiTietDatVe.js';
 import LichSuDungMa from './LichSuDungMa.js';
 import KhuyenMai from './KhuyenMai.js';
+import ComBoDoAn from './ComboDoAn.js';
+import DonDatVeCombo from './DonDatVeCombo.js';
 
 
 // --- THIẾT LẬP MỐI QUAN HỆ ---
@@ -94,6 +96,25 @@ KhuyenMai.hasMany(DatVe, { foreignKey: 'maKhuyenMaiId', as: 'datVes' });
 DatVe.hasOne(ThanhToan, { foreignKey: 'maDatVe', as: 'thanhToan', onDelete: 'CASCADE' });
 ThanhToan.belongsTo(DatVe, { foreignKey: 'maDatVe', as: 'datVe' });
 
+DatVe.belongsToMany(ComBoDoAn, {
+  through: DonDatVeCombo,
+  foreignKey: "maDatVe",
+  otherKey: "maCombo",
+});
+
+ComBoDoAn.belongsToMany(DatVe, {
+  through: DonDatVeCombo,
+  foreignKey: "maCombo",
+  otherKey: "maDatVe",
+});
+
+// Quan hệ ngược để query chi tiết
+DonDatVeCombo.belongsTo(DatVe, { foreignKey: "maDatVe" });
+DonDatVeCombo.belongsTo(ComBoDoAn, { foreignKey: "maCombo" });
+
+DatVe.hasMany(DonDatVeCombo, { foreignKey: "maDatVe" });
+ComBoDoAn.hasMany(DonDatVeCombo, { foreignKey: "maCombo" });
+
 // Xuất các models
 export {
   TaiKhoan,
@@ -114,5 +135,7 @@ export {
   Phim_UaThich,
   ChiTietDatVe,
   LichSuDungMa,
-  KhuyenMai
+  KhuyenMai,
+  ComBoDoAn,
+  DonDatVeCombo
 };

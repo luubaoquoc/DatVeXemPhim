@@ -22,6 +22,7 @@ const QuanLyKhuyenMai = () => {
     giamToiDa: "",
     giaTriDonToiThieu: "",
     soLuotSuDung: "",
+    ngayBatDau: "",
     ngayHetHan: "",
     trangThai: true
   })
@@ -30,12 +31,13 @@ const QuanLyKhuyenMai = () => {
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const limit = 10
+  const [filterStatus, setFilterStatus] = useState("")
 
   // ================= FETCH LIST =================
   const fetchData = async () => {
     try {
       const res = await api.get("/khuyenmai", {
-        params: { page: currentPage, limit, search }
+        params: { page: currentPage, limit, search, trangThai: filterStatus }
       })
       setItems(res.data.data)
       setTotalPages(res.data.totalPages)
@@ -46,7 +48,7 @@ const QuanLyKhuyenMai = () => {
 
   useEffect(() => {
     fetchData()
-  }, [currentPage, search])
+  }, [currentPage, search, filterStatus])
 
   // ================= HANDLE CHANGE =================
   const handleChange = (e) => {
@@ -91,6 +93,7 @@ const QuanLyKhuyenMai = () => {
       giamToiDa: "",
       giaTriDonToiThieu: "",
       soLuotSuDung: "",
+      ngayBatDau: "",
       ngayHetHan: "",
       trangThai: true
     })
@@ -112,8 +115,15 @@ const QuanLyKhuyenMai = () => {
     if (item) {
       setEditItem(item)
       setFormData({
-        ...item,
-        ngayHetHan: item.ngayHetHan?.slice(0, 10)
+        maKhuyenMai: item.maKhuyenMai,
+        loaiGiamGia: item.loaiGiamGia,
+        giaTriGiamGia: item.giaTriGiamGia,
+        giamToiDa: item.giamToiDa || "",
+        giaTriDonToiThieu: item.giaTriDonToiThieu,
+        soLuotSuDung: item.soLuotSuDung,
+        ngayBatDau: item.ngayBatDau?.slice(0, 10),
+        ngayHetHan: item.ngayHetHan?.slice(0, 10),
+        trangThai: item.trangThai
       })
     } else {
       setEditItem(null)
@@ -134,13 +144,25 @@ const QuanLyKhuyenMai = () => {
           <PlusIcon size={18} /> Thêm khuyến mãi
         </button>
       </div>
+      <div className='flex flex-wrap gap-3 mb-4'>
+        <SearchInput
+          search={search}
+          setSearch={setSearch}
+          setCurrentPage={setCurrentPage}
+          item="mã khuyến mãi"
+        />
+        <select
+          value={filterStatus}
+          onChange={(e) => { setFilterStatus(e.target.value); setCurrentPage(1); }}
+          className="border border-primary/70 px-3 py-2 bg-black h-[3rem] outline-none cursor-pointer"
 
-      <SearchInput
-        search={search}
-        setSearch={setSearch}
-        setCurrentPage={setCurrentPage}
-        item="mã khuyến mãi"
-      />
+        >
+          <option value="">Tất cả</option>
+          <option value="chua_bat_dau">Chưa bắt đầu</option>
+          <option value="dang_ap_dung">Đang áp dụng</option>
+          <option value="het_han">Đã hết hạn</option>
+        </select>
+      </div>
 
       {/* TABLE */}
       <table className="w-full text-sm border-b border-primary/30">
@@ -151,7 +173,8 @@ const QuanLyKhuyenMai = () => {
             <th className="p-2">Loại</th>
             <th className="p-2">Giảm</th>
             <th className="p-2">Số lượt</th>
-            <th className="p-2">Hết hạn</th>
+            <th className="p-2">Ngày bắt đầu</th>
+            <th className="p-2">Ngày hết hạn</th>
             <th className="p-2">Trạng thái</th>
             <th className="p-2">Hành động</th>
           </tr>
@@ -169,9 +192,14 @@ const QuanLyKhuyenMai = () => {
                   : item.giaTriGiamGia.toLocaleString()}
               </td>
               <td className="p-2 text-center">{item.soLuotSuDung}</td>
+              <td className="p-2 text-center">{formatDate(item.ngayBatDau)}</td>
               <td className="p-2 text-center">{formatDate(item.ngayHetHan)}</td>
               <td className="p-2 text-center">
-                {item.trangThai ? "Hoạt động" : "Tắt"}
+                {item.trangThai === true ? (
+                  <span className="px-2 py-1 bg-green-600/30 text-green-400 rounded-full">Hoạt động</span>
+                ) : (
+                  <span className="px-2 py-1 bg-red-600/30 text-red-400 rounded-full">Tắt</span>
+                )}
               </td>
               <td className="p-2 text-center">
                 <button
@@ -280,8 +308,23 @@ const QuanLyKhuyenMai = () => {
               </div>
 
               <div>
+                <label className="block mb-1 font-medium text-primary">Ngày Bắt Đầu</label>
+                <input
+                  name="ngayBatDau"
+                  type="date"
+                  value={formData.ngayBatDau}
+                  onChange={handleChange}
+                  className="w-full p-2 mb-4 rounded bg-[#111] border border-gray-600" />
+              </div>
+
+              <div>
                 <label className="block mb-1 font-medium text-primary">Ngày Hết Hạn</label>
-                <input name="ngayHetHan" type="date" value={formData.ngayHetHan} onChange={handleChange} className="w-full p-2 mb-4 rounded bg-[#111] border border-gray-600" />
+                <input
+                  name="ngayHetHan"
+                  type="date"
+                  value={formData.ngayHetHan}
+                  onChange={handleChange}
+                  className="w-full p-2 mb-4 rounded bg-[#111] border border-gray-600" />
               </div>
 
               <label className="flex items-center gap-2">

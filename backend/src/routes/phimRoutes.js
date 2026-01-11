@@ -7,14 +7,14 @@ const router = express.Router();
 
 
 router.get('/', getAllPhim);
+router.get('/:maPhim', getPhim);
 
 router.get('/liked', authenticateToken, getLikedPhims);
-router.get('/:maPhim', getPhim);
 
 router.post('/:maPhim/like', authenticateToken, likePhim);
 router.delete('/:maPhim/like', authenticateToken, unlikePhim);
 
-// đánh giá phim
+
 router.get('/:maPhim/danhgia', authenticateToken, getUserDanhGia);
 router.post('/:maPhim/danhgia', authenticateToken, danhGiaPhim);
 

@@ -89,7 +89,7 @@ const ChiTietPhim = () => {
       authIntent.action === 'likePhim' &&
       String(authIntent.maPhim) === String(maPhim)
     ) {
-      toggleLike(); // hoặc setLiked(true)
+      toggleLike(); 
     }
 
     if (authIntent.action === 'chon-suatChieu') {
@@ -111,9 +111,9 @@ const ChiTietPhim = () => {
     .slice(0, 3)
 
 
-  const overview = movie.noiDung || movie.overview || ''
+  const overview = movie.noiDung || ''
   const genres = movie.theLoais || []
-  const runtime = movie.thoiLuong || movie.runtime || 0
+  const runtime = movie.thoiLuong || 0
   const releaseYear = formatDate(movie.ngayCongChieu)
 
   const handleDanhGiaClick = () => {
@@ -256,7 +256,6 @@ const ChiTietPhim = () => {
           {/* Lịch chiếu */}
           <div id="dateSelect" className="mt-4">
             <DateSelect
-              // dateTime={dateTimeMap}
               maPhim={maPhim}
               selected={selectedDate}
               onSelect={setSelectedDate}

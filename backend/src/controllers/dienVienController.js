@@ -39,7 +39,7 @@ export const getAllDienVien = async (req, res) => {
 export const createDienVien = async (req, res) => {
   try {
     let { tenDienVien, ngaySinh, tieuSu } = req.body
-    if (!tenDienVien) return res.status(400).json({ message: 'Thiếu tên diễn viên' })
+    if (!tenDienVien || tenDienVien.trim() === "") return res.status(400).json({ message: 'Tên diễn viên là bắt buộc và không được để trống' })
 
     const existingDienVien = await DienVien.findOne({ where: { tenDienVien } });
     if (existingDienVien) return res.status(400).json({ message: 'Diễn viên với tên này đã tồn tại' });

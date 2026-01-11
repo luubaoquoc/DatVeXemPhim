@@ -25,6 +25,12 @@ const DateSelect = ({ selected: selectedProp, onSelect, selectRap, onSelectRap, 
     fetchRaps();
   }, []);
 
+ const formatLocalDate = (d) => {
+    const yyyy = d.getFullYear()
+    const mm = String(d.getMonth() + 1).padStart(2, '0')
+    const dd = String(d.getDate()).padStart(2, '0')
+    return `${yyyy}-${mm}-${dd}`
+  }
 
   // default select today (even if no shows) when uncontrolled
   useEffect(() => {
@@ -33,14 +39,9 @@ const DateSelect = ({ selected: selectedProp, onSelect, selectRap, onSelectRap, 
     setInternalSelected(today)
   }, [selectedProp])
 
-  const formatLocalDate = (d) => {
-    const yyyy = d.getFullYear()
-    const mm = String(d.getMonth() + 1).padStart(2, '0')
-    const dd = String(d.getDate()).padStart(2, '0')
-    return `${yyyy}-${mm}-${dd}`
-  }
+ 
 
-  // build array: today and next 4 days (local)
+  // build array: today and next 5 days (local)
   const dates = Array.from({ length: 6 }).map((_, i) => {
     const dt = new Date()
     dt.setDate(dt.getDate() + i)
@@ -74,12 +75,6 @@ const DateSelect = ({ selected: selectedProp, onSelect, selectRap, onSelectRap, 
                 aspect-square rounded cursor-pointer ${selected === date ? 'bg-primary text-white' : 'border border-primary/70'} `}>
                       <span className='text-lg'>{new Date(date).getDate()}</span>
                       <span className='text-xs'>{new Date(date).toLocaleDateString('vi-VN', { month: 'short' })}</span>
-                      {/* optional badge for counts
-                    {hasShows && (
-                      <span className='absolute -top-2 -right-2 bg-primary text-white text-xs rounded-full px-1'>
-                        {shows.length}
-                      </span>
-                    )} */}
                     </button>
                   )
                 })}
@@ -105,7 +100,6 @@ const DateSelect = ({ selected: selectedProp, onSelect, selectRap, onSelectRap, 
         </div>
 
       </div>
-      {/* SuatChieu is rendered by the parent so it can share selected state with other components */}
     </div>
   )
 }

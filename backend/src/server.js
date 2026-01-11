@@ -14,6 +14,7 @@ import theLoaiRoutes from './routes/theLoaiRoutes.js';
 import dienVienRoutes from './routes/dienVienRoutes.js';
 import suatChieuRoutes from './routes/suatChieuRoutes.js';
 import datVeRoutes from './routes/datVeRoutes.js';
+import datVeComboRoutes from './routes/datVeComboRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
 import phongChieuRoutes from './routes/phongChieuRoutes.js';
 import rapRoutes from './routes/rapRoutes.js';
@@ -68,7 +69,7 @@ app.use('/api/theloai', theLoaiRoutes);
 app.use('/api/dienvien', dienVienRoutes);
 app.use('/api/suatchieu', suatChieuRoutes);
 app.use('/api/datve', datVeRoutes);
-
+app.use('/api/combodoan', datVeComboRoutes);
 app.use('/api/phongchieu', phongChieuRoutes);
 app.use('/api/rap', rapRoutes);
 app.use("/api/ghe", gheRoutes);

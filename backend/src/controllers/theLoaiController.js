@@ -38,7 +38,7 @@ export const createTheLoai = async (req, res) => {
   try {
     const { tenTheLoai, moTa } = req.body
 
-    if (!tenTheLoai) return res.status(400).json({ message: 'Thiếu tên thể loại' })
+    if (!tenTheLoai || tenTheLoai.trim() === "") return res.status(400).json({ message: 'Tên thể loại là bắt buộc và không được để trống' })
 
     const existingTheLoai = await TheLoai.findOne({ where: { tenTheLoai } });
     if (existingTheLoai) return res.status(400).json({ message: 'Thể loại với tên này đã tồn tại' });
