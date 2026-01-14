@@ -118,10 +118,8 @@ const DatVeThanhCong = () => {
       </div>
 
       {/* Actions */}
-      <div className="flex gap-4 mt-6">
-        <button className="bg-primary-dull hover:bg-primary px-4 py-2 rounded cursor-pointer">
-          Tải vé về máy
-        </button>
+      <div className=" mt-6">
+        
         <button
           onClick={() => navigate('/')}
           className="border px-4 py-2 rounded cursor-pointer hover:text-white flex items-center gap-2"

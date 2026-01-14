@@ -4,6 +4,7 @@ import {
   CalendarCheck2,
   UserPlusIcon,
   StarIcon,
+  Download,
 } from "lucide-react";
 
 import React, { useEffect, useState } from "react";
@@ -72,6 +73,12 @@ const QuanLyDashboard = () => {
       setFilterResult(null);
       return;
     }
+    if (filterType === "date" && (!from || !to)) {
+      return;
+    }
+
+    if (filterType === "month" && (!month || !year)) return;
+    if (filterType === "year" && !year) return;
 
     try {
       const res = await api.get("/admin/dashboard/filter", {
@@ -93,6 +100,12 @@ const QuanLyDashboard = () => {
     fetchFilter();
   }, [filterType, from, to, month, year]);
 
+    useEffect(() => {
+      setFrom("");
+      setTo("");
+      setMonth("");
+      setYear("");
+    }, [filterType]);
 
 
   // DATA CHO BIỂU ĐỒ
@@ -142,7 +155,7 @@ const QuanLyDashboard = () => {
     }
   }
 
-
+  const topPhim = filterResult?.topPhim ?? dashboard.topPhimTuan;
 
   const Card = ({ icon, label, value, color }) => (
     <div className="p-6 bg-black rounded-xl border border-primary shadow-md">
@@ -160,7 +173,17 @@ const QuanLyDashboard = () => {
 
   return (
     <div className="p-6 text-white">
-      <h1 className="text-3xl font-semibold mb-6">Tổng quan • GoCinema</h1>
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
+
+        <h1 className="text-3xl font-semibold mb-6 max-md:text-2xl">Tổng quan • GoCinema</h1>
+
+        <div className="flex items-center gap-3 border border-primary px-4 py-2 rounded-lg cursor-pointer bg-primary-dull hover:bg-primary">
+          <Download />
+
+          Xuất báo cáo
+
+        </div>
+      </div>
 
       {/* CARDS */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
@@ -264,10 +287,11 @@ const QuanLyDashboard = () => {
         <div className="bg-black border border-primary rounded-xl p-6 flex-1">
           <h2 className="text-xl mb-4 font-semibold flex items-center gap-2">
             <StarIcon /> Top phim bán chạy tuần
+             {filterType !== "7days" && " (theo bộ lọc)"}
           </h2>
 
           <ul className="space-y-4">
-            {dashboard.topPhimTuan.map((item, i) => (
+            {topPhim.map((item, i) => (
               <li key={i} className="flex items-center gap-4">
                 <img
                   src={item.poster}
@@ -278,6 +302,10 @@ const QuanLyDashboard = () => {
                     {item.tenPhim}
                   </p>
                   <p className="text-gray-400">Vé bán: {item.soVe}</p>
+                  <p className="text-green-400 text-sm">
+                    Doanh thu:{" "}
+                    {Number(item.doanhThu).toLocaleString("vi-VN")} {currency}
+                  </p>
                 </div>
               </li>
             ))}

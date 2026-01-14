@@ -3,13 +3,36 @@ import sequelize from '../configs/sequelize.js';
 import DaoDien from './DaoDien.js';
 
 const Phim = sequelize.define('Phim', {
-  maPhim: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true, allowNull: false },
-  tenPhim: { type: DataTypes.STRING, allowNull: false },
-  noiDung: { type: DataTypes.TEXT, allowNull: true },
-  thoiLuong: { type: DataTypes.INTEGER, allowNull: true },
-  poster: { type: DataTypes.STRING, allowNull: true },
-  trailer: { type: DataTypes.STRING, allowNull: true },
-  ngayCongChieu: { type: DataTypes.DATE, allowNull: true },
+  maPhim: { 
+    type: DataTypes.INTEGER, 
+    autoIncrement: true, 
+    primaryKey: true, 
+    allowNull: false 
+  },
+  tenPhim: { 
+    type: DataTypes.STRING, 
+    allowNull: false 
+  },
+  noiDung: { 
+    type: DataTypes.TEXT, 
+    allowNull: true 
+  },
+  thoiLuong: { 
+    type: DataTypes.INTEGER, 
+    allowNull: true 
+  },
+  poster: { 
+    type: DataTypes.STRING, 
+    allowNull: true 
+  },
+  trailer: { 
+    type: DataTypes.STRING, 
+    allowNull: true 
+  },
+  ngayCongChieu: { 
+    type: DataTypes.DATE, 
+    allowNull: true 
+  },
   trangThaiChieu: {
     type: DataTypes.ENUM('Sắp chiếu', 'Đang chiếu', 'Đã kết thúc'),
     allowNull: false,
@@ -20,8 +43,14 @@ const Phim = sequelize.define('Phim', {
     allowNull: false,
     defaultValue: 'P'
   },
-  ngonNgu: { type: DataTypes.STRING(50), allowNull: true },
-  phuDe: { type: DataTypes.STRING(50), allowNull: true },
+  ngonNgu: { 
+    type: DataTypes.STRING(50), 
+    allowNull: true 
+  },
+  phuDe: { 
+    type: DataTypes.STRING(50), 
+    allowNull: true 
+  },
   maDaoDien: {
     type: DataTypes.INTEGER,
     allowNull: true,

@@ -5,9 +5,11 @@ import toast from 'react-hot-toast'
 import Pagination from '../../components/admin/Paginnation'
 import DeleteForm from '../../components/admin/DeleteForm'
 import SearchInput from '../../components/SearchInput'
+import { useSearchParams } from 'react-router-dom'
 
 const TheLoai = () => {
   const api = useApi(true)
+  const [searchParams, setSearchParams] = useSearchParams();
   const [theloais, setTheloais] = useState([])
   const [showModal, setShowModal] = useState(false)
   const [editItem, setEditItem] = useState(null)
@@ -16,7 +18,13 @@ const TheLoai = () => {
     moTa: ''
   })
   const [search, setSearch] = useState("")
-  const [currentPage, setCurrentPage] = useState(1)
+  const currentPage = Number(searchParams.get("page")) || 1
+  const setCurrentPage = (page) => {
+    setSearchParams({
+      page,
+      search,
+    });
+  }
   const [totalPages, setTotalPages] = useState(1)
   const limit = 10
 
@@ -78,7 +86,7 @@ const TheLoai = () => {
       fetchData()
     } catch (err) {
       console.log(err);
-      toast.error("Xoá thất bại!")
+      toast.error(err.response?.data?.message || "Xoá thất bại!")
     }
   }
 
@@ -111,10 +119,15 @@ const TheLoai = () => {
       </div>
 
       <SearchInput
+        item="thể loại"
         search={search}
-        setSearch={setSearch}
-        setCurrentPage={setCurrentPage}
-        item="tên thể loại"
+        onSearch={(value) => {
+          setSearch(value)
+          setSearchParams({
+            page: 1,
+            search: value,
+          })
+        }}
       />
       <table className="w-full border-b border-primary/30 rounded-lg text-sm">
         <thead className="bg-primary/70 text-white">

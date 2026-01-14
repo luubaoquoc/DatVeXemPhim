@@ -4,6 +4,7 @@ import toast from 'react-hot-toast'
 import useApi from '../hooks/useApi'
 import momo from '../assets/vi-momo.jpg'
 import vnpay from '../assets/vnpay.png'
+import stripe from '../assets/stripe.png'
 import ThongTinDatVe from '../components/ThongTinDatVe'
 import XacNhanTuoiModal from '../components/XacNhanTuoiModal'
 
@@ -171,23 +172,23 @@ const ThanhToan = () => {
       }
 
       // fallback: tạo đặt vé và thanh toán cùng lúc (cũ)
-      const payload = {
-        maSuatChieu,
-        chiTiet: selectedSeats,
-        tongTien: finalTotal,
-        phuongThuc,
-        khuyenMaiId
-      }
-      const res = await api.post('/datve', payload)
-      if (res.data.redirectUrl) {
-        window.location.href = res.data.redirectUrl // 👉 chuyển sang trang thanh toán
-      } else {
-        navigate('/dat-ve-thanh-cong', {
-          state: {
-            booking: res.data.data
-          }
-        })
-      }
+      // const payload = {
+      //   maSuatChieu,
+      //   chiTiet: selectedSeats,
+      //   tongTien: finalTotal,
+      //   phuongThuc,
+      //   khuyenMaiId
+      // }
+      // const res = await api.post('/datve', payload)
+      // if (res.data.redirectUrl) {
+      //   window.location.href = res.data.redirectUrl //  chuyển sang trang thanh toán
+      // } else {
+      //   navigate('/dat-ve-thanh-cong', {
+      //     state: {
+      //       booking: res.data.data
+      //     }
+      //   })
+      // }
     } catch (err) {
       console.error(err)
       const msg = err?.response?.data?.message || 'Đặt vé thất bại'
@@ -266,7 +267,7 @@ const ThanhToan = () => {
               id: 'stripe',
               name: 'Stripe',
               desc: 'Thanh toán quốc tế (Visa / MasterCard).',
-              logo: '/assets/images/payment/stripe.png'
+              logo: { src: stripe, alt: 'Stripe' }
             }
           ].map((method) => (
             <label

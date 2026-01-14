@@ -6,10 +6,11 @@ import Pagination from "../../components/admin/Paginnation"
 import DeleteForm from "../../components/admin/DeleteForm"
 import SearchInput from "../../components/SearchInput"
 import { useSelector } from "react-redux"
+import { useSearchParams } from "react-router-dom"
 
 const QuanLyTaiKhoan = () => {
   const api = useApi(true)
-
+  const [searchParams, setSearchParams] = useSearchParams()
   const user = useSelector((state) => state.auth.user)
 
   const [taiKhoans, setTaiKhoans] = useState([])
@@ -26,7 +27,15 @@ const QuanLyTaiKhoan = () => {
     maRap: ""
   })
   const [search, setSearch] = useState("")
-  const [currentPage, setCurrentPage] = useState(1)
+  const currentPage = Number(searchParams.get("page")) || 1
+  const setCurrentPage = (page) => {
+    setSearchParams({
+      page,
+      search,
+      maVaiTro: filterRole,
+      maRap: filterRap
+    });
+  };
   const [totalPages, setTotalPages] = useState(1)
   const limit = 10
   const [loading, setLoading] = useState(false)
@@ -218,10 +227,17 @@ const QuanLyTaiKhoan = () => {
 
       <div className='flex flex-wrap gap-3 mb-4'>
         <SearchInput
+          item="tên tài khoản"
           search={search}
-          setSearch={setSearch}
-          setCurrentPage={setCurrentPage}
-          item="email"
+          onSearch={(value) => {
+            setSearch(value);
+            setSearchParams({
+              page: 1,
+              search: value,
+              maVaiTro: filterRole,
+              maRap: filterRap
+            });
+          }}
         />
 
         {/* Trạng thái */}

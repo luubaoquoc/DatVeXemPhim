@@ -1,5 +1,16 @@
 import express from 'express';
-import { getAllPhim, getPhim, createPhim, updatePhim, deletePhim, likePhim, unlikePhim, getLikedPhims, getUserDanhGia, danhGiaPhim } from '../controllers/phimControllers.js';
+import { 
+    getAllPhim, 
+    getPhim, 
+    createPhim, 
+    updatePhim, 
+    deletePhim, 
+    likePhim, 
+    unlikePhim, 
+    getLikedPhims, 
+    getUserDanhGia, 
+    danhGiaPhim 
+} from '../controllers/phimControllers.js';
 import { authenticateToken, isAdmin } from '../middleware/authMiddleware.js';
 import upload from '../configs/multer.js';
 
@@ -7,10 +18,10 @@ const router = express.Router();
 
 
 router.get('/', getAllPhim);
-router.get('/:maPhim', getPhim);
 
 router.get('/liked', authenticateToken, getLikedPhims);
 
+router.get('/:maPhim', getPhim);
 router.post('/:maPhim/like', authenticateToken, likePhim);
 router.delete('/:maPhim/like', authenticateToken, unlikePhim);
 

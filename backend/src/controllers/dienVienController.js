@@ -2,6 +2,8 @@ import cloudinary from '../configs/cloudinary.js';
 import streamifier from 'streamifier'
 import DienVien from '../models/DienVien.js'
 import { Op } from "sequelize";
+import Phim from '../models/Phim.js';
+import Phim_DienVien from '../models/Phim_DienVien.js';
 
 // Lấy tất cả diễn viên
 export const getAllDienVien = async (req, res) => {
@@ -122,8 +124,17 @@ export const deleteDienVien = async (req, res) => {
   try {
     const { maDienVien } = req.params
     const dienVien = await DienVien.findByPk(maDienVien)
+    console.log(dienVien);
+    
     if (!dienVien) return res.status(404).json({ message: 'Không tìm thấy diễn viên' })
-    await dienVien.destroy()
+    
+    const phim = await Phim_DienVien.count({ where: { maDienVien } });
+
+    if (phim > 0) {
+      return res.status(400).json({ message: 'Không thể xóa! Diễn viên đang được sử dụng trong phim.' });
+    }
+
+      await dienVien.destroy()
     res.json({ message: 'Đã xóa diễn viên' })
   } catch (error) {
     res.status(500).json({ message: 'Lỗi khi xóa diễn viên' })

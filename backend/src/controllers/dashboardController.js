@@ -10,16 +10,12 @@ import {
 } from "../models/index.js"
 
 
-
-// ==================== DASHBOARD ====================
+// Lấy dữ liệu dashboard
 export const getDashboardData = async (req, res) => {
   try {
     const { maVaiTro, maRap: maRapUser } = req.user
     const maRap = maVaiTro === 3 || maVaiTro === 2 ? maRapUser : req.query.maRap
 
-
-    // ===== CARDS =====
-    // doanh thu hôm nay
     const doanhThuHomNay = await ThanhToan.findOne({
       attributes: [[fn("SUM", col("ThanhToan.soTien")), "tong"]],
       include: [{
@@ -251,7 +247,7 @@ export const filterDashboard = async (req, res) => {
       raw: true
     })
 
-    // ================= TOP PHIM THEO FILTER =================
+    // top phim
     const topPhim = await DatVe.findAll({
       attributes: [
         [col("suatChieu.phim.maPhim"), "maPhim"],

@@ -5,10 +5,11 @@ import useApi from "../../hooks/useApi";
 import Pagination from "../../components/admin/Paginnation";
 import DeleteForm from "../../components/admin/DeleteForm";
 import SearchInput from "../../components/SearchInput";
+import { useSearchParams } from "react-router-dom";
 
 const QuanLyDanhGia = () => {
   const api = useApi(true);
-
+const [searchParams, setSearchParams] = useSearchParams();
   const [danhGias, setDanhGias] = useState([]);
 
   const [loading, setLoading] = useState(false);
@@ -18,7 +19,13 @@ const QuanLyDanhGia = () => {
   const [diem, setDiem] = useState("");
 
   const [search, setSearch] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
+  const currentPage = Number(searchParams.get("page")) || 1;
+  const setCurrentPage = (page) => {
+  setSearchParams({
+    page,
+    search,
+  });
+}
   const [totalPages, setTotalPages] = useState(1);
   const limit = 10;
 
@@ -79,10 +86,15 @@ const QuanLyDanhGia = () => {
       <h1 className="text-3xl font-semibold mb-6 max-md:text-2xl">Quản lý đánh giá</h1>
 
       <SearchInput
-        search={search}
-        setSearch={setSearch}
-        setCurrentPage={setCurrentPage}
         item="tên phim"
+        search={search}
+        onSearch={(value) => {
+          setSearch(value);
+          setSearchParams({
+            page: 1,
+            search: value,
+          });
+        }}
       />
 
       <table className="w-full border-b border-primary/30 rounded-lg text-sm mt-4">

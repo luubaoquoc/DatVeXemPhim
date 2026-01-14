@@ -9,8 +9,15 @@ const VaiTro = sequelize.define('VaiTro', {
     primaryKey: true,
     allowNull: false
   },
-  tenVaiTro: { type: DataTypes.STRING(50), allowNull: false, unique: true },
-  moTa: { type: DataTypes.TEXT, allowNull: true }
+  tenVaiTro: { 
+    type: DataTypes.STRING(50), 
+    allowNull: false, 
+    unique: true 
+  },
+  moTa: { 
+    type: DataTypes.TEXT, 
+    allowNull: true 
+  }
 }, {
   tableName: 'VAI_TRO',
   timestamps: false,

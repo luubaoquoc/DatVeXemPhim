@@ -6,6 +6,7 @@ import streamifier from 'streamifier'
 import { Op } from "sequelize";
 
 
+// lấy danh sách combo đồ ăn hoạt động
 export const getAllComBoDoAn = async (req, res) => {
   try {
     const combos = await ComBoDoAn.findAll({
@@ -19,7 +20,7 @@ export const getAllComBoDoAn = async (req, res) => {
   }
 };
 
-
+// lấy combo theo mã đơn đặt vé
 export const getComboByDatVe = async (req, res) => {
   const { maDatVe } = req.params;
 
@@ -41,6 +42,7 @@ export const getComboByDatVe = async (req, res) => {
 };
 
 
+// thêm hoặc cập nhật combo trong đơn đặt vé
 export const addOrUpdateComboToDatVe = async (req, res) => {
   const { maDatVe } = req.params;
   const { maCombo, soLuong } = req.body;
@@ -89,6 +91,8 @@ export const addOrUpdateComboToDatVe = async (req, res) => {
   }
 };
 
+
+// xóa combo khỏi đơn đặt vé
 export const removeComboFromDatVe = async (req, res) => {
   const { maDatVe, maCombo } = req.params;
 
@@ -108,7 +112,7 @@ export const removeComboFromDatVe = async (req, res) => {
   }
 };
 
-/* ================= GET ALL ================= */
+// lấy danh sách combo (admin)
 export const getAllCombos = async (req, res) => {
   try {
     const page = Number(req.query.page) || 1;
@@ -142,7 +146,8 @@ export const getAllCombos = async (req, res) => {
   }
 };
 
-/* ================= GET ONE ================= */
+
+// lấy combo theo mã
 export const getComboById = async (req, res) => {
   try {
     const combo = await ComBoDoAn.findByPk(req.params.maCombo);
@@ -157,7 +162,7 @@ export const getComboById = async (req, res) => {
   }
 };
 
-/* ================= CREATE ================= */
+// tạo combo
 export const createCombo = async (req, res) => {
   try {
     const { tenCombo, moTa, gia, trangThai } = req.body;
@@ -167,10 +172,7 @@ export const createCombo = async (req, res) => {
         .status(400)
         .json({ message: "Tên combo và giá là bắt buộc" });
     }
-    console.log(req.file);
-    console.log(tenCombo);
-    console.log(moTa);
-    console.log(gia);
+   
     let hinhAnh = null;
     if (req.file) {
       const result = await new Promise((resolve, reject) => {
@@ -192,9 +194,6 @@ export const createCombo = async (req, res) => {
       hinhAnh = result.secure_url;
     }
 
-
-
-
     const combo = await ComBoDoAn.create({
       tenCombo,
       moTa,
@@ -209,7 +208,7 @@ export const createCombo = async (req, res) => {
   }
 };
 
-/* ================= UPDATE ================= */
+// cập nhật combo
 export const updateCombo = async (req, res) => {
   try {
     const { maCombo } = req.params;
@@ -256,7 +255,7 @@ export const updateCombo = async (req, res) => {
   }
 };
 
-/* ================= DELETE ================= */
+// xóa combo
 export const deleteCombo = async (req, res) => {
   try {
     const { maCombo } = req.params;

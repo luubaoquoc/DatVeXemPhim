@@ -2,8 +2,15 @@ import { DataTypes } from 'sequelize';
 import sequelize from '../configs/sequelize.js';
 
 const AnhBanner = sequelize.define('AnhBanner', {
-  maAnhBanner: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-  anh: { type: DataTypes.STRING, allowNull: false }
+  maAnhBanner: { 
+    type: DataTypes.INTEGER, 
+    autoIncrement: true, 
+    primaryKey: true 
+  },
+  anh: { 
+    type: DataTypes.STRING, 
+    allowNull: false 
+  }
 }, {
   tableName: 'ANH_BANNER',
   timestamps: false

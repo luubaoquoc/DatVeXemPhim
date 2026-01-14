@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import useApi from '../hooks/useApi'
 import { useDispatch, useSelector } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import MoviesCard from '../components/MoviesCard'
 import { ChevronRight, SearchIcon } from 'lucide-react'
 import { fetchPhims } from '../redux/features/phimSlice'
@@ -15,9 +15,17 @@ const DienVien = () => {
   const api = useApi(false)
   const navigate = useNavigate()
   const dispatch = useDispatch()
+  const [searchParams, setSearchParams] = useSearchParams()
+
   const [dienViens, setDienViens] = useState([])
   const allMovies = useSelector(state => state.phim.items || [])
-  const [currentPage, setCurrentPage] = useState(1)
+  const currentPage = Number(searchParams.get("page")) || 1
+  const setCurrentPage = (page) => {
+    setSearchParams({
+      page,
+      search,
+    });
+  }
   const [totalPages, setTotalPages] = useState(1)
   const limit = 6
   const [search, setSearch] = useState('')
@@ -56,8 +64,13 @@ const DienVien = () => {
           <SearchInput
             item="diễn viên"
             search={search}
-            setSearch={setSearch}
-            setCurrentPage={setCurrentPage}
+            onSearch={(value) => {
+              setSearch(value)
+              setSearchParams({
+                page: 1,
+                search: value,
+              })
+            }}
           />
 
           <div className="flex flex-col gap-3">

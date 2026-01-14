@@ -1,5 +1,12 @@
 import express from 'express'
-import { register, verifyOtp, resendOtp, login, refreshToken, logout } from '../controllers/authControllers.js';
+import { 
+    register, 
+    verifyOtp, 
+    resendOtp, 
+    login, 
+    refreshToken, 
+    logout 
+} from '../controllers/authControllers.js';
 
 const router = express.Router();
 

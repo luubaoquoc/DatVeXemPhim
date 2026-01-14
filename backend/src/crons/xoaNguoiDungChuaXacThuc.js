@@ -1,6 +1,8 @@
 import { TaiKhoan } from "../models/index.js";
 import { Op } from "sequelize";
 
+
+// Xóa người dùng chưa xác thực sau 24 giờ
 export const xoaNguoiDungChuaXacThuc = async () => {
   try {
     const now = new Date(Date.now() - 24 * 60 * 60 * 1000);
@@ -16,6 +18,6 @@ export const xoaNguoiDungChuaXacThuc = async () => {
     }
     console.log('Cleanup tài khoản chưa xác thực hoàn tất.');
   } catch (error) {
-    console.error("Lỗi cleanupUnverifiedUsers:", error);
+    console.error("Lỗi xóa người dùng chưa xác thực:", error);
   }
 };

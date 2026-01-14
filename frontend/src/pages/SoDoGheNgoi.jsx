@@ -36,6 +36,7 @@ const SoDoGheNgoi = () => {
   const [comboTotal, setComboTotal] = useState(0);
 
 
+console.log(maPhim);
 
   /* ====================== LOAD DATA ====================== */
 
@@ -46,7 +47,7 @@ const SoDoGheNgoi = () => {
       setShow(data);
       setSelectedTime(data?.gioBatDau || null);
     } catch (err) {
-      console.error("Load show failed:", err);
+      console.error("Lấy suất chiếu thất bại:", err);
       toast.error("Không thể tải suất chiếu");
     }
   }, [maSuatChieu, publicApi]);
@@ -62,7 +63,7 @@ const SoDoGheNgoi = () => {
       });
       setRoomShows(data);
     } catch (err) {
-      console.error("Load room shows failed", err);
+      console.error("Lấy lịch chiếu phòng thất bại:", err);
       toast.error("Không thể tải lịch chiếu phòng");
     }
   }, [show, publicApi]);
@@ -83,7 +84,7 @@ const SoDoGheNgoi = () => {
         }))
       );
     } catch (err) {
-      console.error("Load seats failed:", err);
+      console.error("Lấy danh sách ghế thất bại:", err);
     }
   }, [show, api]);
 
@@ -100,7 +101,7 @@ const SoDoGheNgoi = () => {
         (data?.gheDaDat || []).map(s => String(s).toUpperCase())
       );
     } catch (err) {
-      console.error("Load booked seats failed:", err);
+      console.error("Lấy ghế đã đặt thất bại:", err);
     }
   }, [maSuatChieu, maDatVe, api]);
 
@@ -111,7 +112,7 @@ const SoDoGheNgoi = () => {
       const { data } = await api.get(`/datve/${maDatVe}/ghes`);
       setSelectedSeats(data.map(s => String(s).toUpperCase()));
     } catch (err) {
-      console.error("Restore selected seats failed:", err);
+      console.error("Khôi phục ghế đã chọn thất bại:", err);
     }
   }, [maDatVe, api]);
 
@@ -136,7 +137,7 @@ const SoDoGheNgoi = () => {
 
         setTimeLeft(Math.max(0, diff));
       } catch (err) {
-        console.error('Fetch booking failed:', err);
+        console.error('Lấy thông tin đặt vé thất bại:', err);
         toast.error("Đã hết thời gian giữ ghế");
         navigate(`/chon-ghe/${maSuatChieu}`);
       }
@@ -163,7 +164,7 @@ const SoDoGheNgoi = () => {
         );
         setComboTotal(total);
       } catch (err) {
-        console.error("Load combo failed", err);
+        console.error("Lấy combo thất bại:", err);
       }
     };
 
@@ -213,7 +214,7 @@ const SoDoGheNgoi = () => {
   };
 
 
-  /* ====================== HANDLERS ====================== */
+
 
   const handleSeatClick = (seatId) => {
     if (bookedSeats.includes(seatId)) return;
@@ -353,11 +354,17 @@ const SoDoGheNgoi = () => {
         </div>
         <div className="flex flex-wrap gap-4 items-center justify-center text-sm mt-5">
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-primary-dull rounded" />Ghế đã bán</div>
+            <div className="w-4 h-4 bg-primary-dull rounded" />
+            Ghế đã bán
+          </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-primary rounded" /> Ghế đang chọn</div>
+            <div className="w-4 h-4 bg-primary rounded" />
+            Ghế đang chọn
+            </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-primary/20 rounded" /> Ghế trống</div>
+            <div className="w-4 h-4 bg-primary/20 rounded" /> 
+            Ghế trống
+            </div>
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 bg-red-500 rounded" />
             Khóa / Hỏng

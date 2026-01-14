@@ -27,24 +27,17 @@ export const kiemTraMaKhuyenMai = async (req, res) => {
       return res.status(400).json({ message: "Mã khuyến mãi không tồn tại" });
     }
 
-
-    //  Chưa tới ngày bắt đầu
     if (now < ngayBatDau) {
       return res.status(400).json({ message: "Mã khuyến mãi chưa bắt đầu" });
     }
 
-    //  Trạng thái
     if (!km.trangThai || ngayHetHan < now) {
       return res.status(400).json({ message: "Mã khuyến mãi đã hết hạn" });
     }
 
-
-    //  Hết lượt sử dụng
     if (km.soLuotSuDung <= 0) {
       return res.status(400).json({ message: "Mã khuyến mãi đã hết lượt sử dụng" });
     }
-
-
 
     const daSuDung = await LichSuDungMa.findOne({
       where: {
@@ -85,7 +78,6 @@ export const kiemTraMaKhuyenMai = async (req, res) => {
     res.status(500).json({ message: "Lỗi hệ thống" });
   }
 };
-
 
 
 // lấy danh sách khuyến mãi

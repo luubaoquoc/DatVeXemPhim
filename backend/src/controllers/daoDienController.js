@@ -2,6 +2,7 @@ import cloudinary from '../configs/cloudinary.js';
 import streamifier from 'streamifier'
 import DaoDien from '../models/DaoDien.js'
 import { Op } from "sequelize";
+import Phim from '../models/Phim.js';
 
 // Lấy tất cả đạo diễn
 export const getAllDaoDien = async (req, res) => {
@@ -67,7 +68,6 @@ export const createDaoDien = async (req, res) => {
           }
         )
 
-        // Dùng streamifier để tạo stream an toàn từ buffer
         streamifier.createReadStream(req.file.buffer).pipe(stream)
       })
 
@@ -147,7 +147,12 @@ export const deleteDaoDien = async (req, res) => {
     const { maDaoDien } = req.params
     const daoDien = await DaoDien.findByPk(maDaoDien)
     if (!daoDien) return res.status(404).json({ message: 'Không tìm thấy đạo diễn' })
-    await daoDien.destroy()
+    
+    const phim = await Phim.findOne({ where: { maDaoDien } });
+    if (phim) {
+      return res.status(400).json({ message: 'Không thể xóa! Đạo diễn đang được sử dụng trong phim.' });
+    }
+      await daoDien.destroy()
     res.json({ message: 'Đã xóa đạo diễn' })
   } catch (error) {
     console.error(error)

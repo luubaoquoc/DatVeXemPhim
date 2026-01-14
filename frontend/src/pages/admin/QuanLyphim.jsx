@@ -10,10 +10,12 @@ import DeleteForm from '../../components/admin/DeleteForm'
 import PhimDetail from '../../components/admin/ChiTietPhim'
 import SearchInput from '../../components/SearchInput'
 import { formatDate } from '../../lib/dateFormat'
+import { useSearchParams } from 'react-router-dom'
 
 const QuanLyPhim = () => {
   const api = useApi(true)
   const dispatch = useDispatch()
+  const [searchParams, setSearchParams] = useSearchParams();
   const { items: phims, status, totalPages } = useSelector((state) => state.phim)
 
   const [showDetail, setShowDetail] = useState(false);
@@ -22,7 +24,13 @@ const QuanLyPhim = () => {
   const [showModal, setShowModal] = useState(false)
   const [editPhim, setEditPhim] = useState(null)
   const [search, setSearch] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
+  const currentPage = Number(searchParams.get("page")) || 1;
+  const setCurrentPage = (page) => {
+  setSearchParams({
+    page,
+    search,
+  });
+};
   const limit = 5;
   const [filterStatus, setFilterStatus] = useState("")
 
@@ -90,10 +98,15 @@ const QuanLyPhim = () => {
 
       <div className='flex flex-wrap gap-3 mb-4'>
         <SearchInput
-          search={search}
-          setSearch={setSearch}
-          setCurrentPage={setCurrentPage}
           item="tên phim"
+          search={search}
+          onSearch={(value) => {
+            setSearch(value);
+            setSearchParams({
+              page: 1,
+              search: value,
+            });
+          }}
         />
 
         {/* Trạng thái */}
@@ -102,7 +115,11 @@ const QuanLyPhim = () => {
           value={filterStatus}
           onChange={(e) => {
             setFilterStatus(e.target.value);
-            setCurrentPage(1);
+            setSearchParams({
+              page: 1,
+              search,
+              trangThaiChieu: e.target.value,
+            });
           }}
         >
           <option value="">Tất cả trạng thái</option>

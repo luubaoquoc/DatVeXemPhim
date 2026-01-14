@@ -31,29 +31,27 @@ export const authenticateToken = async (req, res, next) => {
   }
 };
 
-// ==========================
-//   PHÂN QUYỀN THEO ROLE
-// ==========================
 
-// 1. Khách hàng
+//   PHÂN QUYỀN THEO ROLE
+//  Khách hàng
 export const isCustomer = (req, res, next) => {
   if (req.user.maVaiTro === 1) return next();
   return res.status(403).json({ message: 'Yêu cầu quyền khách hàng' });
 };
 
-// 2. Nhân viên rạp
+//  Nhân viên rạp
 export const isStaff = (req, res, next) => {
   if (req.user.maVaiTro === 2) return next();
   return res.status(403).json({ message: 'Yêu cầu quyền nhân viên rạp' });
 };
 
-// 3. Quản lý rạp
+//  Quản lý rạp
 export const isManager = (req, res, next) => {
   if (req.user.maVaiTro === 3) return next();
   return res.status(403).json({ message: 'Yêu cầu quyền quản lý rạp' });
 };
 
-// 4. Quản trị viên (Admin)
+// Quản trị viên (Admin)
 export const isAdmin = (req, res, next) => {
   if (req.user.maVaiTro === 4) return next();
   return res.status(403).json({ message: 'Yêu cầu quyền quản trị viên' });

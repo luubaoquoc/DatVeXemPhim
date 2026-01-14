@@ -8,17 +8,25 @@ import isoTimeFormat from "../../lib/isoTimeFormat";
 import { formatDate } from "../../lib/dateFormat";
 import DeleteForm from "../../components/admin/DeleteForm";
 import SearchInput from "../../components/SearchInput";
+import { useSearchParams } from "react-router-dom";
 
 const QuanLySuatChieu = () => {
   const api = useApi(true)
   const current = import.meta.env.VITE_CURRENCY;
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [suatChieus, setSuatChieus] = useState([])
   const [phong, setPhong] = useState([])
   const [showModal, setShowModal] = useState(false)
   const [editItem, setEditItem] = useState(null)
 
-  const [currentPage, setCurrentPage] = useState(1)
+  const currentPage = Number(searchParams.get("page")) || 1
+  const setCurrentPage = (page) => {
+    setSearchParams({
+      page,
+      search,
+    });
+  }
   const [totalPages, setTotalPages] = useState(1)
   let limit = 10
 
@@ -109,10 +117,15 @@ const QuanLySuatChieu = () => {
 
       <div className='flex flex-wrap gap-3 mb-4'>
         <SearchInput
+          item="phim"
           search={search}
-          setSearch={setSearch}
-          setCurrentPage={setCurrentPage}
-          item="tên phim"
+          onSearch={(value) => {
+            setSearch(value)
+            setSearchParams({
+              page: 1,
+              search: value,
+            })
+          }}
         />
 
         <select

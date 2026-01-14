@@ -63,7 +63,28 @@ const QuanLyGhe = () => {
       toast.success(`Cập nhật ghế ${seat.hang}${seat.soGhe}`);
     } catch (err) {
       setSeats(prev => prev.map(s => s.maGhe === seat.maGhe ? { ...s, trangThai: seat.trangThai } : s));
-      toast.error(err.response?.data?.message || "Cập nhật thất bại");
+      
+      if (err.response?.data?.needConfirm) {
+        const confirm = window.confirm("Ghế này đã được đặt cho suất chiếu tương lai. Bạn có chắc chắn muốn khóa ghế không?");
+        if (confirm) {
+          try {
+            await api.put(`/ghe/${seat.maGhe}`, { trangThai: newState, force: true });
+            setSeats(prev =>
+      prev.map(s =>
+        s.maGhe === seat.maGhe
+          ? { ...s, trangThai: newState }
+          : s
+      )
+    );
+            toast.success(`Cập nhật ghế ${seat.hang}${seat.soGhe}`);
+          } catch (err) {
+            setSeats(prev => prev.map(s => s.maGhe === seat.maGhe ? { ...s, trangThai: seat.trangThai } : s));
+            toast.error(err.response?.data?.message || "Cập nhật thất bại");
+          }
+        }
+      } else {
+        toast.error(err.response?.data?.message || "Cập nhật thất bại");
+      }
     }
   };
 

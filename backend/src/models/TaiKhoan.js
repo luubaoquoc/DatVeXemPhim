@@ -11,15 +11,45 @@ const TaiKhoan = sequelize.define('TaiKhoan', {
     allowNull: false
   },
 
-  hoTen: { type: DataTypes.STRING(100), allowNull: false },
-  email: { type: DataTypes.STRING, allowNull: false, unique: true },
-  matKhau: { type: DataTypes.STRING, allowNull: false },
-  soDienThoai: { type: DataTypes.STRING(10), allowNull: true },
-  ngayTao: { type: DataTypes.DATE, defaultValue: DataTypes.NOW, allowNull: false },
-  emailXacThuc: { type: DataTypes.BOOLEAN, defaultValue: false },
-  otpMa: { type: DataTypes.STRING(6), allowNull: true },
-  otpHetHan: { type: DataTypes.DATE, allowNull: true },
-  anhDaiDien: { type: DataTypes.STRING, defaultValue: null, allowNull: true },
+  hoTen: { 
+    type: DataTypes.STRING(100), 
+    allowNull: false 
+  },
+  email: { 
+    type: DataTypes.STRING, 
+    allowNull: false, 
+    unique: true 
+  },
+  matKhau: { 
+    type: DataTypes.STRING, 
+    allowNull: false 
+  },
+  soDienThoai: { 
+    type: DataTypes.STRING(10), 
+    allowNull: true 
+  },
+  ngayTao: { 
+    type: DataTypes.DATE, 
+    defaultValue: DataTypes.NOW, 
+    allowNull: false 
+  },
+  emailXacThuc: { 
+    type: DataTypes.BOOLEAN, 
+    defaultValue: false 
+  },
+  otpMa: { 
+    type: DataTypes.STRING(6), 
+    allowNull: true 
+  },
+  otpHetHan: { 
+    type: DataTypes.DATE, 
+    allowNull: true 
+  },
+  anhDaiDien: { 
+    type: DataTypes.STRING, 
+    defaultValue: null, 
+    allowNull: true 
+  },
   khoaTaiKhoan: {
     type: DataTypes.BOOLEAN,
     allowNull: false,

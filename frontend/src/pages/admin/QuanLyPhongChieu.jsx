@@ -6,10 +6,11 @@ import Pagination from "../../components/admin/Paginnation"
 import DeleteForm from "../../components/admin/DeleteForm"
 import SearchInput from "../../components/SearchInput"
 import { useSelector } from "react-redux"
+import { useSearchParams } from "react-router-dom"
 
 const PhongChieu = () => {
   const api = useApi(true)
-
+  const [searchParams, setSearchParams] = useSearchParams()
   const user = useSelector((state) => state.auth.user)
 
   const [phongchieus, setPhongChieus] = useState([])
@@ -23,7 +24,13 @@ const PhongChieu = () => {
     trangThai: "Hoạt động"
   })
   const [search, setSearch] = useState("")
-  const [currentPage, setCurrentPage] = useState(1)
+  const currentPage = Number(searchParams.get("page")) || 1
+  const setCurrentPage = (page) => {
+    setSearchParams({
+      page,
+      search,
+    });
+  }
   const [totalPages, setTotalPages] = useState(1)
   const limit = 10
   const [loading, setLoading] = useState(false)
@@ -139,10 +146,15 @@ const PhongChieu = () => {
 
       <div className='flex flex-wrap gap-3 mb-4'>
         <SearchInput
+          item="phòng chiếu"
           search={search}
-          setSearch={setSearch}
-          setCurrentPage={setCurrentPage}
-          item="tên phòng"
+          onSearch={(value) => {
+            setSearch(value)
+            setSearchParams({
+              page: 1,
+              search: value,
+            })
+          }}
         />
 
         {/*Lọc Rạp */}

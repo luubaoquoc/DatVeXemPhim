@@ -29,7 +29,7 @@ export const register = async (req, res) => {
           to: email,
           subject: "Mã xác thực tài khoản Go Cinema",
           html: `
-            <h2>Chào mừng bạn đến với Go Cinema 🎬</h2>
+            <h2>Chào mừng bạn đến với Go Cinema</h2>
             <p>Mã xác thực của bạn là:</p>
             <h1 style="color: #4F46E5;">${newOtp}</h1>
             <p>Mã có hiệu lực trong 5 phút.</p>
@@ -61,7 +61,7 @@ export const register = async (req, res) => {
       to: email,
       subject: "Mã xác thực tài khoản Go Cinema",
       html: `
-        <h2>Chào mừng bạn đến với Go Cinema 🎬</h2>
+        <h2>Chào mừng bạn đến với Go Cinema</h2>
         <p>Mã xác thực của bạn là:</p>
         <h1 style="color: #4F46E5;">${otp}</h1>
         <p>Mã có hiệu lực trong 5 phút.</p>
@@ -135,7 +135,7 @@ export const resendOtp = async (req, res) => {
       to: email,
       subject: "Gửi lại mã xác thực tài khoản Go Cinema",
       html: `
-        <h2>Xin chào ${user.hoTen} 🎬</h2>
+        <h2>Xin chào ${user.hoTen}</h2>
         <p>Đây là mã xác thực mới của bạn:</p>
         <h1 style="color: #4F46E5;">${newOtp}</h1>
         <p>Mã có hiệu lực trong 5 phút.</p>

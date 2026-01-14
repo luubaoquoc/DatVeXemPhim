@@ -3,6 +3,8 @@ import { Op } from "sequelize";
 import DatVe from "../models/DatVe.js";
 import ChiTietDatVe from "../models/ChiTietDatVe.js";
 
+
+// Xóa vé hết hạn thanh toán cho suất chiếu cụ thể
 export const xoaVeHetHan = async (maSuatChieu) => {
   const now = new Date();
 

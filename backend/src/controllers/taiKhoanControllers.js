@@ -66,7 +66,7 @@ export const listUsers = async (req, res) => {
   }
 };
 
-
+// Lấy danh sách vai trò
 export const listVaiTro = async (req, res) => {
   try {
     const vaiTros = await VaiTro.findAll();
@@ -113,7 +113,7 @@ export const createTaiKhoan = async (req, res) => {
     });
     return res.status(201).json({ message: 'Tạo tài khoản thành công', user: newUser });
   } catch (error) {
-    console.error('createTaiKhoan error:', error);
+    console.error('lỗi tạo tài khoản:', error);
     return res.status(500).json({ message: 'Lỗi server' });
   }
 };
@@ -128,7 +128,7 @@ export const getUser = async (req, res) => {
     if (!user) return res.status(404).json({ message: 'Người dùng không tồn tại' });
     return res.json(user);
   } catch (error) {
-    console.error('getUser error:', error);
+    console.error('lỗi lấy thông tin tài khoản:', error);
     return res.status(500).json({ message: 'Lỗi server' });
   }
 };
@@ -174,7 +174,7 @@ export const updateUser = async (req, res) => {
     const updated = await TaiKhoan.findByPk(ma);
     return res.json({ message: 'Cập nhật thành công', user: updated });
   } catch (error) {
-    console.error('updateUser error:', error);
+    console.error('lỗi cập nhật tài khoản:', error);
     return res.status(500).json({ message: 'Lỗi server' });
   }
 };
@@ -191,7 +191,7 @@ export const deleteUser = async (req, res) => {
     await user.destroy();
     return res.json({ message: 'Xóa người dùng thành công' });
   } catch (error) {
-    console.error('deleteUser error:', error);
+    console.error('lỗi xóa tài khoản:', error);
     return res.status(500).json({ message: 'Lỗi server' });
   }
 };
@@ -235,7 +235,7 @@ export const uploadAvatar = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("uploadAvatar error:", error);
+    console.error("lỗi upload ảnh đại diện:", error);
     return res.status(500).json({ message: "Lỗi server" });
   }
 };
@@ -261,7 +261,7 @@ export const changePassword = async (req, res) => {
 
     return res.json({ message: "Đổi mật khẩu thành công" });
   } catch (error) {
-    console.error("changePassword error:", error);
+    console.error("lỗi đổi mật khẩu:", error);
     return res.status(500).json({ message: "Lỗi server" });
   }
 };
@@ -279,7 +279,7 @@ export const khoaTaiKhoan = async (req, res) => {
     await user.update({ khoaTaiKhoan: true });
     return res.json({ message: "Khóa tài khoản thành công" });
   } catch (error) {
-    console.error("khoaTaiKhoan error:", error);
+    console.error("lỗi khóa tài khoản:", error);
     return res.status(500).json({ message: "Lỗi server" });
   }
 };
@@ -297,7 +297,7 @@ export const moKhoaTaiKhoan = async (req, res) => {
     await user.update({ khoaTaiKhoan: false });
     return res.json({ message: "Mở khóa tài khoản thành công" });
   } catch (error) {
-    console.error("moKhoaTaiKhoan error:", error);
+    console.error("lỗi mở khóa tài khoản:", error);
     return res.status(500).json({ message: "Lỗi server" });
   }
 };

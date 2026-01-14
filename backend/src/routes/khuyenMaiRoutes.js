@@ -1,7 +1,10 @@
 import express from 'express';
 import {
-  kiemTraMaKhuyenMai, getDanhSachKhuyenMai,
-  taoKhuyenMai, capNhatKhuyenMai, xoaKhuyenMai
+  kiemTraMaKhuyenMai, 
+  getDanhSachKhuyenMai,
+  taoKhuyenMai, 
+  capNhatKhuyenMai, 
+  xoaKhuyenMai
 } from '../controllers/khuyenMaiController.js';
 import { authenticateToken, hasRole } from '../middleware/authMiddleware.js';
 const router = express.Router();

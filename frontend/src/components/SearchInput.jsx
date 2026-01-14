@@ -1,7 +1,7 @@
 import { SearchIcon } from 'lucide-react';
 import React from 'react'
 
-const SearchInput = ({ search, setSearch, setCurrentPage, item = "item" }) => {
+const SearchInput = ({ search, onSearch, item = "item" }) => {
   return (
     <div className="mb-4 border border-primary/70 p-1 w-74 flex items-center bg-black">
       <input
@@ -10,8 +10,7 @@ const SearchInput = ({ search, setSearch, setCurrentPage, item = "item" }) => {
         className="p-2 rounded border-none text-white w-64 outline-none"
         value={search}
         onChange={(e) => {
-          setSearch(e.target.value);
-          setCurrentPage(1); // reset về trang đầu
+          onSearch(e.target.value);
         }}
       />
       <SearchIcon className="inline ml-2 text-gray-400" size={18} />

@@ -187,7 +187,7 @@ export const chatWithAI = async (req, res) => {
 export const getRecommendedMovies = async (req, res) => {
   try {
 
-    console.log("USER FROM OPTIONAL AUTH:", req.user);
+    console.log("Người dùng từ xác thực:", req.user);
 
     if (!req.user) {
       return await fallbackMovies(res);
@@ -335,7 +335,7 @@ const fallbackMovies = async (res) => {
 };
 
 
-
+// Phân tích doanh thu với AI
 export const analyzeRevenueAI = async (req, res) => {
   try {
     const { chartData, topPhim, filterType, maRap } = req.body;

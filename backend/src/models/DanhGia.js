@@ -26,8 +26,12 @@ const DanhGia = sequelize.define('DanhGia', {
       key: 'maPhim'
     }
   },
-  diem: { type: DataTypes.DECIMAL(3, 1), allowNull: false },
-  ngayDanhGia: { type: DataTypes.DATE, defaultValue: DataTypes.NOW }
+  diem: { 
+    type: DataTypes.DECIMAL(3, 1),
+     allowNull: false 
+    },
+  ngayDanhGia: { 
+    type: DataTypes.DATE, defaultValue: DataTypes.NOW }
 }, {
   tableName: 'DANH_GIA',
   timestamps: false

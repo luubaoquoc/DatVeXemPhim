@@ -115,7 +115,7 @@ const AdminSidebar = ({ onClose }) => {
       name: 'Quản lý combo đồ ăn',
       path: '/admin/quan-ly-combo-do-an',
       icon: TagsIcon,
-      roles: [3, 4]
+      roles: [4]
     },
     {
       name: 'Quản lý khuyến mãi',

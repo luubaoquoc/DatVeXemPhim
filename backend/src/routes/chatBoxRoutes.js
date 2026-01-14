@@ -1,5 +1,8 @@
 import express from "express";
-import { chatWithAI, getRecommendedMovies, analyzeRevenueAI } from "../controllers/chatBoxControler.js";
+import { chatWithAI, 
+    getRecommendedMovies, 
+    analyzeRevenueAI 
+} from "../controllers/chatBoxControler.js";
 import { authenticateToken, isAdmin, optionalAuth } from "../middleware/authMiddleware.js";
 
 const router = express.Router();

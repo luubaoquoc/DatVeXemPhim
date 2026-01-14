@@ -6,9 +6,12 @@ import { formatDate } from '../../lib/dateFormat'
 import Pagination from '../../components/admin/Paginnation'
 import DeleteForm from '../../components/admin/DeleteForm'
 import SearchInput from '../../components/SearchInput'
+import { useSearchParams } from "react-router-dom";
+
 
 const DaoDien = () => {
   const api = useApi(true)
+  const [searchParams, setSearchParams] = useSearchParams();
   const [daoDiens, setDaoDiens] = useState([])
   const [showModal, setShowModal] = useState(false)
   const [editItem, setEditItem] = useState(null)
@@ -21,7 +24,13 @@ const DaoDien = () => {
   })
 
   const [search, setSearch] = useState('')
-  const [currentPage, setCurrentPage] = useState(1)
+  const currentPage = Number(searchParams.get("page")) || 1;
+  const setCurrentPage = (page) => {
+  setSearchParams({
+    page,
+    search,
+  });
+};
   const [totalPages, setTotalPages] = useState(1)
   const limit = 10
   const [loading, setLoading] = useState(false)
@@ -107,11 +116,11 @@ const DaoDien = () => {
   // ===========================
   const handleDelete = async (id) => {
     try {
-      await api.delete(`/daodien/${id}`)
-      toast.success("Xoá thành công!")
+      const res = await api.delete(`/daodien/${id}`)
+      toast.success(res.data?.message || " Xoá đạo diễn thành công!")
       fetchData()
-    } catch {
-      toast.error("Lỗi xoá đạo diễn!")
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Lỗi xoá đạo diễn!")
     }
   }
 
@@ -152,11 +161,16 @@ const DaoDien = () => {
       </div>
 
       <SearchInput
-        search={search}
-        setSearch={setSearch}
-        setCurrentPage={setCurrentPage}
-        item="tên đạo diễn"
-      />
+      item="tên đạo diễn"
+      search={search}
+      onSearch={(value) => {
+        setSearch(value);
+        setSearchParams({
+          page: 1,
+          search: value,
+        });
+      }}
+    />
 
       {/* TABLE */}
       <table className="w-full border-b border-primary/30 rounded-lg text-sm">

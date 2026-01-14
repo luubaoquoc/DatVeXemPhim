@@ -14,7 +14,7 @@ import theLoaiRoutes from './routes/theLoaiRoutes.js';
 import dienVienRoutes from './routes/dienVienRoutes.js';
 import suatChieuRoutes from './routes/suatChieuRoutes.js';
 import datVeRoutes from './routes/datVeRoutes.js';
-import datVeComboRoutes from './routes/datVeComboRoutes.js';
+import datVeComboRoutes from './routes/comboDoAnRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
 import phongChieuRoutes from './routes/phongChieuRoutes.js';
 import rapRoutes from './routes/rapRoutes.js';

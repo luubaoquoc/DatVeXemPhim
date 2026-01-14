@@ -3,6 +3,8 @@ import sequelize from '../configs/sequelize.js';
 import { Op } from 'sequelize';
 import ChiTietDatVe from '../models/ChiTietDatVe.js';
 
+
+// Xóa vé đang chờ thanh toán đã hết hạn
 export const xoaVeDangCho = async () => {
   const now = new Date();
   try {

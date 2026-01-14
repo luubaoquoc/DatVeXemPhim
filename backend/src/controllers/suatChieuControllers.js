@@ -68,7 +68,7 @@ export const getAllSuatChieu = async (req, res) => {
 
 
 // Lấy danh sách rạp có suất chiếu của phim vào ngày nhất định
-export const getRapsForMovieDate = async (req, res) => {
+export const getRapsForPhimDate = async (req, res) => {
   try {
     const maPhim = Number(req.query.maPhim);
     const date = req.query.date;
@@ -149,7 +149,7 @@ export const getRapsForMovieDate = async (req, res) => {
     ));
     return res.json(result);
   } catch (error) {
-    console.error('getRapsForMovieDate error:', error);
+    console.error('getRapsForPhimDate error:', error);
     return res.status(500).json({ message: 'Lỗi server' });
   }
 };
@@ -273,6 +273,7 @@ export const getSuatChieu = async (req, res) => {
   }
 };
 
+// tạo suất chiếu
 export const createSuatChieu = async (req, res) => {
   try {
     const body = req.body;
@@ -285,9 +286,17 @@ export const createSuatChieu = async (req, res) => {
         console.log(sc.gioKetThuc);
         sc.gioBatDau = new Date(sc.gioBatDau);
         sc.gioKetThuc = new Date(sc.gioKetThuc);
+        const now = new Date();
+
+        if (sc.gioBatDau < now) {
+          return res.status(400).json({
+            message: `Không thể tạo suất chiếu có giờ bắt đầu đã qua!`,
+            gioBatDau: sc.gioBatDau
+          });
+        }
       }
 
-      // --- Check trùng giữa các suất trong payload ---
+      // Check trùng giữa các suất trong payload 
       for (let i = 0; i < body.length; i++) {
         for (let j = i + 1; j < body.length; j++) {
           if (body[i].maPhong === body[j].maPhong) {
@@ -305,7 +314,7 @@ export const createSuatChieu = async (req, res) => {
         }
       }
 
-      // --- Check trùng trong DB ---
+      // Check trùng trong DB 
       for (const sc of body) {
         const overlaps = await SuatChieu.findOne({
           where: {
@@ -335,6 +344,14 @@ export const createSuatChieu = async (req, res) => {
     // Xử lý 1 suất (tương tự)
     body.gioBatDau = new Date(body.gioBatDau);
     body.gioKetThuc = new Date(body.gioKetThuc);
+    const now = new Date();
+
+    if (body.gioBatDau < now) {
+      return res.status(400).json({
+        message: 'Không thể tạo suất chiếu có giờ bắt đầu đã qua!',
+        gioBatDau: body.gioBatDau
+      });
+    }
 
     const conflict = await SuatChieu.findOne({
       where: {
@@ -382,12 +399,20 @@ export const updateSuatChieu = async (req, res) => {
     }
 
     const body = { ...req.body };
+    const now = new Date();
 
     // ÉP TÍNH LẠI GIỜ KẾT THÚC
     if (body.gioBatDau) {
       const start = new Date(body.gioBatDau);
       if (isNaN(start)) {
         return res.status(400).json({ message: "gioBatDau không hợp lệ" });
+      }
+
+      if (start < now) {
+        return res.status(400).json({ 
+          message: 'Không thể cập nhật suất chiếu với giờ bắt đầu đã qua!',
+          gioBatDau: start
+        });
       }
 
       const duration = sc.phim?.thoiLuong;

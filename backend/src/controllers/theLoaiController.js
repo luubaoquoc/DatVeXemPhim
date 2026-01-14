@@ -1,3 +1,4 @@
+import Phim_TheLoai from '../models/Phim_TheLoai.js';
 import TheLoai from '../models/TheLoai.js'
 import { Op } from "sequelize";
 
@@ -69,7 +70,13 @@ export const deleteTheLoai = async (req, res) => {
     const { maTheLoai } = req.params
     const theLoai = await TheLoai.findByPk(maTheLoai)
     if (!theLoai) return res.status(404).json({ message: 'Không tìm thấy thể loại' })
-    await theLoai.destroy()
+    
+    const phim = await Phim_TheLoai.count({ where: { maTheLoai } });
+    if (phim > 0) {
+      return res.status(400).json({ message: 'Không thể xóa! Thể loại đang được sử dụng trong phim.' });
+    }
+    
+      await theLoai.destroy()
     res.json({ message: 'Đã xóa thể loại' })
   } catch (error) {
     res.status(500).json({ message: 'Lỗi khi xóa thể loại' })

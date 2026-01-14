@@ -108,13 +108,13 @@ const BanVeTaiQuay = () => {
       inVe(res.data);
 
       setTimeout(() => {
-        toast.success("In vé thành công!");
+        toast.success("Tạo vé thành công!");
         setStep(1);
         // Reset POS
         setSelectedSeats([]);
         setSelectedShow(null);
         setSelectedMovie(null);
-      }, 5000);
+      }, 10000);
     } catch (err) {
       console.error(err);
       toast.error("Thanh toán lỗi");

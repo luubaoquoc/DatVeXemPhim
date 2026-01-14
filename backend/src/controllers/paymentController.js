@@ -8,9 +8,8 @@ import { stripe } from '../helpers/stripe.js';
 
 
 const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:5173';
-/**
- *  MoMo IPN callback
- */
+
+// Tạo thanh toán MoMo
 export const momoIPN = async (req, res) => {
   const t = await sequelize.transaction();
   try {
@@ -49,9 +48,7 @@ export const momoIPN = async (req, res) => {
   }
 };
 
-/**
- *  VNPay return callback
- */
+// Tạo thanh toán VNPay
 export const createVNPay = async (req, res) => {
   try {
     const { datVe, tongTien } = req.body
@@ -222,9 +219,8 @@ export const vnpayReturn = async (req, res) => {
   }
 };
 
-/**
- *  Stripe webhook
- */
+
+// Xử lý webhook từ Stripe
 export const stripeWebhook = async (req, res) => {
   console.log(' Stripe webhook received');
 
@@ -345,7 +341,7 @@ export const stripeWebhook = async (req, res) => {
       console.error('stripeWebhook email error:', error);
     }
   } else if (event.type === 'checkout.session.expired') {
-    // Payment failed or expired
+    // thanh toán thất bại hoặc hết hạn
     await datVe.update({ trangThai: 'Thất bại' });
     await thanhToan.update({ trangThai: 'Thất bại' });
     await ChiTietDatVe.update(

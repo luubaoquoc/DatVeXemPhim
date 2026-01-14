@@ -1,12 +1,11 @@
 import { KhuyenMai } from "../models/index.js";
 import { Op } from "sequelize";
 
-
+// Cập nhật trạng thái khuyến mãi theo ngày bắt đầu và ngày hết hạn
 export const updateTrangThaiKhuyenMai = async () => {
   try {
     const now = new Date();
 
-    // Bật mã khi tới ngày bắt đầu
     await KhuyenMai.update(
       { trangThai: true },
       {
@@ -17,7 +16,6 @@ export const updateTrangThaiKhuyenMai = async () => {
       }
     );
 
-    //  Tắt mã khi hết hạn
     await KhuyenMai.update(
       { trangThai: false },
       {

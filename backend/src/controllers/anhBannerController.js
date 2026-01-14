@@ -95,7 +95,7 @@ export const updateAnhBanner = async (req, res) => {
   }
 }
 
-
+// Xóa ảnh banner
 export const deleteAnhBanner = async (req, res) => {
   try {
     const { maAnhBanner } = req.params;

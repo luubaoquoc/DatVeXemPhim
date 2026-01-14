@@ -1,7 +1,7 @@
 import { Phim } from "../models/index.js";
 import { Op } from "sequelize";
 
-
+// Cập nhật trạng thái chiếu phim theo ngày công chiếu
 export const updateTranThaiChieu = async () => {
   try {
     const now = new Date();

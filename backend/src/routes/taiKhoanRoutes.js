@@ -12,16 +12,10 @@ import {
   moKhoaTaiKhoan
 } from '../controllers/taiKhoanControllers.js';
 
-import {
-  authenticateToken,
-  hasRole,
-  isSelfOrManagerOrAdmin
-} from '../middleware/authMiddleware.js';
-
+import { authenticateToken, hasRole, isSelfOrManagerOrAdmin } from '../middleware/authMiddleware.js';
 import upload from '../configs/multer.js';
 
 const router = express.Router();
-
 
 router.get('/', authenticateToken, hasRole(3, 4), listUsers);
 router.get('/vaitro', authenticateToken, hasRole(3, 4), listVaiTro);

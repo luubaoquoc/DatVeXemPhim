@@ -152,6 +152,8 @@ const SuatChieuForm = ({ onSubmit, onClose, editItem }) => {
     e.preventDefault();
     setLoading(true);
 
+    const now = new Date();
+
     // Validate
     for (const slot of timeSlots) {
       if (!slot.gioBatDau || !slot.gioKetThuc) {
@@ -162,6 +164,12 @@ const SuatChieuForm = ({ onSubmit, onClose, editItem }) => {
 
       if (slot.gioKetThuc === "Invalid date") {
         toast.error("Giờ kết thúc không hợp lệ!");
+        setLoading(false);
+        return;
+      }
+
+      if (new Date(slot.gioBatDau) < now) {
+        toast.error("Không thể thêm suất chiếu có giờ bắt đầu đã qua!");
         setLoading(false);
         return;
       }

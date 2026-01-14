@@ -170,7 +170,7 @@ export const createDatVe = async (req, res) => {
         as: 'datVe',
         where: {
           maSuatChieu,
-          trangThai: { [Op.in]: ['Đang chờ', 'Thành công'] }
+          trangThai: { [Op.in]: ['Đang chờ', 'Đang thanh toán', 'Thành công'] }
         }
       },
       lock: t.LOCK.UPDATE,
@@ -654,7 +654,7 @@ export const BanVeTaiQuay = async (req, res) => {
         as: 'datVe',
         where: {
           maSuatChieu,
-          trangThai: { [Op.in]: ['Đang chờ', 'Thành công'] }
+          trangThai: { [Op.in]: ['Đang chờ', 'Đang thanh toán', 'Thành công'] }
         }
       },
       lock: t.LOCK.UPDATE,

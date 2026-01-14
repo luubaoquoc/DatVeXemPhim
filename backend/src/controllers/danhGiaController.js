@@ -3,6 +3,8 @@ import Phim from "../models/Phim.js";
 import TaiKhoan from "../models/TaiKhoan.js";
 import { Op } from "sequelize";
 
+
+// lấy danh sách đánh giá với phân trang và tìm kiếm
 export const getAllDanhGia = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
@@ -45,6 +47,8 @@ export const getAllDanhGia = async (req, res) => {
   }
 };
 
+
+// Cập nhật đánh giá
 export const updateDanhGia = async (req, res) => {
   try {
     const { maDanhGia } = req.params;
@@ -64,7 +68,7 @@ export const updateDanhGia = async (req, res) => {
   }
 };
 
-
+// Xóa đánh giá
 export const deleteDanhGia = async (req, res) => {
   try {
     const { maDanhGia } = req.params;

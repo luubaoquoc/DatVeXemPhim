@@ -39,7 +39,7 @@ const createMoMoPayment = async (datVe, tongTien) => {
   try {
     const response = await axios.post(endpoint, body, { headers: { 'Content-Type': 'application/json' } })
     console.log(' MoMo response:', response.data)
-    return response.data?.payUrl // chính field này frontend cần
+    return response.data?.payUrl
   } catch (error) {
     console.error(' MoMo API error:', error.response?.data || error.message)
     return null

@@ -1,6 +1,7 @@
 import React from 'react'
 import Navbar from './components/Navbar'
 import { Route, Routes, useLocation } from 'react-router-dom'
+import { Toaster } from 'react-hot-toast'
 import TrangChu from './pages/TrangChu'
 import Phims from './pages/Phims'
 import ChiTietPhim from './pages/ChiTietPhim'
@@ -8,7 +9,6 @@ import SoDoGheNgoi from './pages/SoDoGheNgoi'
 import LichSuDatVe from './pages/LichSuDatVe'
 import ThanhToan from './pages/ThanhToan'
 import PhimUaThich from './pages/PhimUaThich'
-import { Toaster } from 'react-hot-toast'
 import Footer from './components/Footer'
 import Layout from './pages/admin/Layout'
 import Dashboard from './pages/admin/Dashboard'
@@ -216,7 +216,7 @@ const App = () => {
 
           <Route path='quan-ly-combo-do-an'
             element={
-              <RoleRoute allowRoles={[3, 4]}>
+              <RoleRoute allowRoles={[ 4]}>
                 <QuanLyComboDoAn />
               </RoleRoute>
             }
