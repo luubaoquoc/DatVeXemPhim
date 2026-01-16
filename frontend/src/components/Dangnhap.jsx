@@ -5,10 +5,12 @@ import { login, register } from '../redux/features/authSlice'
 import toast from "react-hot-toast";
 import OtpModal from "./OtpModal";
 import { Eye, EyeOff } from "lucide-react";
+import useApi from "../hooks/useApi";
 
 const Dangnhap = ({ onClose }) => {
   const dispatch = useDispatch()
   const navigate = useNavigate();
+  const api = useApi();
   const [hoTen, setHoTen] = useState("");
   const [email, setEmail] = useState("");
   const [matKhau, setMatKhau] = useState("");
@@ -18,6 +20,11 @@ const Dangnhap = ({ onClose }) => {
   const [otp, setOtp] = useState("");
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [showNew, setShowNew] = useState(false)
+  const [showForgotModal, setShowForgotModal] = useState(false)
+  const [showResetModal, setShowResetModal] = useState(false)
+  const [newPassword, setNewPassword] = useState("")
+  const [otpMode, setOtpMode] = useState(null)
+  const [loadingRest, setLoadingRest] = useState(false)
 
   const { status } = useSelector((state) => state.auth);
   const loading = status === 'loading';
@@ -40,12 +47,52 @@ const Dangnhap = ({ onClose }) => {
       } else {
         const res = await dispatch(register({ hoTen, email, matKhau })).unwrap();
         toast.success(res.message);
+        setOtpMode("register")
         setShowOtpModal(true);
       }
     } catch (error) {
       setErr(error || error.message || "Lỗi không xác định");
     }
   };
+
+  const submitEmail = async () => {
+    try {
+      setLoadingRest(true)
+      await api.post("/auth/forgot-password", { email })
+  toast.success("Đã gửi OTP")
+  setOtpMode("reset")
+  setShowForgotModal(false)
+  setShowOtpModal(true)
+    } catch (error) {
+      console.log(error);
+      toast.error(error.response?.data?.message || "Lỗi không xác định")
+    } finally {
+      setLoadingRest(false)
+    }
+  
+}
+
+
+const submitNewPassword = async () => {
+
+  try {
+    await api.post("/auth/reset-password", {
+    email,
+    newPassword
+  })
+
+  toast.success("Đổi mật khẩu thành công")
+  setShowResetModal(false)
+  setIsLogin(true) // mở modal đăng nhập
+  } catch (error) {
+    console.log(error);
+    toast.error(error.response?.data?.message || "Lỗi không xác định")
+  } finally {
+    setLoadingRest(false)
+  }
+  
+}
+
 
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
@@ -108,9 +155,12 @@ const Dangnhap = ({ onClose }) => {
                     />
                     Nhớ mật khẩu
                   </label>
-                  <a href="#" className="hover:underline">
+                  <button
+                    onClick={() => setShowForgotModal(true)}
+                    className="hover:underline"
+                  >
                     Quên mật khẩu?
-                  </a>
+                  </button>
                 </div>
               )}
 
@@ -165,7 +215,62 @@ const Dangnhap = ({ onClose }) => {
             </div>
           </div>
         )}
-      {showOtpModal && (<OtpModal email={email} otp={otp} setOtp={setOtp} setShowOtpModal={setShowOtpModal} setIsLogin={setIsLogin} />)}
+      {showOtpModal && (
+        <OtpModal 
+        email={email} 
+        otp={otp} 
+        setOtp={setOtp} 
+        setShowOtpModal={setShowOtpModal} 
+        otpMode={otpMode}
+      onVerified={() => {
+      if (otpMode === "register") {
+        setIsLogin(true);
+      }
+      if (otpMode === "reset") {
+        setShowResetModal(true);
+      }
+    }} />)}
+
+      {showForgotModal && (
+        <div>
+          <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+            <div className="bg-black/80 w-[350px] border border-primary rounded-2xl p-6 shadow-xl relative">
+              <input type="email"
+                placeholder="Nhập email của bạn"
+                className="w-full px-4 py-2 border-b rounded-xl focus:outline-none focus:border-b "
+                value={email}
+                onChange={(e) => setEmail(e.target.value)} />
+              <button
+                onClick={submitEmail}
+                disabled={loadingRest}
+                className="mt-4 w-full bg-primary text-white py-2 rounded-xl hover:bg-primary-dull cursor-pointer"
+              >
+                {loadingRest ? "Đang gửi..." : "Gửi mã OTP"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {showResetModal && (
+          <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+            <div className="bg-black/80 w-[350px] border border-primary rounded-2xl p-6 shadow-xl relative">
+              <input type="password"
+                placeholder="Nhập mật khẩu mới"
+                className="w-full px-4 py-2 border-b rounded-xl focus:outline-none focus:border-b "
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)} />
+              <button
+                onClick={submitNewPassword}
+                disabled={loadingRest}
+                className="mt-4 w-full bg-primary text-white py-2 rounded-xl hover:bg-primary-dull cursor-pointer"
+              >
+                {loadingRest ? "Đang đặt lại..." : "Đặt lại mật khẩu"}
+              </button>
+            </div>
+          </div>
+      )}
+
+
     </div >
   );
 };

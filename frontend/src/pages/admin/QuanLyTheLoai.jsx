@@ -139,7 +139,20 @@ const TheLoai = () => {
           </tr>
         </thead>
         <tbody>
-          {theloais.map((item, index) => (
+          {loading ? (
+            <tr>
+              <td colSpan="8" className="text-center py-10">
+                Đang tải...
+              </td>
+            </tr>
+          ) : theloais.length === 0 ? (
+            <tr>
+              <td colSpan="8" className="text-center py-10">
+                Không có thể loại nào.
+              </td>
+            </tr>
+          ) : (
+          theloais.map((item, index) => (
             <tr key={item.maTheLoai} className=" text-center border-b border-primary/30">
               <td className="p-2">{index + 1}</td>
               <td className="p-2 text-left">{item.tenTheLoai}</td>
@@ -158,7 +171,8 @@ const TheLoai = () => {
                 />
               </td>
             </tr>
-          ))}
+          ))
+          )}
         </tbody>
       </table>
 

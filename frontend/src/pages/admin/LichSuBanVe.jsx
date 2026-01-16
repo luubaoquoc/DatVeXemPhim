@@ -13,7 +13,7 @@ const LichSuBanVe = () => {
   const api = useApi(true);
   const [searchParams, setSearchParams] = useSearchParams();
   const [donDatVe, setDonDatVe] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
 
   const [search, setSearch] = useState("")
   const currentPage = Number(searchParams.get("page")) || 1

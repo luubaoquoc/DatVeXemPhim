@@ -306,7 +306,7 @@ const ThanhToan = () => {
           selectedTime={state.gioBatDau}
           date={state.gioBatDau}
           giaVeCoBan={state.pricePerSeat}
-          selectedCombos={state.selectedCombos}
+          selectedCombos={selectedCombos}
           comboTotal={comboTotal}
           discount={discount}
           finalTotal={finalTotal}

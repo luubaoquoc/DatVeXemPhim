@@ -13,6 +13,7 @@ import Loading from "../../components/Loading";
 import useApi from "../../hooks/useApi";
 import BlurCircle from "../../components/BlurCircle";
 import aiIcon from '../../assets/ai.png';
+import { toast } from "react-hot-toast";
 
 import {
   Chart as ChartJS,
@@ -196,6 +197,29 @@ const AdminDashboard = () => {
     }
   };
 
+    // const exportPDF = async () => {
+    //   const res = await api.post(
+    //     "/admin/dashboard/export-pdf",
+    //     {
+    //       filterType,
+    //       from,
+    //       to,
+    //       month,
+    //       year,
+    //       maRap,
+    //       aiAnalysis
+    //     },
+    //     { responseType: "blob" }
+    //   )
+
+    //   const url = window.URL.createObjectURL(res.data)
+    //   const a = document.createElement("a")
+    //   a.href = url
+    //   a.download = "BaoCao_DoanhThu.pdf"
+    //   a.click()
+    // }
+
+
 
   const Card = ({ icon, label, value, color }) => (
     <div className="p-6 bg-black rounded-xl border border-primary shadow-md">
@@ -217,11 +241,11 @@ const AdminDashboard = () => {
 
         <h1 className="text-3xl font-semibold mb-6 max-md:text-2xl">Tổng quan • GoCinema</h1>
 
-        <div className="flex items-center gap-3 border border-primary px-4 py-2 rounded-lg cursor-pointer bg-primary-dull hover:bg-primary">
+        <div className="flex items-center gap-3 border border-primary px-4 py-2 rounded-lg cursor-pointer bg-primary-dull hover:bg-primary"
+        onClick={() => toast.success("Chức năng xuất báo cáo đang được phát triển")}
+        >
           <Download />
-
           Xuất báo cáo
-
         </div>
       </div>
 

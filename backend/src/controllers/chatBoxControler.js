@@ -117,6 +117,10 @@ export const chatWithAI = async (req, res) => {
         ? `${km.giaTriDonToiThieu.toLocaleString()}đ`
         : "Không yêu cầu",
 
+      soLuotSuDung: km.soLuotSuDung > 0
+        ? km.soLuotSuDung
+        : "Hết lượt sử dụng",
+
       ngayBatDau: km.ngayBatDau
         ? new Date(km.ngayBatDau).toISOString().split("T")[0]
         : "Không xác định",
@@ -356,17 +360,17 @@ export const analyzeRevenueAI = async (req, res) => {
     Dữ liệu doanh thu (${filterType}) ${maRap ? `của rạp ${maRap}` : "toàn hệ thống"}:
 
       DOANH THU (${filterType}):
-${doanhThuText}
+      ${doanhThuText}
 
- TOP PHIM:
-${topPhimText}
+      TOP PHIM:
+      ${topPhimText}
 
-    Yêu cầu:
-1. Nhận xét xu hướng doanh thu
-2. Nhận xét top phim bán chạy
-3. Đề xuất hành động cho admin
-Ngắn gọn – rõ ràng – tiếng Việt.
-`;
+          Yêu cầu:
+      1. Nhận xét xu hướng doanh thu
+      2. Nhận xét top phim bán chạy
+      3. Đề xuất hành động cho admin
+      Ngắn gọn – rõ ràng – tiếng Việt.
+      `;
 
     const completion = await groq.chat.completions.create({
       model: "llama-3.1-8b-instant",

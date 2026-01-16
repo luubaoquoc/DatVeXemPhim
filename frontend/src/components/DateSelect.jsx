@@ -32,7 +32,7 @@ const DateSelect = ({ selected: selectedProp, onSelect, selectRap, onSelectRap, 
     return `${yyyy}-${mm}-${dd}`
   }
 
-  // default select today (even if no shows) when uncontrolled
+  
   useEffect(() => {
     if (selectedProp) return
     const today = formatLocalDate(new Date())
@@ -40,14 +40,11 @@ const DateSelect = ({ selected: selectedProp, onSelect, selectRap, onSelectRap, 
   }, [selectedProp])
 
  
-
-  // build array: today and next 5 days (local)
   const dates = Array.from({ length: 6 }).map((_, i) => {
     const dt = new Date()
     dt.setDate(dt.getDate() + i)
     return formatLocalDate(dt)
   })
-
 
 
   return (
@@ -72,7 +69,7 @@ const DateSelect = ({ selected: selectedProp, onSelect, selectRap, onSelectRap, 
                         else setInternalSelected(date)
                       }}
                       className={`relative flex flex-col items-center justify-center h-18 w-18 
-                aspect-square rounded cursor-pointer ${selected === date ? 'bg-primary text-white' : 'border border-primary/70'} `}>
+                      aspect-square rounded cursor-pointer ${selected === date ? 'bg-primary text-white' : 'border border-primary/70'} `}>
                       <span className='text-lg'>{new Date(date).getDate()}</span>
                       <span className='text-xs'>{new Date(date).toLocaleDateString('vi-VN', { month: 'short' })}</span>
                     </button>

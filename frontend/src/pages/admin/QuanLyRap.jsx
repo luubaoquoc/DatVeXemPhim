@@ -116,7 +116,7 @@ const Rap = () => {
       fetchData()
     } catch (err) {
       console.log(err);
-      toast.error("Xoá thất bại!")
+      toast.error(err.response?.data?.message || "Xoá thất bại!")
     }
   }
 
@@ -183,7 +183,20 @@ const Rap = () => {
         </thead>
 
         <tbody>
-          {raps?.map((rap, index) => (
+          {loading ? (
+            <tr>
+              <td colSpan="8" className="text-center py-10">
+                Đang tải...
+              </td>
+            </tr>
+          ) : raps.length === 0 ? (
+            <tr>
+              <td colSpan="8" className="text-center py-10">
+                Không có rạp nào.
+              </td>
+            </tr>
+          ) : (
+          raps?.map((rap, index) => (
             <tr key={rap.maRap} className="text-center border-b border-primary/30">
               <td className="p-2">{index + 1}</td>
               <td className="p-2">
@@ -214,7 +227,8 @@ const Rap = () => {
                 />
               </td>
             </tr>
-          ))}
+          ))
+          )}
         </tbody>
       </table>
 

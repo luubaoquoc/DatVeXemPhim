@@ -143,9 +143,13 @@ const ComBoDoAn = () => {
                     </div>
                   </div>
                   <div className="flex items-center gap-4 mr-4">
-                    <button onClick={() => updateCombo(combo.maCombo, Math.max(0, soLuong - 1))}>-</button>
+                    <button className="hover:text-primary cursor-pointer"
+                    onClick={() => updateCombo(combo.maCombo, Math.max(0, soLuong - 1))}
+                    >-</button>
                     <span>{soLuong}</span>
-                    <button onClick={() => updateCombo(combo.maCombo, soLuong + 1)}>+</button>
+                    <button className="hover:text-primary cursor-pointer"
+                    onClick={() => updateCombo(combo.maCombo, soLuong + 1)}
+                    >+</button>
                   </div>
                 </div>
               </div>

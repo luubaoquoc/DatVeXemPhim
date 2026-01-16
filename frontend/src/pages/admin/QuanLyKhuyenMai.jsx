@@ -193,7 +193,20 @@ const QuanLyKhuyenMai = () => {
         </thead>
 
         <tbody>
-          {items.map((item, index) => (
+          {loading ? (
+            <tr>
+              <td colSpan="8" className="text-center py-10">
+                Đang tải...
+              </td>
+            </tr>
+          ) : items.length === 0 ? (
+            <tr>
+              <td colSpan="8" className="text-center py-10">
+                Không có khuyễn mãi nào.
+              </td>
+            </tr>
+          ) : (
+          items.map((item, index) => (
             <tr key={item.id} className="border-b border-primary/30">
               <td className="p-2 text-center">{(currentPage - 1) * limit + index + 1}</td>
               <td className="p-2">{item.maKhuyenMai}</td>
@@ -228,7 +241,8 @@ const QuanLyKhuyenMai = () => {
                 />
               </td>
             </tr>
-          ))}
+          ))
+        )}
         </tbody>
       </table>
 

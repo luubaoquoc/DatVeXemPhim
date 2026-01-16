@@ -291,7 +291,20 @@ const QuanLyTaiKhoan = () => {
         </thead>
 
         <tbody>
-          {taiKhoans?.map((taiKhoan, index) => (
+          {loading ? (
+            <tr>
+              <td colSpan="8" className="text-center py-10">
+                Đang tải...
+              </td>
+            </tr>
+          ) : taiKhoans.length === 0 ? (
+            <tr>
+              <td colSpan="8" className="text-center py-10">
+                Không có tài khoản nào.
+              </td>
+            </tr>
+          ) : (
+          taiKhoans?.map((taiKhoan, index) => (
             <tr key={taiKhoan.maTaiKhoan} className="text-center border-b border-primary/30">
               <td className="p-2">{(index + 1)}</td>
               <td className="p-2">{taiKhoan.maTaiKhoan}</td>
@@ -339,7 +352,8 @@ const QuanLyTaiKhoan = () => {
                   />)}
               </td>
             </tr>
-          ))}
+          ))
+          )}
         </tbody>
       </table>
 

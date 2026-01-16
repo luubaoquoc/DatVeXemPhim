@@ -2,7 +2,7 @@ import React, { useCallback, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import useApi from '../hooks/useApi';
 
-const OtpModal = ({ email, otp, setOtp, setShowOtpModal, setIsLogin }) => {
+const OtpModal = ({ email, otp, setOtp, setShowOtpModal, otpMode, onVerified }) => {
   const api = useApi()
   const inputsRef = useRef([]);
   const [isResending, setIsResending] = useState(false);
@@ -66,10 +66,12 @@ const OtpModal = ({ email, otp, setOtp, setShowOtpModal, setIsLogin }) => {
     }
 
     try {
-      const res = await api.post('/auth/verify-otp', { email, otp: trimmedOtp });
+
+      const endpoint = otpMode === 'register' ? '/auth/verify-otp' : '/auth/verify-forgot-otp';
+      const res = await api.post(endpoint, { email, otp: trimmedOtp });
       toast.success(res.data.message || 'Xác thực OTP thành công!');
       setShowOtpModal(false);
-      setIsLogin(true);
+      onVerified();
     } catch (err) {
       toast.error(err.response?.data?.message || 'Mã OTP sai hoặc đã hết hạn!');
     }

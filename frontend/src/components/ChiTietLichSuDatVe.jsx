@@ -20,6 +20,8 @@ const ChiTietLichSuDatVe = (
   }).join(", ");
 
   const thanhToan = bookings.thanhToan || {};
+  const comboDoAn = bookings.ComBoDoAns || [];
+  const comboStr = comboDoAn.map(c => `${c.tenCombo} (x${c.DonDatVeCombo.soLuong})`).join(', ');
   console.log(phim);
 
   const isSuccess = thanhToan.trangThai === 'Thành công' || bookings.trangThai === 'Thành công'
@@ -52,6 +54,7 @@ const ChiTietLichSuDatVe = (
               <p><span className="text-primary">Giờ kết thúc: </span>{isoTimeFormat(suatChieu.gioKetThuc)}</p>
               <p><span className="text-primary">Phòng chiếu: </span> {phongChieu?.tenPhong}</p>
               <p><span className="text-primary">Ghế đã đặt: </span> {gheDaDat}</p>
+              <p><span className="text-primary">Combo đồ ăn: </span> {comboStr || "Không có"}</p>
             </div>
             <div className=" p-2">
               <h4 className="text-center mb-2 text-primary font-medium text-xl">Thông tin thanh toán</h4>

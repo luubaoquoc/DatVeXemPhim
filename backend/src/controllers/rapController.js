@@ -2,6 +2,11 @@ import cloudinary from "../configs/cloudinary.js";
 import streamifier from 'streamifier'
 import Rap from "../models/Rap.js";
 import { Op } from "sequelize";
+import PhongChieu from "../models/PhongChieu.js";
+
+
+
+
 
 // Lấy danh sách rạp với phân trang và lọc
 export const getRaps = async (req, res) => {
@@ -153,6 +158,11 @@ export const deleteRap = async (req, res) => {
 
     const rap = await Rap.findByPk(maRap);
     if (!rap) return res.status(404).json({ message: "Không tìm thấy rạp" });
+
+    const phongTonTai = await PhongChieu.findOne({ where: { maRap } });
+    if (phongTonTai) {
+      return res.status(400).json({ message: "Không thể xóa rạp vì còn phòng chiếu tồn tại" });
+    }
 
     await rap.destroy();
 

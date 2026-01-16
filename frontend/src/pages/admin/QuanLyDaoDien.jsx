@@ -186,7 +186,20 @@ const DaoDien = () => {
         </thead>
 
         <tbody>
-          {daoDiens.map((item, index) => (
+          {loading ? (
+            <tr>
+              <td colSpan="8" className="text-center py-10">
+                Đang tải...
+              </td>
+            </tr>
+          ) : daoDiens.length === 0 ? (
+            <tr>
+              <td colSpan="8" className="text-center py-10">
+                Không có đạo diễn nào.
+              </td>
+            </tr>
+          ) : (
+          daoDiens.map((item, index) => (
             <tr key={item.maDaoDien} className="border-b border-primary/30">
               <td className="p-2 text-center">{(currentPage - 1) * limit + index + 1}</td>
 
@@ -219,7 +232,8 @@ const DaoDien = () => {
                 />
               </td>
             </tr>
-          ))}
+          ))
+        )}
         </tbody>
       </table>
 

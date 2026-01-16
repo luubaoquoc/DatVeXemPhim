@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import useApi from "../../hooks/useApi";
 import toast from "react-hot-toast";
-import { Search, TicketCheck, Clock, Film, Armchair, X } from "lucide-react";
+import { Search, TicketCheck, Clock, Film, Armchair, X, DoorOpenIcon } from "lucide-react";
 
 const CheckInVe = () => {
   const api = useApi(true);
@@ -115,7 +115,11 @@ const CheckInVe = () => {
               <p className="flex items-center gap-2 text-white">
                 <Armchair size={18} className="text-green-600" />
                 <b className="text-primary">Ghế:</b>{ghe}
+              </p>
 
+              <p className="flex items-center gap-2 text-white">
+                <DoorOpenIcon size={18} className="text-green-600" />
+                <b className="text-primary">Phòng chiếu:</b>{ ve.datVe?.suatChieu?.phongChieu?.tenPhong }
               </p>
 
               <p>

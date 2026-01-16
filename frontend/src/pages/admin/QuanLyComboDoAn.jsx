@@ -192,7 +192,20 @@ const ComboDoAn = () => {
         </thead>
 
         <tbody>
-          {combos.map((item, index) => (
+          {loading ? (
+            <tr>
+              <td colSpan="8" className="text-center py-10">
+                Đang tải...
+              </td>
+            </tr>
+          ) : combos.length === 0 ? (
+            <tr>
+              <td colSpan="8" className="text-center py-10">
+                Không có combo nào.
+              </td>
+            </tr>
+          ) : (
+          combos.map((item, index) => (
             <tr key={item.maCombo} className="border-b border-primary/30">
               <td className="p-2 text-center">
                 {(currentPage - 1) * limit + index + 1}
@@ -236,7 +249,8 @@ const ComboDoAn = () => {
                 />
               </td>
             </tr>
-          ))}
+          ))
+        )}
         </tbody>
       </table>
 

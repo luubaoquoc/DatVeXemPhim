@@ -1,7 +1,7 @@
 import { verifyVNPayReturn } from '../helpers/VNPay.js';
 import sequelize from '../configs/sequelize.js';
 import ChiTietDatVe from '../models/ChiTietDatVe.js';
-import { DatVe, Ghe, KhuyenMai, LichSuDungMa, Phim, PhongChieu, Rap, SuatChieu, TaiKhoan, ThanhToan } from '../models/index.js';
+import { ComBoDoAn, DatVe, Ghe, KhuyenMai, LichSuDungMa, Phim, PhongChieu, Rap, SuatChieu, TaiKhoan, ThanhToan } from '../models/index.js';
 import { sendVerificationEmail } from '../utils/sendEmail.js';
 import { Op } from 'sequelize';
 import { stripe } from '../helpers/stripe.js';
@@ -143,7 +143,7 @@ export const vnpayReturn = async (req, res) => {
         {
           model: TaiKhoan,
           as: 'khachHang',
-          attributes: ['email']
+          attributes: ['hoTen','email', 'soDienThoai']
         },
         {
           model: SuatChieu,
@@ -179,6 +179,11 @@ export const vnpayReturn = async (req, res) => {
               attributes: ['hang', 'soGhe']
             }
           ]
+        },
+        {
+          model: ComBoDoAn,
+          through: { attributes: ['soLuong', 'giaTaiThoiDiem'] },
+          attributes: ['tenCombo', 'moTa']
         }
       ]
     });
@@ -187,6 +192,14 @@ export const vnpayReturn = async (req, res) => {
     const tenPhong = fullOrder?.suatChieu?.phongChieu?.tenPhong || 'Không xác định';
     const gioBatDau = fullOrder?.suatChieu?.gioBatDau || 'Không xác định';
     const soGhe = fullOrder?.chiTietDatVes?.map(ct => `${ct.ghe.hang}${ct.ghe.soGhe}`).join(', ') || 'Chưa chọn';
+    const combo = fullOrder?.ComBoDoAns || [];
+    const comboStr = combo.map(c => `${c.tenCombo} (x${c.DonDatVeCombo.soLuong})`).join(', ');
+    const tenKhachHang = fullOrder?.khachHang?.hoTen || 'Khách vãng lai';
+    const soDienThoai = fullOrder?.khachHang?.soDienThoai || 'N/A';
+    const email = fullOrder?.khachHang?.email || 'N/A';
+
+
+    
 
     // Gửi email vé cho khách
     await sendVerificationEmail({
@@ -196,14 +209,30 @@ export const vnpayReturn = async (req, res) => {
           <h2>Thanh toán thành công!</h2>
           <p>Cảm ơn bạn đã đặt vé tại hệ thống của chúng tôi.</p>
           <p>Mã đặt vé: <b>${orderId}</b></p>
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${orderId}" />
           <p><b>Phim:</b> ${tenPhim}</p>
           <p><b>Rạp:</b> ${tenRap}</p>
           <p><b>Phòng:</b> ${tenPhong}</p>
           <p><b>Suất chiếu:</b> ${gioBatDau}</p>
           <p><b>Ghế:</b> ${soGhe}</p>
+          <p><b>Thức ăn kèm:</b> ${comboStr || 'Không có'}</p>
           <p><b>Tổng tiền:</b> ${(Number(params.vnp_Amount) / 100).toLocaleString('vi-VN')} VND</p>
           <p><b>Thời gian thanh toán:</b> ${(params.vnp_PayDate).toLocaleString('vi-VN')}</p>
-        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${orderId}" />
+          <div>
+          <p><b>Khách hàng:</b> ${tenKhachHang}</p>
+          <p><b>Số điện thoại:</b> ${soDienThoai}</p>
+          <p><b>Email:</b> ${email}</p>
+          </div>
+          <div>
+          <p>Xin vui lòng mang theo mã vé hoặc email xác nhận này khi đến rạp để được phục vụ.</p>
+          <p>Chúc bạn có những trải nghiệm xem phim tuyệt vời!</p>
+          </div>
+          <div>
+          <h3>Chính sách hoàn/hủy</h3>
+          <p>- Vé đã mua không thể hoàn hoặc hủy trừ khi suất chiếu bị hủy bởi rạp.</p>
+          <p>- Vui lòng đến rạp ít nhất 15 phút trước giờ chiếu để đảm bảo quyền lợi của bạn.</p>
+          <p>- Mọi thắc mắc xin liên hệ bộ phận chăm sóc khách hàng của chúng tôi.</p>
+          </div>
           `
     })
 

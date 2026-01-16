@@ -201,6 +201,74 @@ export const login = async (req, res) => {
 
 }
 
+
+export const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    const user = await TaiKhoan.findOne({ where: { email } });
+    if (!user) {
+      return res.status(404).json({ message: "Email không tồn tại" });
+    }
+
+    const otp = Math.floor(100000 + Math.random() * 900000);
+    const expire = new Date(Date.now() + 5 * 60 * 1000);
+
+    await user.update({
+      otpMa: otp,
+      otpHetHan: expire,
+    });
+
+    await sendVerificationEmail({
+      to: email,
+      subject: "OTP đặt lại mật khẩu",
+      html: `<p>Mã OTP của bạn là: <b>${otp}</b></p>`
+    });
+
+    return res.json({ message: "OTP đã được gửi về email" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Lỗi server" });
+  }
+};
+
+
+export const verifyResetOtp = async (req, res) => {
+  const { email, otp } = req.body;
+
+  const user = await TaiKhoan.findOne({ where: { email } });
+  if (!user) return res.status(404).json({ message: "Không tìm thấy user" });
+
+  if (
+    user.otpMa !== otp ||
+    new Date(user.otpHetHan) < new Date()
+  ) {
+    return res.status(400).json({ message: "OTP không hợp lệ hoặc đã hết hạn" });
+  }
+
+  return res.json({ message: "OTP hợp lệ" });
+};
+
+// POST /auth/reset-password
+export const resetPassword = async (req, res) => {
+  const { email, newPassword } = req.body;
+
+  const user = await TaiKhoan.findOne({ where: { email } });
+  if (!user) return res.status(404).json({ message: "Không tìm thấy user" });
+
+  const hashed = await bcrypt.hash(newPassword, 10);
+
+  await user.update({
+    matKhau: hashed,
+    otpMa: null,
+    otpHetHan: null,
+  });
+
+  return res.json({ message: "Đổi mật khẩu thành công" });
+};
+
+
+
 export const logout = (req, res) => {
   res.clearCookie("refreshToken", { path: "/" });
   res.json({ message: "Đăng xuất thành công" });

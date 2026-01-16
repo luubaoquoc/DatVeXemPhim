@@ -27,6 +27,7 @@
     "node-cron": "^4.2.1",
     "nodemailer": "^7.0.6",
     "phimplus": "file:..",
+    "puppeteer": "^24.35.0",
     "qs": "^6.14.0",
     "resend": "^6.6.0",
     "sequelize": "^6.32.1",

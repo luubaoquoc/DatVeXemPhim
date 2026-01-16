@@ -36,12 +36,14 @@ const DatVeThanhCong = () => {
     const ghe = item.ghe
     return `${ghe.hang}${ghe.soGhe}`;
   }).join(", ")
-
+  const comboDoAn = booking?.ComBoDoAns?.map(c => {
+    return `${c.tenCombo} (${c.DonDatVeCombo.soLuong})`;
+  }).join(", ")
 
 
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center text-white px-4">
+    <div className=" min-h-screen flex flex-col items-center justify-center text-white px-4 mt-12">
 
       <BlurCircle top="100px" left="200px" />
       <BlurCircle bottom="100px" right="200px" />
@@ -52,8 +54,9 @@ const DatVeThanhCong = () => {
       </p>
 
       {/* Vé */}
-      <div className="bg-primary-dull/10 border border-primary backdrop-blur rounded-xl p-6 max-w-3xl w-full flex gap-6">
+      <div className="bg-primary-dull/10 border border-primary backdrop-blur rounded-xl p-6 max-w-3xl w-full ">
 
+      <div className='flex gap-6'>
         {/* Poster */}
         <img
           src={phim.poster}
@@ -99,12 +102,17 @@ const DatVeThanhCong = () => {
                 </p>
               </div>
               <div >
+                <label className='font-semibold'>COMBO ĐỒ ĂN</label>
+                <p className='text-primary flex items-center gap-1'>{comboDoAn || "Không có"}</p>
+              </div>
+              
+            </div>
+            <div className='text-center'>
                 <label className='font-semibold'>TỔNG TIỀN</label>
                 <p className="text-primary font-bold text-lg">
                   {booking.tongTien.toLocaleString()}đ
                 </p>
               </div>
-            </div>
           </div>
         </div>
 
@@ -114,7 +122,8 @@ const DatVeThanhCong = () => {
           <p className="font-bold mb-2">#{booking.maDatVe}</p>
           <img src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${booking.maDatVe}`} alt="QR Code" />
         </div>
-
+        </div>
+        <p className='text-center mt-4 border-t border-primary pt-4 text-primary'><b>Lưu ý*:</b> Hiện tại chưa có chính sách hỗ trợ hoàn/hủy hoặc đổi vé.</p>
       </div>
 
       {/* Actions */}

@@ -153,9 +153,8 @@ const ChiTietPhim = () => {
     <div className="px-6 md:px-16 lg:px-40 pt-30 md:pt-50">
       <div className="flex flex-col lg:flex-row gap-10 max-w-7xl mx-auto">
 
-        {/* ==== CỘT TRÁI: CHI TIẾT PHIM + NỘI DUNG + SUẤT CHIẾU ==== */}
+        
         <div className="flex-1">
-          {/* Thông tin phim */}
           <div className="flex flex-col md:flex-row gap-8">
             <img
               src={movie.poster}
@@ -245,7 +244,7 @@ const ChiTietPhim = () => {
             </div>
           </div>
 
-          {/* Nội dung phim */}
+         
           <div className="mt-12">
             <h3 className="text-xl font-medium border-l-3 pl-2 border-primary">
               Nội Dung Phim
@@ -253,7 +252,7 @@ const ChiTietPhim = () => {
             <p className="text-gray-400 max-w-4xl mt-2">{overview}</p>
           </div>
 
-          {/* Lịch chiếu */}
+          
           <div id="dateSelect" className="mt-4">
             <DateSelect
               maPhim={maPhim}
@@ -271,7 +270,7 @@ const ChiTietPhim = () => {
           </div>
         </div>
 
-        {/* ==== CỘT PHẢI: PHIM ĐANG CHIẾU ==== */}
+        
         <div className="w-full lg:w-1/4">
           <h3 className="text-xl font-medium mb-4 border-l-3 pl-2 border-primary">
             Phim đang chiếu

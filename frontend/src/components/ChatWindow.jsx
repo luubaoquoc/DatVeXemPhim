@@ -43,10 +43,8 @@ const ChatWindow = ({ onClose }) => {
   };
 
   return (
-    <div className="fixed bottom-24 right-6 z-50
-                 w-80 h-[420px]
-                 bg-black/80 rounded-xl shadow-2xl
-                 flex flex-col overflow-hidden"
+    <div className="fixed bottom-24 right-6 z-50 w-80 h-[420px] bg-black/80 rounded-xl shadow-2xl
+    flex flex-col overflow-hidden"
     >
       {/* Header */}
       <div className="bg-primary-dull text-white px-4 py-3 flex justify-between">

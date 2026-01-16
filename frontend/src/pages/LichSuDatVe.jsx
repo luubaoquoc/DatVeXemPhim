@@ -68,6 +68,9 @@ const LichSuDatVe = () => {
                 const thanhToan = item.thanhToan || {}
                 const isSuccess = item.trangThai === 'Thành công' || thanhToan.trangThai === 'Thành công'
                 const isFailed = item.trangThai === 'Thất bại' || thanhToan.trangThai === 'Thất bại'
+                const comboDoAn = item.ComBoDoAns || []
+                const comboStr = comboDoAn.map(c => `${c.tenCombo} (x${c.DonDatVeCombo.soLuong})`).join(', ')
+
 
                 return (
                   <div key={index}
@@ -87,6 +90,8 @@ const LichSuDatVe = () => {
                         <p className='text-gray-400 text-sm mt-1'>
                           <span className='text-primary'>Suất chiếu: </span>{suat.gioBatDau}
                         </p>
+                        <p><span className='text-primary'>Ghế: </span>{item.chiTietDatVes.map(ct => `${ct.ghe.hang}${ct.ghe.soGhe}`).join(', ')}</p>
+                        <p><span className='text-primary'>Combo đồ ăn: </span>{comboStr || "Không có"}</p>
                         <p className='text-gray-400 text-sm mt-1'>
                           <span className='text-primary'>Ngày đặt: </span>{dateFormat(item.ngayDat)}
                         </p>
@@ -119,7 +124,6 @@ const LichSuDatVe = () => {
                         )}
                       </div>
                       <div className='text-sm space-y-1'>
-                        <p><span className='text-primary'>Ghế: </span>{item.chiTietDatVes.map(ct => `${ct.ghe.hang}${ct.ghe.soGhe}`).join(', ')}</p>
                         <p>
                           <span className='text-primary'>Phương thức: </span>{thanhToan.phuongThuc?.toUpperCase() || 'N/A'}
                         </p>

@@ -1,5 +1,16 @@
-import { SuatChieu, Phim, PhongChieu, Rap, Ghe } from '../models/index.js';
+import { SuatChieu, Phim, PhongChieu, Rap, Ghe, DatVe } from '../models/index.js';
 import { Op } from 'sequelize';
+
+
+
+const checkSuatChieu = async (maSuatChieu) => {
+  return await DatVe.findOne({
+    where: { maSuatChieu,
+      trangThai: { [Op.notIn]: ['Thất bại'] } }
+  }); 
+};
+    
+
 
 // lấy danh sách suất chiếu với phân trang và lọc
 export const getAllSuatChieu = async (req, res) => {
@@ -165,6 +176,7 @@ export const getLichChieuByRapDate = async (req, res) => {
     const end   = `${date} 23:59:59`;
 
     const rows = await SuatChieu.findAll({
+      subQuery: false,
       where: { gioBatDau: { [Op.between]: [start, end] } },
       include: [
         {
@@ -176,10 +188,13 @@ export const getLichChieuByRapDate = async (req, res) => {
         {
           model: Phim,
           as: "phim",
-          attributes: ["maPhim", "tenPhim", "poster", "thoiLuong", "noiDung"]
+          attributes: ["maPhim", "tenPhim", "poster", "thoiLuong", "noiDung", "ngayCongChieu"]
         }
       ],
-      order: [["gioBatDau", "ASC"]]
+      order: [
+        [{ model: Phim, as: "phim" }, "ngayCongChieu", "DESC"],
+        ["gioBatDau", "ASC"]
+      ]
     });
 
     const map = {};
@@ -193,6 +208,7 @@ export const getLichChieuByRapDate = async (req, res) => {
           poster: phim.poster,
           thoiLuong: phim.thoiLuong,
           noiDung: phim.noiDung,
+          ngayCongChieu: phim.ngayCongChieu,
           suatChieus: []
         };
       }
@@ -205,7 +221,11 @@ export const getLichChieuByRapDate = async (req, res) => {
       })
     }
 
-    res.json(Object.values(map));
+    const result = Object.values(map).sort(
+  (a, b) => new Date(b.ngayCongChieu) - new Date(a.ngayCongChieu)
+);
+
+    res.json(result);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Lỗi server" });
@@ -277,6 +297,10 @@ export const getSuatChieu = async (req, res) => {
 export const createSuatChieu = async (req, res) => {
   try {
     const body = req.body;
+
+    if(!body) {
+      return res.status(400).json({ message: 'Dữ liệu không hợp lệ' });
+    }
 
     if (Array.isArray(body)) {
 
@@ -398,6 +422,11 @@ export const updateSuatChieu = async (req, res) => {
       return res.status(404).json({ message: 'Suất chiếu không tồn tại' });
     }
 
+    const daCoDonDat = await checkSuatChieu(ma);
+    if (daCoDonDat) {
+      return res.status(400).json({ message: 'Không thể cập nhật suất chiếu đã có đơn đặt vé' });
+    }
+
     const body = { ...req.body };
     const now = new Date();
 
@@ -452,6 +481,12 @@ export const deleteSuatChieu = async (req, res) => {
     if (!ma) return res.status(400).json({ message: 'maSuatChieu không hợp lệ' });
     const sc = await SuatChieu.findByPk(ma);
     if (!sc) return res.status(404).json({ message: 'Suất chiếu không tồn tại' });
+
+    const daCoDonDat = await checkSuatChieu(ma);
+    if (daCoDonDat) {
+      return res.status(400).json({ message: 'Không thể xóa suất chiếu đã có đơn đặt vé' });
+    }
+
     await sc.destroy();
     return res.json({ message: 'Xóa suất chiếu thành công' });
   } catch (error) {

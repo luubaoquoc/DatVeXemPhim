@@ -230,6 +230,7 @@ const SuatChieuForm = ({ onSubmit, onClose, editItem }) => {
               onChange={handleSelectPhim}
               placeholder="Chọn phim..."
               isSearchable
+              required
             />
           </div>
 
@@ -244,6 +245,7 @@ const SuatChieuForm = ({ onSubmit, onClose, editItem }) => {
               onChange={handleSelectPhong}
               placeholder="Chọn phòng..."
               isDisabled={!!editPhongOption}
+              required
             />
             {editPhongOption && (
               <p className="text-sm text-red-400 mt-1">
@@ -321,6 +323,7 @@ const SuatChieuForm = ({ onSubmit, onClose, editItem }) => {
               onChange={(e) => setFormData({ ...formData, giaVeCoBan: e.target.value })}
               className="w-full p-2 rounded bg-[#111] border border-gray-700"
               placeholder="Nhập giá vé..."
+              required
             />
           </div>
 

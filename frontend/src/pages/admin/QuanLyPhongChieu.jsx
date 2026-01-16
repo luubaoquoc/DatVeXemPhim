@@ -204,7 +204,20 @@ const PhongChieu = () => {
         </thead>
 
         <tbody>
-          {phongchieus?.map((phong, index) => (
+          {loading ? (
+            <tr>
+              <td colSpan="8" className="text-center py-10">
+                Đang tải...
+              </td>
+            </tr>
+          ) : phongchieus.length === 0 ? (
+            <tr>
+              <td colSpan="8" className="text-center py-10">
+                Không có phòng chiếu nào.
+              </td>
+            </tr>
+          ) : (
+          phongchieus?.map((phong, index) => (
             <tr key={phong.maPhong} className="text-center border-b border-primary/30">
               <td className="p-2">{index + 1}</td>
               <td className="p-2 font-medium text-left">{phong.tenPhong}</td>
@@ -238,7 +251,8 @@ const PhongChieu = () => {
                 />
               </td>
             </tr>
-          ))}
+          ))
+          )}
         </tbody>
       </table>
 

@@ -4,7 +4,7 @@ import createMoMoPayment from '../helpers/momo.js';
 import createStripePayment from '../helpers/stripe.js';
 import { createVNPayPayment } from '../helpers/VNPay.js';
 import ChiTietDatVe from '../models/ChiTietDatVe.js';
-import { DatVe, Ghe, Phim, PhongChieu, Rap, SuatChieu, TaiKhoan, ThanhToan } from '../models/index.js';
+import { ComBoDoAn, DatVe, Ghe, Phim, PhongChieu, Rap, SuatChieu, TaiKhoan, ThanhToan } from '../models/index.js';
 import { Op } from 'sequelize';
 import { xoaVeHetHan } from '../crons/xoaVeHetHan.js';
 
@@ -254,9 +254,9 @@ export const createCheckoutForDatVe = async (req, res) => {
     }
 
 
-    if (datVe.trangThai !== 'Đang chờ') {
+    if (datVe.trangThai !== 'Đang chờ' && datVe.trangThai !== 'Đang thanh toán') {
       await t.rollback();
-      return res.status(400).json({ message: 'Đặt vé không ở trạng thái đang chờ' });
+      return res.status(400).json({ message: 'Đặt vé không ở trạng thái đang chờ hoặc đang thanh toán' });
     }
     if (new Date(datVe.thoiHanThanhToan) < new Date()) {
       await datVe.update({ trangThai: 'Đã hủy' }, { transaction: t });
@@ -380,7 +380,12 @@ export const listMyDatVes = async (req, res) => {
               as: 'ghe',
             }
           ],
-        }
+        },
+        {
+          model: ComBoDoAn,
+          through: { attributes: ['soLuong'] },
+          attributes: ['tenCombo',  'moTa']
+        },
       ],
       offset,
       limit,
@@ -515,7 +520,12 @@ export const getDatVe = async (req, res) => {
         {
           model: ThanhToan,
           as: 'thanhToan'
-        }
+        },
+        {
+          model: ComBoDoAn,
+          through: { attributes: ['soLuong'] },
+          attributes: ['tenCombo',  'moTa']
+        },
       ]
     })
 

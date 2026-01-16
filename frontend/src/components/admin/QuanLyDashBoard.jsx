@@ -23,6 +23,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import toast from "react-hot-toast";
 
 ChartJS.register(
   CategoryScale,
@@ -177,11 +178,11 @@ const QuanLyDashboard = () => {
 
         <h1 className="text-3xl font-semibold mb-6 max-md:text-2xl">Tổng quan • GoCinema</h1>
 
-        <div className="flex items-center gap-3 border border-primary px-4 py-2 rounded-lg cursor-pointer bg-primary-dull hover:bg-primary">
+        <div className="flex items-center gap-3 border border-primary px-4 py-2 rounded-lg cursor-pointer bg-primary-dull hover:bg-primary"
+        onClick={() => toast.success("Chức năng xuất báo cáo đang được phát triển")}
+        >
           <Download />
-
           Xuất báo cáo
-
         </div>
       </div>
 

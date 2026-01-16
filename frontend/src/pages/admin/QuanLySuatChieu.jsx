@@ -33,11 +33,14 @@ const QuanLySuatChieu = () => {
   const [search, setSearch] = useState("")
   const [filterPhong, setFilterPhong] = useState("")
   const [filterDate, setFilterDate] = useState("");
+  const [loading, setLoading] = useState(false);
 
   console.log(suatChieus);
 
   const fetchSuatChieus = async () => {
     try {
+      setLoading(true);
+      setSuatChieus([])
       const res = await api.get("/suatchieu", {
         params: {
           page: currentPage,
@@ -53,6 +56,8 @@ const QuanLySuatChieu = () => {
     } catch (error) {
       console.log(error);
       toast.error("Lỗi tải danh sách suất chiếu!")
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -73,6 +78,7 @@ const QuanLySuatChieu = () => {
 
   const handleSubmit = async (data) => {
     try {
+      setLoading(true);
       if (editItem) {
         await api.put(`/suatchieu/${editItem.maSuatChieu}`, data)
         toast.success("Cập nhật suất chiếu thành công!")
@@ -86,17 +92,21 @@ const QuanLySuatChieu = () => {
       fetchSuatChieus();
     } catch (e) {
       toast.error(e.response?.data?.message || "Lỗi thao tác!")
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleDelete = async (maSuatChieu) => {
     try {
       await api.delete(`/suatchieu/${maSuatChieu}`)
-      toast.success("Đã xoá!");
+      toast.success("Đã xoá suất chiếu thành công!");
 
       fetchSuatChieus();
-    } catch {
-      toast.error("Xoá thất bại!");
+    } catch(err) {
+      toast.error(err.response?.data?.message || "Xoá thất bại!");
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -170,7 +180,20 @@ const QuanLySuatChieu = () => {
         </thead>
 
         <tbody>
-          {suatChieus.map((sc, index) => (
+          {loading ? (
+            <tr>
+              <td colSpan="8" className="text-center py-10">
+                Đang tải...
+              </td>
+            </tr>
+          ) : suatChieus.length === 0 ? (
+            <tr>
+              <td colSpan="8" className="text-center py-10">
+                Không có suất chiếu nào.
+              </td>
+            </tr>
+          ) : (
+          suatChieus.map((sc, index) => (
             <tr
               key={sc.maSuatChieu}
               className="border-b border-primary/20 text-center"
@@ -208,7 +231,8 @@ const QuanLySuatChieu = () => {
                 />
               </td>
             </tr>
-          ))}
+          ))
+          )}
         </tbody>
       </table>
 
